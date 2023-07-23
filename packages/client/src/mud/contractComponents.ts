@@ -171,8 +171,10 @@ export function defineContractComponents(world: World) {
         world,
         {
           coinBalance: RecsType.BigInt,
-          tokenBalance: RecsType.BigInt,
-          homeExp: RecsType.BigInt,
+          diamondBalance: RecsType.BigInt,
+          exp: RecsType.Number,
+          timeZoneSign: RecsType.Boolean,
+          timeZoneOffset: RecsType.Number,
           nickName: RecsType.String,
         },
         {
@@ -236,8 +238,7 @@ export function defineContractComponents(world: World) {
       return defineComponent(
         world,
         {
-          itemId: RecsType.BigInt,
-          itemNum: RecsType.BigInt,
+          itemNum: RecsType.Number,
           itemStatus: RecsType.Number,
         },
         {
@@ -248,17 +249,129 @@ export function defineContractComponents(world: World) {
         }
       );
     })(),
-    Store: (() => {
-      const tableId = new TableId("", "Store");
+    ItemConfig: (() => {
+      const tableId = new TableId("", "ItemConfig");
+      return defineComponent(
+        world,
+        {
+          maxItemQuantity: RecsType.Number,
+          name: RecsType.String,
+          uri: RecsType.String,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHex(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
+    FoodConfig: (() => {
+      const tableId = new TableId("", "FoodConfig");
+      return defineComponent(
+        world,
+        {
+          hunger: RecsType.Number,
+          travelDropRate: RecsType.Number,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHex(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
+    TaskConfig: (() => {
+      const tableId = new TableId("", "TaskConfig");
+      return defineComponent(
+        world,
+        {
+          level: RecsType.Number,
+          dupPeriod: RecsType.Number,
+          rewardExp: RecsType.Number,
+          rewardCoins: RecsType.BigInt,
+          rewardDiamonds: RecsType.BigInt,
+          itemConsumed: RecsType.Boolean,
+          itemIds: RecsType.BigIntArray,
+          itemQuantities: RecsType.NumberArray,
+          rewardItemIds: RecsType.BigIntArray,
+          rewardItemQuantities: RecsType.NumberArray,
+          uri: RecsType.String,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHex(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
+    ChoresConfig: (() => {
+      const tableId = new TableId("", "ChoresConfig");
+      return defineComponent(
+        world,
+        {
+          choreType: RecsType.Number,
+          choreReward: RecsType.BigInt,
+          choreRewardType: RecsType.Number,
+          choreRewardItemsHash: RecsType.String,
+          choreRewardItems: RecsType.BigIntArray,
+          choreRewardItemsNum: RecsType.BigIntArray,
+          choreName: RecsType.String,
+          choreDescription: RecsType.String,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHex(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
+    Shop: (() => {
+      const tableId = new TableId("", "Shop");
       return defineComponent(
         world,
         {
           itemCoinPrice: RecsType.BigInt,
           itemDiamondPrice: RecsType.BigInt,
-          itemDailyBuyLimit: RecsType.Number,
-          itemWeeklyBuyLimit: RecsType.Number,
-          itemMonthlyBuyLimit: RecsType.Number,
-          itemForeverBuyLimit: RecsType.Number,
+          itemTokenPrice: RecsType.BigInt,
+          itemUnlockLevel: RecsType.Number,
+          itemDailyLimit: RecsType.Number,
+          itemWeeklyLimit: RecsType.Number,
+          itemMonthlyLimit: RecsType.Number,
+          itemForeverLimit: RecsType.Number,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHex(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
+    EventTimes: (() => {
+      const tableId = new TableId("", "EventTimes");
+      return defineComponent(
+        world,
+        {
+          times: RecsType.Number,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHex(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
+    GlobalAddressConfig: (() => {
+      const tableId = new TableId("", "GlobalAddressCon");
+      return defineComponent(
+        world,
+        {
+          configValue: RecsType.String,
         },
         {
           metadata: {
