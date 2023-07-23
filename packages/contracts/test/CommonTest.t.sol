@@ -5,12 +5,15 @@ import "forge-std/Test.sol";
 import { MudV2Test } from "@latticexyz/std-contracts/src/test/MudV2Test.t.sol";
 
 import { IWorld } from "../src/codegen/world/IWorld.sol";
+import { getUserId } from "./utils/UserTestHelper.sol";
 import { Cats, UserStatus, Address2User, ItemConfig, UserItems, FoodConfig, UserCatList } from "../src/codegen/Tables.sol";
 import { TestUser } from "./utils/TestUser.sol";
 
 contract CommonTest is MudV2Test {
   IWorld public world;
   address public user1;
+  bytes32 public userId1;
+
   address public admin;
 
   uint256 public foodID1 = 1000101;
@@ -25,6 +28,7 @@ contract CommonTest is MudV2Test {
     user1 = address(new TestUser());
     vm.startPrank(user1);
     world.registerUser();
+    userId1 = getUserId(world, user1);
     vm.stopPrank();
 
     /**
@@ -33,6 +37,9 @@ contract CommonTest is MudV2Test {
      */
     // set food
     world.setFood(foodID1, 50, 5000, 0, "Fish Can", "");
+
+    // list food
+    world.listBasicItem(foodID1, 10, 1);
 
     /**
      * Set up tasks
@@ -107,8 +114,7 @@ contract CommonTest is MudV2Test {
     vm.startPrank(user1);
     world.adoptInitCat();
 
-    bytes32 userId = Address2User.get(world, user1);
-    bytes32 catId = UserCatList.getItem(world, userId, 0);
+    bytes32 catId = UserCatList.getItem(world, userId1, 0);
 
     world.finishTask(1001);
 
@@ -122,6 +128,14 @@ contract CommonTest is MudV2Test {
     vm.stopPrank();
   }
 
-  // TODO: testBuyItem
-  function testBuyItem() public {}
+  function testBuyItem() public {
+    vm.startPrank(user1);
+
+    world.finishTask(1001);
+    uint32 itemNumBefore = UserItems.getItemNum(world, userId1, foodID1);
+    world.buyItem(foodID1, 1, 0);
+    uint32 itemNumAfter = UserItems.getItemNum(world, userId1, foodID1);
+    assertEq(itemNumAfter - itemNumBefore, 1);
+    vm.stopPrank();
+  }
 }
