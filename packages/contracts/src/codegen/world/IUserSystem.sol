@@ -6,7 +6,7 @@ pragma solidity >=0.8.0;
 interface IUserSystem {
   function userExist(address userAddress) external view returns (bool);
 
-  function register(address userAddress) external;
+  function registerUser() external;
 
   function changeMainAddress(address newMainAddress) external;
 

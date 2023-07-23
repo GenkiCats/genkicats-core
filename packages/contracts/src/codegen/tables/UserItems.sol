@@ -21,35 +21,33 @@ bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("UserI
 bytes32 constant UserItemsTableId = _tableId;
 
 struct UserItemsData {
-  uint256 itemId;
-  uint256 itemNum;
+  uint32 itemNum;
   uint8 itemStatus;
 }
 
 library UserItems {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](3);
-    _schema[0] = SchemaType.UINT256;
-    _schema[1] = SchemaType.UINT256;
-    _schema[2] = SchemaType.UINT8;
+    SchemaType[] memory _schema = new SchemaType[](2);
+    _schema[0] = SchemaType.UINT32;
+    _schema[1] = SchemaType.UINT8;
 
     return SchemaLib.encode(_schema);
   }
 
   function getKeySchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](1);
+    SchemaType[] memory _schema = new SchemaType[](2);
     _schema[0] = SchemaType.BYTES32;
+    _schema[1] = SchemaType.UINT256;
 
     return SchemaLib.encode(_schema);
   }
 
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
-    string[] memory _fieldNames = new string[](3);
-    _fieldNames[0] = "itemId";
-    _fieldNames[1] = "itemNum";
-    _fieldNames[2] = "itemStatus";
+    string[] memory _fieldNames = new string[](2);
+    _fieldNames[0] = "itemNum";
+    _fieldNames[1] = "itemStatus";
     return ("UserItems", _fieldNames);
   }
 
@@ -75,188 +73,167 @@ library UserItems {
     _store.setMetadata(_tableId, _tableName, _fieldNames);
   }
 
-  /** Get itemId */
-  function getItemId(bytes32 userId) internal view returns (uint256 itemId) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  /** Get itemNum */
+  function getItemNum(bytes32 userId, uint256 itemId) internal view returns (uint32 itemNum) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
+    _keyTuple[1] = bytes32(uint256(itemId));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 0);
-    return (uint256(Bytes.slice32(_blob, 0)));
-  }
-
-  /** Get itemId (using the specified store) */
-  function getItemId(IStore _store, bytes32 userId) internal view returns (uint256 itemId) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = userId;
-
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 0);
-    return (uint256(Bytes.slice32(_blob, 0)));
-  }
-
-  /** Set itemId */
-  function setItemId(bytes32 userId, uint256 itemId) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = userId;
-
-    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((itemId)));
-  }
-
-  /** Set itemId (using the specified store) */
-  function setItemId(IStore _store, bytes32 userId, uint256 itemId) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = userId;
-
-    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((itemId)));
-  }
-
-  /** Get itemNum */
-  function getItemNum(bytes32 userId) internal view returns (uint256 itemNum) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = userId;
-
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
-    return (uint256(Bytes.slice32(_blob, 0)));
+    return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Get itemNum (using the specified store) */
-  function getItemNum(IStore _store, bytes32 userId) internal view returns (uint256 itemNum) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function getItemNum(IStore _store, bytes32 userId, uint256 itemId) internal view returns (uint32 itemNum) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
+    _keyTuple[1] = bytes32(uint256(itemId));
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
-    return (uint256(Bytes.slice32(_blob, 0)));
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 0);
+    return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Set itemNum */
-  function setItemNum(bytes32 userId, uint256 itemNum) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function setItemNum(bytes32 userId, uint256 itemId, uint32 itemNum) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
+    _keyTuple[1] = bytes32(uint256(itemId));
 
-    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((itemNum)));
+    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((itemNum)));
   }
 
   /** Set itemNum (using the specified store) */
-  function setItemNum(IStore _store, bytes32 userId, uint256 itemNum) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function setItemNum(IStore _store, bytes32 userId, uint256 itemId, uint32 itemNum) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
+    _keyTuple[1] = bytes32(uint256(itemId));
 
-    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((itemNum)));
+    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((itemNum)));
   }
 
   /** Get itemStatus */
-  function getItemStatus(bytes32 userId) internal view returns (uint8 itemStatus) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function getItemStatus(bytes32 userId, uint256 itemId) internal view returns (uint8 itemStatus) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
+    _keyTuple[1] = bytes32(uint256(itemId));
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
     return (uint8(Bytes.slice1(_blob, 0)));
   }
 
   /** Get itemStatus (using the specified store) */
-  function getItemStatus(IStore _store, bytes32 userId) internal view returns (uint8 itemStatus) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function getItemStatus(IStore _store, bytes32 userId, uint256 itemId) internal view returns (uint8 itemStatus) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
+    _keyTuple[1] = bytes32(uint256(itemId));
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
     return (uint8(Bytes.slice1(_blob, 0)));
   }
 
   /** Set itemStatus */
-  function setItemStatus(bytes32 userId, uint8 itemStatus) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function setItemStatus(bytes32 userId, uint256 itemId, uint8 itemStatus) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
+    _keyTuple[1] = bytes32(uint256(itemId));
 
-    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((itemStatus)));
+    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((itemStatus)));
   }
 
   /** Set itemStatus (using the specified store) */
-  function setItemStatus(IStore _store, bytes32 userId, uint8 itemStatus) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function setItemStatus(IStore _store, bytes32 userId, uint256 itemId, uint8 itemStatus) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
+    _keyTuple[1] = bytes32(uint256(itemId));
 
-    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((itemStatus)));
+    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((itemStatus)));
   }
 
   /** Get the full data */
-  function get(bytes32 userId) internal view returns (UserItemsData memory _table) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function get(bytes32 userId, uint256 itemId) internal view returns (UserItemsData memory _table) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
+    _keyTuple[1] = bytes32(uint256(itemId));
 
     bytes memory _blob = StoreSwitch.getRecord(_tableId, _keyTuple, getSchema());
     return decode(_blob);
   }
 
   /** Get the full data (using the specified store) */
-  function get(IStore _store, bytes32 userId) internal view returns (UserItemsData memory _table) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function get(IStore _store, bytes32 userId, uint256 itemId) internal view returns (UserItemsData memory _table) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
+    _keyTuple[1] = bytes32(uint256(itemId));
 
     bytes memory _blob = _store.getRecord(_tableId, _keyTuple, getSchema());
     return decode(_blob);
   }
 
   /** Set the full data using individual values */
-  function set(bytes32 userId, uint256 itemId, uint256 itemNum, uint8 itemStatus) internal {
-    bytes memory _data = encode(itemId, itemNum, itemStatus);
+  function set(bytes32 userId, uint256 itemId, uint32 itemNum, uint8 itemStatus) internal {
+    bytes memory _data = encode(itemNum, itemStatus);
 
-    bytes32[] memory _keyTuple = new bytes32[](1);
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
+    _keyTuple[1] = bytes32(uint256(itemId));
 
     StoreSwitch.setRecord(_tableId, _keyTuple, _data);
   }
 
   /** Set the full data using individual values (using the specified store) */
-  function set(IStore _store, bytes32 userId, uint256 itemId, uint256 itemNum, uint8 itemStatus) internal {
-    bytes memory _data = encode(itemId, itemNum, itemStatus);
+  function set(IStore _store, bytes32 userId, uint256 itemId, uint32 itemNum, uint8 itemStatus) internal {
+    bytes memory _data = encode(itemNum, itemStatus);
 
-    bytes32[] memory _keyTuple = new bytes32[](1);
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
+    _keyTuple[1] = bytes32(uint256(itemId));
 
     _store.setRecord(_tableId, _keyTuple, _data);
   }
 
   /** Set the full data using the data struct */
-  function set(bytes32 userId, UserItemsData memory _table) internal {
-    set(userId, _table.itemId, _table.itemNum, _table.itemStatus);
+  function set(bytes32 userId, uint256 itemId, UserItemsData memory _table) internal {
+    set(userId, itemId, _table.itemNum, _table.itemStatus);
   }
 
   /** Set the full data using the data struct (using the specified store) */
-  function set(IStore _store, bytes32 userId, UserItemsData memory _table) internal {
-    set(_store, userId, _table.itemId, _table.itemNum, _table.itemStatus);
+  function set(IStore _store, bytes32 userId, uint256 itemId, UserItemsData memory _table) internal {
+    set(_store, userId, itemId, _table.itemNum, _table.itemStatus);
   }
 
   /** Decode the tightly packed blob using this table's schema */
   function decode(bytes memory _blob) internal pure returns (UserItemsData memory _table) {
-    _table.itemId = (uint256(Bytes.slice32(_blob, 0)));
+    _table.itemNum = (uint32(Bytes.slice4(_blob, 0)));
 
-    _table.itemNum = (uint256(Bytes.slice32(_blob, 32)));
-
-    _table.itemStatus = (uint8(Bytes.slice1(_blob, 64)));
+    _table.itemStatus = (uint8(Bytes.slice1(_blob, 4)));
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint256 itemId, uint256 itemNum, uint8 itemStatus) internal view returns (bytes memory) {
-    return abi.encodePacked(itemId, itemNum, itemStatus);
+  function encode(uint32 itemNum, uint8 itemStatus) internal view returns (bytes memory) {
+    return abi.encodePacked(itemNum, itemStatus);
   }
 
   /** Encode keys as a bytes32 array using this table's schema */
-  function encodeKeyTuple(bytes32 userId) internal pure returns (bytes32[] memory _keyTuple) {
-    _keyTuple = new bytes32[](1);
+  function encodeKeyTuple(bytes32 userId, uint256 itemId) internal pure returns (bytes32[] memory _keyTuple) {
+    _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
+    _keyTuple[1] = bytes32(uint256(itemId));
   }
 
   /* Delete all data for given keys */
-  function deleteRecord(bytes32 userId) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function deleteRecord(bytes32 userId, uint256 itemId) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
+    _keyTuple[1] = bytes32(uint256(itemId));
 
     StoreSwitch.deleteRecord(_tableId, _keyTuple);
   }
 
   /* Delete all data for given keys (using the specified store) */
-  function deleteRecord(IStore _store, bytes32 userId) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function deleteRecord(IStore _store, bytes32 userId, uint256 itemId) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
+    _keyTuple[1] = bytes32(uint256(itemId));
 
     _store.deleteRecord(_tableId, _keyTuple);
   }

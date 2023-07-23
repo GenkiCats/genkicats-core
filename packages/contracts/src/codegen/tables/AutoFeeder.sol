@@ -23,8 +23,8 @@ bytes32 constant AutoFeederTableId = _tableId;
 struct AutoFeederData {
   uint32 hunger;
   uint32 level;
-  uint32 lastFillFeederTime;
-  uint32 lastFeedTime;
+  uint256 lastFillFeederTime;
+  uint256 lastFeedTime;
   uint256[] lastFeedCats;
 }
 
@@ -34,8 +34,8 @@ library AutoFeeder {
     SchemaType[] memory _schema = new SchemaType[](5);
     _schema[0] = SchemaType.UINT32;
     _schema[1] = SchemaType.UINT32;
-    _schema[2] = SchemaType.UINT32;
-    _schema[3] = SchemaType.UINT32;
+    _schema[2] = SchemaType.UINT256;
+    _schema[3] = SchemaType.UINT256;
     _schema[4] = SchemaType.UINT256_ARRAY;
 
     return SchemaLib.encode(_schema);
@@ -150,25 +150,25 @@ library AutoFeeder {
   }
 
   /** Get lastFillFeederTime */
-  function getLastFillFeederTime(bytes32 userId) internal view returns (uint32 lastFillFeederTime) {
+  function getLastFillFeederTime(bytes32 userId) internal view returns (uint256 lastFillFeederTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Get lastFillFeederTime (using the specified store) */
-  function getLastFillFeederTime(IStore _store, bytes32 userId) internal view returns (uint32 lastFillFeederTime) {
+  function getLastFillFeederTime(IStore _store, bytes32 userId) internal view returns (uint256 lastFillFeederTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Set lastFillFeederTime */
-  function setLastFillFeederTime(bytes32 userId, uint32 lastFillFeederTime) internal {
+  function setLastFillFeederTime(bytes32 userId, uint256 lastFillFeederTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
@@ -176,7 +176,7 @@ library AutoFeeder {
   }
 
   /** Set lastFillFeederTime (using the specified store) */
-  function setLastFillFeederTime(IStore _store, bytes32 userId, uint32 lastFillFeederTime) internal {
+  function setLastFillFeederTime(IStore _store, bytes32 userId, uint256 lastFillFeederTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
@@ -184,25 +184,25 @@ library AutoFeeder {
   }
 
   /** Get lastFeedTime */
-  function getLastFeedTime(bytes32 userId) internal view returns (uint32 lastFeedTime) {
+  function getLastFeedTime(bytes32 userId) internal view returns (uint256 lastFeedTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Get lastFeedTime (using the specified store) */
-  function getLastFeedTime(IStore _store, bytes32 userId) internal view returns (uint32 lastFeedTime) {
+  function getLastFeedTime(IStore _store, bytes32 userId) internal view returns (uint256 lastFeedTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Set lastFeedTime */
-  function setLastFeedTime(bytes32 userId, uint32 lastFeedTime) internal {
+  function setLastFeedTime(bytes32 userId, uint256 lastFeedTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
@@ -210,7 +210,7 @@ library AutoFeeder {
   }
 
   /** Set lastFeedTime (using the specified store) */
-  function setLastFeedTime(IStore _store, bytes32 userId, uint32 lastFeedTime) internal {
+  function setLastFeedTime(IStore _store, bytes32 userId, uint256 lastFeedTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
@@ -358,8 +358,8 @@ library AutoFeeder {
     bytes32 userId,
     uint32 hunger,
     uint32 level,
-    uint32 lastFillFeederTime,
-    uint32 lastFeedTime,
+    uint256 lastFillFeederTime,
+    uint256 lastFeedTime,
     uint256[] memory lastFeedCats
   ) internal {
     bytes memory _data = encode(hunger, level, lastFillFeederTime, lastFeedTime, lastFeedCats);
@@ -376,8 +376,8 @@ library AutoFeeder {
     bytes32 userId,
     uint32 hunger,
     uint32 level,
-    uint32 lastFillFeederTime,
-    uint32 lastFeedTime,
+    uint256 lastFillFeederTime,
+    uint256 lastFeedTime,
     uint256[] memory lastFeedCats
   ) internal {
     bytes memory _data = encode(hunger, level, lastFillFeederTime, lastFeedTime, lastFeedCats);
@@ -408,22 +408,22 @@ library AutoFeeder {
 
   /** Decode the tightly packed blob using this table's schema */
   function decode(bytes memory _blob) internal view returns (AutoFeederData memory _table) {
-    // 16 is the total byte length of static data
-    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 16));
+    // 72 is the total byte length of static data
+    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 72));
 
     _table.hunger = (uint32(Bytes.slice4(_blob, 0)));
 
     _table.level = (uint32(Bytes.slice4(_blob, 4)));
 
-    _table.lastFillFeederTime = (uint32(Bytes.slice4(_blob, 8)));
+    _table.lastFillFeederTime = (uint256(Bytes.slice32(_blob, 8)));
 
-    _table.lastFeedTime = (uint32(Bytes.slice4(_blob, 12)));
+    _table.lastFeedTime = (uint256(Bytes.slice32(_blob, 40)));
 
     // Store trims the blob if dynamic fields are all empty
-    if (_blob.length > 16) {
+    if (_blob.length > 72) {
       uint256 _start;
       // skip static data length + dynamic lengths word
-      uint256 _end = 48;
+      uint256 _end = 104;
 
       _start = _end;
       _end += _encodedLengths.atIndex(0);
@@ -435,8 +435,8 @@ library AutoFeeder {
   function encode(
     uint32 hunger,
     uint32 level,
-    uint32 lastFillFeederTime,
-    uint32 lastFeedTime,
+    uint256 lastFillFeederTime,
+    uint256 lastFeedTime,
     uint256[] memory lastFeedCats
   ) internal view returns (bytes memory) {
     uint40[] memory _counters = new uint40[](1);

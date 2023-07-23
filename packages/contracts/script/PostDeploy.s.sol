@@ -16,8 +16,8 @@ contract PostDeploy is Script {
     // ------------------ EXAMPLES ------------------
 
     // Call increment on the world via the registered function selector
-    IWorld(worldAddress).create();
-    console.log("create the first cat");
+    // IWorld(worldAddress).create();
+    // console.log("create the first cat");
 
     vm.stopBroadcast();
   }

@@ -22,8 +22,8 @@ bytes32 constant CatBuffTableId = _tableId;
 
 struct CatBuffData {
   uint256 buffId;
-  uint32 startTime;
-  uint32 duration;
+  uint256 startTime;
+  uint256 duration;
 }
 
 library CatBuff {
@@ -31,8 +31,8 @@ library CatBuff {
   function getSchema() internal pure returns (Schema) {
     SchemaType[] memory _schema = new SchemaType[](3);
     _schema[0] = SchemaType.UINT256;
-    _schema[1] = SchemaType.UINT32;
-    _schema[2] = SchemaType.UINT32;
+    _schema[1] = SchemaType.UINT256;
+    _schema[2] = SchemaType.UINT256;
 
     return SchemaLib.encode(_schema);
   }
@@ -110,25 +110,25 @@ library CatBuff {
   }
 
   /** Get startTime */
-  function getStartTime(uint256 catId) internal view returns (uint32 startTime) {
+  function getStartTime(uint256 catId) internal view returns (uint256 startTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(catId));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Get startTime (using the specified store) */
-  function getStartTime(IStore _store, uint256 catId) internal view returns (uint32 startTime) {
+  function getStartTime(IStore _store, uint256 catId) internal view returns (uint256 startTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(catId));
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Set startTime */
-  function setStartTime(uint256 catId, uint32 startTime) internal {
+  function setStartTime(uint256 catId, uint256 startTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(catId));
 
@@ -136,7 +136,7 @@ library CatBuff {
   }
 
   /** Set startTime (using the specified store) */
-  function setStartTime(IStore _store, uint256 catId, uint32 startTime) internal {
+  function setStartTime(IStore _store, uint256 catId, uint256 startTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(catId));
 
@@ -144,25 +144,25 @@ library CatBuff {
   }
 
   /** Get duration */
-  function getDuration(uint256 catId) internal view returns (uint32 duration) {
+  function getDuration(uint256 catId) internal view returns (uint256 duration) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(catId));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Get duration (using the specified store) */
-  function getDuration(IStore _store, uint256 catId) internal view returns (uint32 duration) {
+  function getDuration(IStore _store, uint256 catId) internal view returns (uint256 duration) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(catId));
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Set duration */
-  function setDuration(uint256 catId, uint32 duration) internal {
+  function setDuration(uint256 catId, uint256 duration) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(catId));
 
@@ -170,7 +170,7 @@ library CatBuff {
   }
 
   /** Set duration (using the specified store) */
-  function setDuration(IStore _store, uint256 catId, uint32 duration) internal {
+  function setDuration(IStore _store, uint256 catId, uint256 duration) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(catId));
 
@@ -196,7 +196,7 @@ library CatBuff {
   }
 
   /** Set the full data using individual values */
-  function set(uint256 catId, uint256 buffId, uint32 startTime, uint32 duration) internal {
+  function set(uint256 catId, uint256 buffId, uint256 startTime, uint256 duration) internal {
     bytes memory _data = encode(buffId, startTime, duration);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
@@ -206,7 +206,7 @@ library CatBuff {
   }
 
   /** Set the full data using individual values (using the specified store) */
-  function set(IStore _store, uint256 catId, uint256 buffId, uint32 startTime, uint32 duration) internal {
+  function set(IStore _store, uint256 catId, uint256 buffId, uint256 startTime, uint256 duration) internal {
     bytes memory _data = encode(buffId, startTime, duration);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
@@ -229,13 +229,13 @@ library CatBuff {
   function decode(bytes memory _blob) internal pure returns (CatBuffData memory _table) {
     _table.buffId = (uint256(Bytes.slice32(_blob, 0)));
 
-    _table.startTime = (uint32(Bytes.slice4(_blob, 32)));
+    _table.startTime = (uint256(Bytes.slice32(_blob, 32)));
 
-    _table.duration = (uint32(Bytes.slice4(_blob, 36)));
+    _table.duration = (uint256(Bytes.slice32(_blob, 64)));
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint256 buffId, uint32 startTime, uint32 duration) internal view returns (bytes memory) {
+  function encode(uint256 buffId, uint256 startTime, uint256 duration) internal view returns (bytes memory) {
     return abi.encodePacked(buffId, startTime, duration);
   }
 

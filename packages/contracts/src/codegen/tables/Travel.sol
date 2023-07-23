@@ -29,9 +29,9 @@ struct TravelData {
   uint32 hunger;
   uint32 fun;
   uint256 originPhotoId;
-  uint32 startTime;
-  uint32 endTime;
-  uint32 startWaitingDuration;
+  uint256 startTime;
+  uint256 endTime;
+  uint256 startWaitingDuration;
   uint256 foodId;
   bytes32 backpackItemsHash;
   uint256 randSeed;
@@ -51,9 +51,9 @@ library Travel {
     _schema[5] = SchemaType.UINT32;
     _schema[6] = SchemaType.UINT32;
     _schema[7] = SchemaType.UINT256;
-    _schema[8] = SchemaType.UINT32;
-    _schema[9] = SchemaType.UINT32;
-    _schema[10] = SchemaType.UINT32;
+    _schema[8] = SchemaType.UINT256;
+    _schema[9] = SchemaType.UINT256;
+    _schema[10] = SchemaType.UINT256;
     _schema[11] = SchemaType.UINT256;
     _schema[12] = SchemaType.BYTES32;
     _schema[13] = SchemaType.UINT256;
@@ -387,25 +387,25 @@ library Travel {
   }
 
   /** Get startTime */
-  function getStartTime(bytes32 userId) internal view returns (uint32 startTime) {
+  function getStartTime(bytes32 userId) internal view returns (uint256 startTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 8);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Get startTime (using the specified store) */
-  function getStartTime(IStore _store, bytes32 userId) internal view returns (uint32 startTime) {
+  function getStartTime(IStore _store, bytes32 userId) internal view returns (uint256 startTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 8);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Set startTime */
-  function setStartTime(bytes32 userId, uint32 startTime) internal {
+  function setStartTime(bytes32 userId, uint256 startTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
@@ -413,7 +413,7 @@ library Travel {
   }
 
   /** Set startTime (using the specified store) */
-  function setStartTime(IStore _store, bytes32 userId, uint32 startTime) internal {
+  function setStartTime(IStore _store, bytes32 userId, uint256 startTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
@@ -421,25 +421,25 @@ library Travel {
   }
 
   /** Get endTime */
-  function getEndTime(bytes32 userId) internal view returns (uint32 endTime) {
+  function getEndTime(bytes32 userId) internal view returns (uint256 endTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 9);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Get endTime (using the specified store) */
-  function getEndTime(IStore _store, bytes32 userId) internal view returns (uint32 endTime) {
+  function getEndTime(IStore _store, bytes32 userId) internal view returns (uint256 endTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 9);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Set endTime */
-  function setEndTime(bytes32 userId, uint32 endTime) internal {
+  function setEndTime(bytes32 userId, uint256 endTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
@@ -447,7 +447,7 @@ library Travel {
   }
 
   /** Set endTime (using the specified store) */
-  function setEndTime(IStore _store, bytes32 userId, uint32 endTime) internal {
+  function setEndTime(IStore _store, bytes32 userId, uint256 endTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
@@ -455,25 +455,25 @@ library Travel {
   }
 
   /** Get startWaitingDuration */
-  function getStartWaitingDuration(bytes32 userId) internal view returns (uint32 startWaitingDuration) {
+  function getStartWaitingDuration(bytes32 userId) internal view returns (uint256 startWaitingDuration) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 10);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Get startWaitingDuration (using the specified store) */
-  function getStartWaitingDuration(IStore _store, bytes32 userId) internal view returns (uint32 startWaitingDuration) {
+  function getStartWaitingDuration(IStore _store, bytes32 userId) internal view returns (uint256 startWaitingDuration) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 10);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Set startWaitingDuration */
-  function setStartWaitingDuration(bytes32 userId, uint32 startWaitingDuration) internal {
+  function setStartWaitingDuration(bytes32 userId, uint256 startWaitingDuration) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
@@ -481,7 +481,7 @@ library Travel {
   }
 
   /** Set startWaitingDuration (using the specified store) */
-  function setStartWaitingDuration(IStore _store, bytes32 userId, uint32 startWaitingDuration) internal {
+  function setStartWaitingDuration(IStore _store, bytes32 userId, uint256 startWaitingDuration) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
@@ -869,9 +869,9 @@ library Travel {
     uint32 hunger,
     uint32 fun,
     uint256 originPhotoId,
-    uint32 startTime,
-    uint32 endTime,
-    uint32 startWaitingDuration,
+    uint256 startTime,
+    uint256 endTime,
+    uint256 startWaitingDuration,
     uint256 foodId,
     bytes32 backpackItemsHash,
     uint256 randSeed,
@@ -915,9 +915,9 @@ library Travel {
     uint32 hunger,
     uint32 fun,
     uint256 originPhotoId,
-    uint32 startTime,
-    uint32 endTime,
-    uint32 startWaitingDuration,
+    uint256 startTime,
+    uint256 endTime,
+    uint256 startWaitingDuration,
     uint256 foodId,
     bytes32 backpackItemsHash,
     uint256 randSeed,
@@ -998,8 +998,8 @@ library Travel {
 
   /** Decode the tightly packed blob using this table's schema */
   function decode(bytes memory _blob) internal view returns (TravelData memory _table) {
-    // 246 is the total byte length of static data
-    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 246));
+    // 330 is the total byte length of static data
+    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 330));
 
     _table.travelId = (uint256(Bytes.slice32(_blob, 0)));
 
@@ -1017,23 +1017,23 @@ library Travel {
 
     _table.originPhotoId = (uint256(Bytes.slice32(_blob, 106)));
 
-    _table.startTime = (uint32(Bytes.slice4(_blob, 138)));
+    _table.startTime = (uint256(Bytes.slice32(_blob, 138)));
 
-    _table.endTime = (uint32(Bytes.slice4(_blob, 142)));
+    _table.endTime = (uint256(Bytes.slice32(_blob, 170)));
 
-    _table.startWaitingDuration = (uint32(Bytes.slice4(_blob, 146)));
+    _table.startWaitingDuration = (uint256(Bytes.slice32(_blob, 202)));
 
-    _table.foodId = (uint256(Bytes.slice32(_blob, 150)));
+    _table.foodId = (uint256(Bytes.slice32(_blob, 234)));
 
-    _table.backpackItemsHash = (Bytes.slice32(_blob, 182));
+    _table.backpackItemsHash = (Bytes.slice32(_blob, 266));
 
-    _table.randSeed = (uint256(Bytes.slice32(_blob, 214)));
+    _table.randSeed = (uint256(Bytes.slice32(_blob, 298)));
 
     // Store trims the blob if dynamic fields are all empty
-    if (_blob.length > 246) {
+    if (_blob.length > 330) {
       uint256 _start;
       // skip static data length + dynamic lengths word
-      uint256 _end = 278;
+      uint256 _end = 362;
 
       _start = _end;
       _end += _encodedLengths.atIndex(0);
@@ -1055,9 +1055,9 @@ library Travel {
     uint32 hunger,
     uint32 fun,
     uint256 originPhotoId,
-    uint32 startTime,
-    uint32 endTime,
-    uint32 startWaitingDuration,
+    uint256 startTime,
+    uint256 endTime,
+    uint256 startWaitingDuration,
     uint256 foodId,
     bytes32 backpackItemsHash,
     uint256 randSeed,

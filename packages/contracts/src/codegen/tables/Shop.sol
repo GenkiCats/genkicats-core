@@ -24,11 +24,11 @@ struct ShopData {
   uint256 itemCoinPrice;
   uint256 itemDiamondPrice;
   uint256 itemTokenPrice;
-  uint32 itemUnlockExp;
-  uint32 itemDailyBuyLimit;
-  uint32 itemWeeklyBuyLimit;
-  uint32 itemMonthlyBuyLimit;
-  uint32 itemForeverBuyLimit;
+  uint32 itemUnlockLevel;
+  uint32 itemDailyLimit;
+  uint32 itemWeeklyLimit;
+  uint32 itemMonthlyLimit;
+  uint32 itemForeverLimit;
 }
 
 library Shop {
@@ -60,11 +60,11 @@ library Shop {
     _fieldNames[0] = "itemCoinPrice";
     _fieldNames[1] = "itemDiamondPrice";
     _fieldNames[2] = "itemTokenPrice";
-    _fieldNames[3] = "itemUnlockExp";
-    _fieldNames[4] = "itemDailyBuyLimit";
-    _fieldNames[5] = "itemWeeklyBuyLimit";
-    _fieldNames[6] = "itemMonthlyBuyLimit";
-    _fieldNames[7] = "itemForeverBuyLimit";
+    _fieldNames[3] = "itemUnlockLevel";
+    _fieldNames[4] = "itemDailyLimit";
+    _fieldNames[5] = "itemWeeklyLimit";
+    _fieldNames[6] = "itemMonthlyLimit";
+    _fieldNames[7] = "itemForeverLimit";
     return ("Shop", _fieldNames);
   }
 
@@ -192,8 +192,8 @@ library Shop {
     _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((itemTokenPrice)));
   }
 
-  /** Get itemUnlockExp */
-  function getItemUnlockExp(uint256 itemId) internal view returns (uint32 itemUnlockExp) {
+  /** Get itemUnlockLevel */
+  function getItemUnlockLevel(uint256 itemId) internal view returns (uint32 itemUnlockLevel) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
@@ -201,8 +201,8 @@ library Shop {
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Get itemUnlockExp (using the specified store) */
-  function getItemUnlockExp(IStore _store, uint256 itemId) internal view returns (uint32 itemUnlockExp) {
+  /** Get itemUnlockLevel (using the specified store) */
+  function getItemUnlockLevel(IStore _store, uint256 itemId) internal view returns (uint32 itemUnlockLevel) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
@@ -210,24 +210,24 @@ library Shop {
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Set itemUnlockExp */
-  function setItemUnlockExp(uint256 itemId, uint32 itemUnlockExp) internal {
+  /** Set itemUnlockLevel */
+  function setItemUnlockLevel(uint256 itemId, uint32 itemUnlockLevel) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
-    StoreSwitch.setField(_tableId, _keyTuple, 3, abi.encodePacked((itemUnlockExp)));
+    StoreSwitch.setField(_tableId, _keyTuple, 3, abi.encodePacked((itemUnlockLevel)));
   }
 
-  /** Set itemUnlockExp (using the specified store) */
-  function setItemUnlockExp(IStore _store, uint256 itemId, uint32 itemUnlockExp) internal {
+  /** Set itemUnlockLevel (using the specified store) */
+  function setItemUnlockLevel(IStore _store, uint256 itemId, uint32 itemUnlockLevel) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
-    _store.setField(_tableId, _keyTuple, 3, abi.encodePacked((itemUnlockExp)));
+    _store.setField(_tableId, _keyTuple, 3, abi.encodePacked((itemUnlockLevel)));
   }
 
-  /** Get itemDailyBuyLimit */
-  function getItemDailyBuyLimit(uint256 itemId) internal view returns (uint32 itemDailyBuyLimit) {
+  /** Get itemDailyLimit */
+  function getItemDailyLimit(uint256 itemId) internal view returns (uint32 itemDailyLimit) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
@@ -235,8 +235,8 @@ library Shop {
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Get itemDailyBuyLimit (using the specified store) */
-  function getItemDailyBuyLimit(IStore _store, uint256 itemId) internal view returns (uint32 itemDailyBuyLimit) {
+  /** Get itemDailyLimit (using the specified store) */
+  function getItemDailyLimit(IStore _store, uint256 itemId) internal view returns (uint32 itemDailyLimit) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
@@ -244,24 +244,24 @@ library Shop {
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Set itemDailyBuyLimit */
-  function setItemDailyBuyLimit(uint256 itemId, uint32 itemDailyBuyLimit) internal {
+  /** Set itemDailyLimit */
+  function setItemDailyLimit(uint256 itemId, uint32 itemDailyLimit) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
-    StoreSwitch.setField(_tableId, _keyTuple, 4, abi.encodePacked((itemDailyBuyLimit)));
+    StoreSwitch.setField(_tableId, _keyTuple, 4, abi.encodePacked((itemDailyLimit)));
   }
 
-  /** Set itemDailyBuyLimit (using the specified store) */
-  function setItemDailyBuyLimit(IStore _store, uint256 itemId, uint32 itemDailyBuyLimit) internal {
+  /** Set itemDailyLimit (using the specified store) */
+  function setItemDailyLimit(IStore _store, uint256 itemId, uint32 itemDailyLimit) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
-    _store.setField(_tableId, _keyTuple, 4, abi.encodePacked((itemDailyBuyLimit)));
+    _store.setField(_tableId, _keyTuple, 4, abi.encodePacked((itemDailyLimit)));
   }
 
-  /** Get itemWeeklyBuyLimit */
-  function getItemWeeklyBuyLimit(uint256 itemId) internal view returns (uint32 itemWeeklyBuyLimit) {
+  /** Get itemWeeklyLimit */
+  function getItemWeeklyLimit(uint256 itemId) internal view returns (uint32 itemWeeklyLimit) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
@@ -269,8 +269,8 @@ library Shop {
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Get itemWeeklyBuyLimit (using the specified store) */
-  function getItemWeeklyBuyLimit(IStore _store, uint256 itemId) internal view returns (uint32 itemWeeklyBuyLimit) {
+  /** Get itemWeeklyLimit (using the specified store) */
+  function getItemWeeklyLimit(IStore _store, uint256 itemId) internal view returns (uint32 itemWeeklyLimit) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
@@ -278,24 +278,24 @@ library Shop {
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Set itemWeeklyBuyLimit */
-  function setItemWeeklyBuyLimit(uint256 itemId, uint32 itemWeeklyBuyLimit) internal {
+  /** Set itemWeeklyLimit */
+  function setItemWeeklyLimit(uint256 itemId, uint32 itemWeeklyLimit) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
-    StoreSwitch.setField(_tableId, _keyTuple, 5, abi.encodePacked((itemWeeklyBuyLimit)));
+    StoreSwitch.setField(_tableId, _keyTuple, 5, abi.encodePacked((itemWeeklyLimit)));
   }
 
-  /** Set itemWeeklyBuyLimit (using the specified store) */
-  function setItemWeeklyBuyLimit(IStore _store, uint256 itemId, uint32 itemWeeklyBuyLimit) internal {
+  /** Set itemWeeklyLimit (using the specified store) */
+  function setItemWeeklyLimit(IStore _store, uint256 itemId, uint32 itemWeeklyLimit) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
-    _store.setField(_tableId, _keyTuple, 5, abi.encodePacked((itemWeeklyBuyLimit)));
+    _store.setField(_tableId, _keyTuple, 5, abi.encodePacked((itemWeeklyLimit)));
   }
 
-  /** Get itemMonthlyBuyLimit */
-  function getItemMonthlyBuyLimit(uint256 itemId) internal view returns (uint32 itemMonthlyBuyLimit) {
+  /** Get itemMonthlyLimit */
+  function getItemMonthlyLimit(uint256 itemId) internal view returns (uint32 itemMonthlyLimit) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
@@ -303,8 +303,8 @@ library Shop {
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Get itemMonthlyBuyLimit (using the specified store) */
-  function getItemMonthlyBuyLimit(IStore _store, uint256 itemId) internal view returns (uint32 itemMonthlyBuyLimit) {
+  /** Get itemMonthlyLimit (using the specified store) */
+  function getItemMonthlyLimit(IStore _store, uint256 itemId) internal view returns (uint32 itemMonthlyLimit) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
@@ -312,24 +312,24 @@ library Shop {
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Set itemMonthlyBuyLimit */
-  function setItemMonthlyBuyLimit(uint256 itemId, uint32 itemMonthlyBuyLimit) internal {
+  /** Set itemMonthlyLimit */
+  function setItemMonthlyLimit(uint256 itemId, uint32 itemMonthlyLimit) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
-    StoreSwitch.setField(_tableId, _keyTuple, 6, abi.encodePacked((itemMonthlyBuyLimit)));
+    StoreSwitch.setField(_tableId, _keyTuple, 6, abi.encodePacked((itemMonthlyLimit)));
   }
 
-  /** Set itemMonthlyBuyLimit (using the specified store) */
-  function setItemMonthlyBuyLimit(IStore _store, uint256 itemId, uint32 itemMonthlyBuyLimit) internal {
+  /** Set itemMonthlyLimit (using the specified store) */
+  function setItemMonthlyLimit(IStore _store, uint256 itemId, uint32 itemMonthlyLimit) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
-    _store.setField(_tableId, _keyTuple, 6, abi.encodePacked((itemMonthlyBuyLimit)));
+    _store.setField(_tableId, _keyTuple, 6, abi.encodePacked((itemMonthlyLimit)));
   }
 
-  /** Get itemForeverBuyLimit */
-  function getItemForeverBuyLimit(uint256 itemId) internal view returns (uint32 itemForeverBuyLimit) {
+  /** Get itemForeverLimit */
+  function getItemForeverLimit(uint256 itemId) internal view returns (uint32 itemForeverLimit) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
@@ -337,8 +337,8 @@ library Shop {
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Get itemForeverBuyLimit (using the specified store) */
-  function getItemForeverBuyLimit(IStore _store, uint256 itemId) internal view returns (uint32 itemForeverBuyLimit) {
+  /** Get itemForeverLimit (using the specified store) */
+  function getItemForeverLimit(IStore _store, uint256 itemId) internal view returns (uint32 itemForeverLimit) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
@@ -346,20 +346,20 @@ library Shop {
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Set itemForeverBuyLimit */
-  function setItemForeverBuyLimit(uint256 itemId, uint32 itemForeverBuyLimit) internal {
+  /** Set itemForeverLimit */
+  function setItemForeverLimit(uint256 itemId, uint32 itemForeverLimit) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
-    StoreSwitch.setField(_tableId, _keyTuple, 7, abi.encodePacked((itemForeverBuyLimit)));
+    StoreSwitch.setField(_tableId, _keyTuple, 7, abi.encodePacked((itemForeverLimit)));
   }
 
-  /** Set itemForeverBuyLimit (using the specified store) */
-  function setItemForeverBuyLimit(IStore _store, uint256 itemId, uint32 itemForeverBuyLimit) internal {
+  /** Set itemForeverLimit (using the specified store) */
+  function setItemForeverLimit(IStore _store, uint256 itemId, uint32 itemForeverLimit) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(itemId));
 
-    _store.setField(_tableId, _keyTuple, 7, abi.encodePacked((itemForeverBuyLimit)));
+    _store.setField(_tableId, _keyTuple, 7, abi.encodePacked((itemForeverLimit)));
   }
 
   /** Get the full data */
@@ -386,21 +386,21 @@ library Shop {
     uint256 itemCoinPrice,
     uint256 itemDiamondPrice,
     uint256 itemTokenPrice,
-    uint32 itemUnlockExp,
-    uint32 itemDailyBuyLimit,
-    uint32 itemWeeklyBuyLimit,
-    uint32 itemMonthlyBuyLimit,
-    uint32 itemForeverBuyLimit
+    uint32 itemUnlockLevel,
+    uint32 itemDailyLimit,
+    uint32 itemWeeklyLimit,
+    uint32 itemMonthlyLimit,
+    uint32 itemForeverLimit
   ) internal {
     bytes memory _data = encode(
       itemCoinPrice,
       itemDiamondPrice,
       itemTokenPrice,
-      itemUnlockExp,
-      itemDailyBuyLimit,
-      itemWeeklyBuyLimit,
-      itemMonthlyBuyLimit,
-      itemForeverBuyLimit
+      itemUnlockLevel,
+      itemDailyLimit,
+      itemWeeklyLimit,
+      itemMonthlyLimit,
+      itemForeverLimit
     );
 
     bytes32[] memory _keyTuple = new bytes32[](1);
@@ -416,21 +416,21 @@ library Shop {
     uint256 itemCoinPrice,
     uint256 itemDiamondPrice,
     uint256 itemTokenPrice,
-    uint32 itemUnlockExp,
-    uint32 itemDailyBuyLimit,
-    uint32 itemWeeklyBuyLimit,
-    uint32 itemMonthlyBuyLimit,
-    uint32 itemForeverBuyLimit
+    uint32 itemUnlockLevel,
+    uint32 itemDailyLimit,
+    uint32 itemWeeklyLimit,
+    uint32 itemMonthlyLimit,
+    uint32 itemForeverLimit
   ) internal {
     bytes memory _data = encode(
       itemCoinPrice,
       itemDiamondPrice,
       itemTokenPrice,
-      itemUnlockExp,
-      itemDailyBuyLimit,
-      itemWeeklyBuyLimit,
-      itemMonthlyBuyLimit,
-      itemForeverBuyLimit
+      itemUnlockLevel,
+      itemDailyLimit,
+      itemWeeklyLimit,
+      itemMonthlyLimit,
+      itemForeverLimit
     );
 
     bytes32[] memory _keyTuple = new bytes32[](1);
@@ -446,11 +446,11 @@ library Shop {
       _table.itemCoinPrice,
       _table.itemDiamondPrice,
       _table.itemTokenPrice,
-      _table.itemUnlockExp,
-      _table.itemDailyBuyLimit,
-      _table.itemWeeklyBuyLimit,
-      _table.itemMonthlyBuyLimit,
-      _table.itemForeverBuyLimit
+      _table.itemUnlockLevel,
+      _table.itemDailyLimit,
+      _table.itemWeeklyLimit,
+      _table.itemMonthlyLimit,
+      _table.itemForeverLimit
     );
   }
 
@@ -462,11 +462,11 @@ library Shop {
       _table.itemCoinPrice,
       _table.itemDiamondPrice,
       _table.itemTokenPrice,
-      _table.itemUnlockExp,
-      _table.itemDailyBuyLimit,
-      _table.itemWeeklyBuyLimit,
-      _table.itemMonthlyBuyLimit,
-      _table.itemForeverBuyLimit
+      _table.itemUnlockLevel,
+      _table.itemDailyLimit,
+      _table.itemWeeklyLimit,
+      _table.itemMonthlyLimit,
+      _table.itemForeverLimit
     );
   }
 
@@ -478,15 +478,15 @@ library Shop {
 
     _table.itemTokenPrice = (uint256(Bytes.slice32(_blob, 64)));
 
-    _table.itemUnlockExp = (uint32(Bytes.slice4(_blob, 96)));
+    _table.itemUnlockLevel = (uint32(Bytes.slice4(_blob, 96)));
 
-    _table.itemDailyBuyLimit = (uint32(Bytes.slice4(_blob, 100)));
+    _table.itemDailyLimit = (uint32(Bytes.slice4(_blob, 100)));
 
-    _table.itemWeeklyBuyLimit = (uint32(Bytes.slice4(_blob, 104)));
+    _table.itemWeeklyLimit = (uint32(Bytes.slice4(_blob, 104)));
 
-    _table.itemMonthlyBuyLimit = (uint32(Bytes.slice4(_blob, 108)));
+    _table.itemMonthlyLimit = (uint32(Bytes.slice4(_blob, 108)));
 
-    _table.itemForeverBuyLimit = (uint32(Bytes.slice4(_blob, 112)));
+    _table.itemForeverLimit = (uint32(Bytes.slice4(_blob, 112)));
   }
 
   /** Tightly pack full data using this table's schema */
@@ -494,22 +494,22 @@ library Shop {
     uint256 itemCoinPrice,
     uint256 itemDiamondPrice,
     uint256 itemTokenPrice,
-    uint32 itemUnlockExp,
-    uint32 itemDailyBuyLimit,
-    uint32 itemWeeklyBuyLimit,
-    uint32 itemMonthlyBuyLimit,
-    uint32 itemForeverBuyLimit
+    uint32 itemUnlockLevel,
+    uint32 itemDailyLimit,
+    uint32 itemWeeklyLimit,
+    uint32 itemMonthlyLimit,
+    uint32 itemForeverLimit
   ) internal view returns (bytes memory) {
     return
       abi.encodePacked(
         itemCoinPrice,
         itemDiamondPrice,
         itemTokenPrice,
-        itemUnlockExp,
-        itemDailyBuyLimit,
-        itemWeeklyBuyLimit,
-        itemMonthlyBuyLimit,
-        itemForeverBuyLimit
+        itemUnlockLevel,
+        itemDailyLimit,
+        itemWeeklyLimit,
+        itemMonthlyLimit,
+        itemForeverLimit
       );
   }
 

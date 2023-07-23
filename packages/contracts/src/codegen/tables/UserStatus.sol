@@ -23,20 +23,22 @@ bytes32 constant UserStatusTableId = _tableId;
 struct UserStatusData {
   uint256 coinBalance;
   uint256 diamondBalance;
-  uint256 experience;
+  uint32 exp;
+  bool timeZoneSign;
+  uint32 timeZoneOffset;
   string nickName;
-  int32 timeZoneOffset;
 }
 
 library UserStatus {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](5);
+    SchemaType[] memory _schema = new SchemaType[](6);
     _schema[0] = SchemaType.UINT256;
     _schema[1] = SchemaType.UINT256;
-    _schema[2] = SchemaType.UINT256;
-    _schema[3] = SchemaType.STRING;
-    _schema[4] = SchemaType.INT32;
+    _schema[2] = SchemaType.UINT32;
+    _schema[3] = SchemaType.BOOL;
+    _schema[4] = SchemaType.UINT32;
+    _schema[5] = SchemaType.STRING;
 
     return SchemaLib.encode(_schema);
   }
@@ -50,12 +52,13 @@ library UserStatus {
 
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
-    string[] memory _fieldNames = new string[](5);
+    string[] memory _fieldNames = new string[](6);
     _fieldNames[0] = "coinBalance";
     _fieldNames[1] = "diamondBalance";
-    _fieldNames[2] = "experience";
-    _fieldNames[3] = "nickName";
+    _fieldNames[2] = "exp";
+    _fieldNames[3] = "timeZoneSign";
     _fieldNames[4] = "timeZoneOffset";
+    _fieldNames[5] = "nickName";
     return ("UserStatus", _fieldNames);
   }
 
@@ -149,38 +152,106 @@ library UserStatus {
     _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((diamondBalance)));
   }
 
-  /** Get experience */
-  function getExperience(bytes32 userId) internal view returns (uint256 experience) {
+  /** Get exp */
+  function getExp(bytes32 userId) internal view returns (uint32 exp) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
-    return (uint256(Bytes.slice32(_blob, 0)));
+    return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Get experience (using the specified store) */
-  function getExperience(IStore _store, bytes32 userId) internal view returns (uint256 experience) {
+  /** Get exp (using the specified store) */
+  function getExp(IStore _store, bytes32 userId) internal view returns (uint32 exp) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
-    return (uint256(Bytes.slice32(_blob, 0)));
+    return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Set experience */
-  function setExperience(bytes32 userId, uint256 experience) internal {
+  /** Set exp */
+  function setExp(bytes32 userId, uint32 exp) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((experience)));
+    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((exp)));
   }
 
-  /** Set experience (using the specified store) */
-  function setExperience(IStore _store, bytes32 userId, uint256 experience) internal {
+  /** Set exp (using the specified store) */
+  function setExp(IStore _store, bytes32 userId, uint32 exp) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((experience)));
+    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((exp)));
+  }
+
+  /** Get timeZoneSign */
+  function getTimeZoneSign(bytes32 userId) internal view returns (bool timeZoneSign) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
+    return (_toBool(uint8(Bytes.slice1(_blob, 0))));
+  }
+
+  /** Get timeZoneSign (using the specified store) */
+  function getTimeZoneSign(IStore _store, bytes32 userId) internal view returns (bool timeZoneSign) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
+    return (_toBool(uint8(Bytes.slice1(_blob, 0))));
+  }
+
+  /** Set timeZoneSign */
+  function setTimeZoneSign(bytes32 userId, bool timeZoneSign) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    StoreSwitch.setField(_tableId, _keyTuple, 3, abi.encodePacked((timeZoneSign)));
+  }
+
+  /** Set timeZoneSign (using the specified store) */
+  function setTimeZoneSign(IStore _store, bytes32 userId, bool timeZoneSign) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    _store.setField(_tableId, _keyTuple, 3, abi.encodePacked((timeZoneSign)));
+  }
+
+  /** Get timeZoneOffset */
+  function getTimeZoneOffset(bytes32 userId) internal view returns (uint32 timeZoneOffset) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 4);
+    return (uint32(Bytes.slice4(_blob, 0)));
+  }
+
+  /** Get timeZoneOffset (using the specified store) */
+  function getTimeZoneOffset(IStore _store, bytes32 userId) internal view returns (uint32 timeZoneOffset) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 4);
+    return (uint32(Bytes.slice4(_blob, 0)));
+  }
+
+  /** Set timeZoneOffset */
+  function setTimeZoneOffset(bytes32 userId, uint32 timeZoneOffset) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    StoreSwitch.setField(_tableId, _keyTuple, 4, abi.encodePacked((timeZoneOffset)));
+  }
+
+  /** Set timeZoneOffset (using the specified store) */
+  function setTimeZoneOffset(IStore _store, bytes32 userId, uint32 timeZoneOffset) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    _store.setField(_tableId, _keyTuple, 4, abi.encodePacked((timeZoneOffset)));
   }
 
   /** Get nickName */
@@ -188,7 +259,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 5);
     return (string(_blob));
   }
 
@@ -197,7 +268,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 5);
     return (string(_blob));
   }
 
@@ -206,7 +277,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 3, bytes((nickName)));
+    StoreSwitch.setField(_tableId, _keyTuple, 5, bytes((nickName)));
   }
 
   /** Set nickName (using the specified store) */
@@ -214,7 +285,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    _store.setField(_tableId, _keyTuple, 3, bytes((nickName)));
+    _store.setField(_tableId, _keyTuple, 5, bytes((nickName)));
   }
 
   /** Get the length of nickName */
@@ -222,7 +293,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 3, getSchema());
+    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 5, getSchema());
     return _byteLength / 1;
   }
 
@@ -231,7 +302,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 3, getSchema());
+    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 5, getSchema());
     return _byteLength / 1;
   }
 
@@ -240,7 +311,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 3, getSchema(), _index * 1, (_index + 1) * 1);
+    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 5, getSchema(), _index * 1, (_index + 1) * 1);
     return (string(_blob));
   }
 
@@ -249,7 +320,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 3, getSchema(), _index * 1, (_index + 1) * 1);
+    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 5, getSchema(), _index * 1, (_index + 1) * 1);
     return (string(_blob));
   }
 
@@ -258,7 +329,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    StoreSwitch.pushToField(_tableId, _keyTuple, 3, bytes((_slice)));
+    StoreSwitch.pushToField(_tableId, _keyTuple, 5, bytes((_slice)));
   }
 
   /** Push a slice to nickName (using the specified store) */
@@ -266,7 +337,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    _store.pushToField(_tableId, _keyTuple, 3, bytes((_slice)));
+    _store.pushToField(_tableId, _keyTuple, 5, bytes((_slice)));
   }
 
   /** Pop a slice from nickName */
@@ -274,7 +345,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    StoreSwitch.popFromField(_tableId, _keyTuple, 3, 1);
+    StoreSwitch.popFromField(_tableId, _keyTuple, 5, 1);
   }
 
   /** Pop a slice from nickName (using the specified store) */
@@ -282,7 +353,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    _store.popFromField(_tableId, _keyTuple, 3, 1);
+    _store.popFromField(_tableId, _keyTuple, 5, 1);
   }
 
   /** Update a slice of nickName at `_index` */
@@ -290,7 +361,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    StoreSwitch.updateInField(_tableId, _keyTuple, 3, _index * 1, bytes((_slice)));
+    StoreSwitch.updateInField(_tableId, _keyTuple, 5, _index * 1, bytes((_slice)));
   }
 
   /** Update a slice of nickName (using the specified store) at `_index` */
@@ -298,41 +369,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    _store.updateInField(_tableId, _keyTuple, 3, _index * 1, bytes((_slice)));
-  }
-
-  /** Get timeZoneOffset */
-  function getTimeZoneOffset(bytes32 userId) internal view returns (int32 timeZoneOffset) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = userId;
-
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 4);
-    return (int32(uint32(Bytes.slice4(_blob, 0))));
-  }
-
-  /** Get timeZoneOffset (using the specified store) */
-  function getTimeZoneOffset(IStore _store, bytes32 userId) internal view returns (int32 timeZoneOffset) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = userId;
-
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 4);
-    return (int32(uint32(Bytes.slice4(_blob, 0))));
-  }
-
-  /** Set timeZoneOffset */
-  function setTimeZoneOffset(bytes32 userId, int32 timeZoneOffset) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = userId;
-
-    StoreSwitch.setField(_tableId, _keyTuple, 4, abi.encodePacked((timeZoneOffset)));
-  }
-
-  /** Set timeZoneOffset (using the specified store) */
-  function setTimeZoneOffset(IStore _store, bytes32 userId, int32 timeZoneOffset) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = userId;
-
-    _store.setField(_tableId, _keyTuple, 4, abi.encodePacked((timeZoneOffset)));
+    _store.updateInField(_tableId, _keyTuple, 5, _index * 1, bytes((_slice)));
   }
 
   /** Get the full data */
@@ -358,11 +395,12 @@ library UserStatus {
     bytes32 userId,
     uint256 coinBalance,
     uint256 diamondBalance,
-    uint256 experience,
-    string memory nickName,
-    int32 timeZoneOffset
+    uint32 exp,
+    bool timeZoneSign,
+    uint32 timeZoneOffset,
+    string memory nickName
   ) internal {
-    bytes memory _data = encode(coinBalance, diamondBalance, experience, nickName, timeZoneOffset);
+    bytes memory _data = encode(coinBalance, diamondBalance, exp, timeZoneSign, timeZoneOffset, nickName);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
@@ -376,11 +414,12 @@ library UserStatus {
     bytes32 userId,
     uint256 coinBalance,
     uint256 diamondBalance,
-    uint256 experience,
-    string memory nickName,
-    int32 timeZoneOffset
+    uint32 exp,
+    bool timeZoneSign,
+    uint32 timeZoneOffset,
+    string memory nickName
   ) internal {
-    bytes memory _data = encode(coinBalance, diamondBalance, experience, nickName, timeZoneOffset);
+    bytes memory _data = encode(coinBalance, diamondBalance, exp, timeZoneSign, timeZoneOffset, nickName);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
@@ -390,7 +429,15 @@ library UserStatus {
 
   /** Set the full data using the data struct */
   function set(bytes32 userId, UserStatusData memory _table) internal {
-    set(userId, _table.coinBalance, _table.diamondBalance, _table.experience, _table.nickName, _table.timeZoneOffset);
+    set(
+      userId,
+      _table.coinBalance,
+      _table.diamondBalance,
+      _table.exp,
+      _table.timeZoneSign,
+      _table.timeZoneOffset,
+      _table.nickName
+    );
   }
 
   /** Set the full data using the data struct (using the specified store) */
@@ -400,30 +447,33 @@ library UserStatus {
       userId,
       _table.coinBalance,
       _table.diamondBalance,
-      _table.experience,
-      _table.nickName,
-      _table.timeZoneOffset
+      _table.exp,
+      _table.timeZoneSign,
+      _table.timeZoneOffset,
+      _table.nickName
     );
   }
 
   /** Decode the tightly packed blob using this table's schema */
   function decode(bytes memory _blob) internal view returns (UserStatusData memory _table) {
-    // 100 is the total byte length of static data
-    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 100));
+    // 73 is the total byte length of static data
+    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 73));
 
     _table.coinBalance = (uint256(Bytes.slice32(_blob, 0)));
 
     _table.diamondBalance = (uint256(Bytes.slice32(_blob, 32)));
 
-    _table.experience = (uint256(Bytes.slice32(_blob, 64)));
+    _table.exp = (uint32(Bytes.slice4(_blob, 64)));
 
-    _table.timeZoneOffset = (int32(uint32(Bytes.slice4(_blob, 96))));
+    _table.timeZoneSign = (_toBool(uint8(Bytes.slice1(_blob, 68))));
+
+    _table.timeZoneOffset = (uint32(Bytes.slice4(_blob, 69)));
 
     // Store trims the blob if dynamic fields are all empty
-    if (_blob.length > 100) {
+    if (_blob.length > 73) {
       uint256 _start;
       // skip static data length + dynamic lengths word
-      uint256 _end = 132;
+      uint256 _end = 105;
 
       _start = _end;
       _end += _encodedLengths.atIndex(0);
@@ -435,9 +485,10 @@ library UserStatus {
   function encode(
     uint256 coinBalance,
     uint256 diamondBalance,
-    uint256 experience,
-    string memory nickName,
-    int32 timeZoneOffset
+    uint32 exp,
+    bool timeZoneSign,
+    uint32 timeZoneOffset,
+    string memory nickName
   ) internal view returns (bytes memory) {
     uint40[] memory _counters = new uint40[](1);
     _counters[0] = uint40(bytes(nickName).length);
@@ -447,7 +498,8 @@ library UserStatus {
       abi.encodePacked(
         coinBalance,
         diamondBalance,
-        experience,
+        exp,
+        timeZoneSign,
         timeZoneOffset,
         _encodedLengths.unwrap(),
         bytes((nickName))
@@ -474,5 +526,11 @@ library UserStatus {
     _keyTuple[0] = userId;
 
     _store.deleteRecord(_tableId, _keyTuple);
+  }
+}
+
+function _toBool(uint8 value) pure returns (bool result) {
+  assembly {
+    result := value
   }
 }

@@ -22,7 +22,7 @@ bytes32 constant UserCatAlbumTableId = _tableId;
 
 struct UserCatAlbumData {
   uint256 photoId;
-  uint32 obtainTime;
+  uint256 obtainTime;
   uint8 status;
   uint256[] catIds;
 }
@@ -32,7 +32,7 @@ library UserCatAlbum {
   function getSchema() internal pure returns (Schema) {
     SchemaType[] memory _schema = new SchemaType[](4);
     _schema[0] = SchemaType.UINT256;
-    _schema[1] = SchemaType.UINT32;
+    _schema[1] = SchemaType.UINT256;
     _schema[2] = SchemaType.UINT8;
     _schema[3] = SchemaType.UINT256_ARRAY;
 
@@ -113,25 +113,25 @@ library UserCatAlbum {
   }
 
   /** Get obtainTime */
-  function getObtainTime(bytes32 userId) internal view returns (uint32 obtainTime) {
+  function getObtainTime(bytes32 userId) internal view returns (uint256 obtainTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Get obtainTime (using the specified store) */
-  function getObtainTime(IStore _store, bytes32 userId) internal view returns (uint32 obtainTime) {
+  function getObtainTime(IStore _store, bytes32 userId) internal view returns (uint256 obtainTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Set obtainTime */
-  function setObtainTime(bytes32 userId, uint32 obtainTime) internal {
+  function setObtainTime(bytes32 userId, uint256 obtainTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
@@ -139,7 +139,7 @@ library UserCatAlbum {
   }
 
   /** Set obtainTime (using the specified store) */
-  function setObtainTime(IStore _store, bytes32 userId, uint32 obtainTime) internal {
+  function setObtainTime(IStore _store, bytes32 userId, uint256 obtainTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
@@ -317,7 +317,7 @@ library UserCatAlbum {
   }
 
   /** Set the full data using individual values */
-  function set(bytes32 userId, uint256 photoId, uint32 obtainTime, uint8 status, uint256[] memory catIds) internal {
+  function set(bytes32 userId, uint256 photoId, uint256 obtainTime, uint8 status, uint256[] memory catIds) internal {
     bytes memory _data = encode(photoId, obtainTime, status, catIds);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
@@ -331,7 +331,7 @@ library UserCatAlbum {
     IStore _store,
     bytes32 userId,
     uint256 photoId,
-    uint32 obtainTime,
+    uint256 obtainTime,
     uint8 status,
     uint256[] memory catIds
   ) internal {
@@ -355,20 +355,20 @@ library UserCatAlbum {
 
   /** Decode the tightly packed blob using this table's schema */
   function decode(bytes memory _blob) internal view returns (UserCatAlbumData memory _table) {
-    // 37 is the total byte length of static data
-    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 37));
+    // 65 is the total byte length of static data
+    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 65));
 
     _table.photoId = (uint256(Bytes.slice32(_blob, 0)));
 
-    _table.obtainTime = (uint32(Bytes.slice4(_blob, 32)));
+    _table.obtainTime = (uint256(Bytes.slice32(_blob, 32)));
 
-    _table.status = (uint8(Bytes.slice1(_blob, 36)));
+    _table.status = (uint8(Bytes.slice1(_blob, 64)));
 
     // Store trims the blob if dynamic fields are all empty
-    if (_blob.length > 37) {
+    if (_blob.length > 65) {
       uint256 _start;
       // skip static data length + dynamic lengths word
-      uint256 _end = 69;
+      uint256 _end = 97;
 
       _start = _end;
       _end += _encodedLengths.atIndex(0);
@@ -379,7 +379,7 @@ library UserCatAlbum {
   /** Tightly pack full data using this table's schema */
   function encode(
     uint256 photoId,
-    uint32 obtainTime,
+    uint256 obtainTime,
     uint8 status,
     uint256[] memory catIds
   ) internal view returns (bytes memory) {
