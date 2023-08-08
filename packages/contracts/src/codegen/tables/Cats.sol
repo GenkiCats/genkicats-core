@@ -21,36 +21,30 @@ bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("Cats"
 bytes32 constant CatsTableId = _tableId;
 
 struct CatsData {
-  bool sex;
-  uint256 fatherId;
-  uint256 motherId;
-  uint256 personality;
-  uint256 skin;
+  bytes32 ownerId;
   uint32 exp;
   uint32 level;
   uint32 hunger;
   uint32 fun;
   uint32 health;
   uint8 cleanLevel;
-  uint256 birthTime;
+  uint256 starvingTime;
+  uint256 lastUpdateTime;
 }
 
 library Cats {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](12);
-    _schema[0] = SchemaType.BOOL;
-    _schema[1] = SchemaType.UINT256;
-    _schema[2] = SchemaType.UINT256;
-    _schema[3] = SchemaType.UINT256;
-    _schema[4] = SchemaType.UINT256;
+    SchemaType[] memory _schema = new SchemaType[](9);
+    _schema[0] = SchemaType.BYTES32;
+    _schema[1] = SchemaType.UINT32;
+    _schema[2] = SchemaType.UINT32;
+    _schema[3] = SchemaType.UINT32;
+    _schema[4] = SchemaType.UINT32;
     _schema[5] = SchemaType.UINT32;
-    _schema[6] = SchemaType.UINT32;
-    _schema[7] = SchemaType.UINT32;
-    _schema[8] = SchemaType.UINT32;
-    _schema[9] = SchemaType.UINT32;
-    _schema[10] = SchemaType.UINT8;
-    _schema[11] = SchemaType.UINT256;
+    _schema[6] = SchemaType.UINT8;
+    _schema[7] = SchemaType.UINT256;
+    _schema[8] = SchemaType.UINT256;
 
     return SchemaLib.encode(_schema);
   }
@@ -64,19 +58,16 @@ library Cats {
 
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
-    string[] memory _fieldNames = new string[](12);
-    _fieldNames[0] = "sex";
-    _fieldNames[1] = "fatherId";
-    _fieldNames[2] = "motherId";
-    _fieldNames[3] = "personality";
-    _fieldNames[4] = "skin";
-    _fieldNames[5] = "exp";
-    _fieldNames[6] = "level";
-    _fieldNames[7] = "hunger";
-    _fieldNames[8] = "fun";
-    _fieldNames[9] = "health";
-    _fieldNames[10] = "cleanLevel";
-    _fieldNames[11] = "birthTime";
+    string[] memory _fieldNames = new string[](9);
+    _fieldNames[0] = "ownerId";
+    _fieldNames[1] = "exp";
+    _fieldNames[2] = "level";
+    _fieldNames[3] = "hunger";
+    _fieldNames[4] = "fun";
+    _fieldNames[5] = "health";
+    _fieldNames[6] = "cleanLevel";
+    _fieldNames[7] = "starvingTime";
+    _fieldNames[8] = "lastUpdateTime";
     return ("Cats", _fieldNames);
   }
 
@@ -102,174 +93,38 @@ library Cats {
     _store.setMetadata(_tableId, _tableName, _fieldNames);
   }
 
-  /** Get sex */
-  function getSex(bytes32 cat_id) internal view returns (bool sex) {
+  /** Get ownerId */
+  function getOwnerId(bytes32 cat_id) internal view returns (bytes32 ownerId) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 0);
-    return (_toBool(uint8(Bytes.slice1(_blob, 0))));
+    return (Bytes.slice32(_blob, 0));
   }
 
-  /** Get sex (using the specified store) */
-  function getSex(IStore _store, bytes32 cat_id) internal view returns (bool sex) {
+  /** Get ownerId (using the specified store) */
+  function getOwnerId(IStore _store, bytes32 cat_id) internal view returns (bytes32 ownerId) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 0);
-    return (_toBool(uint8(Bytes.slice1(_blob, 0))));
+    return (Bytes.slice32(_blob, 0));
   }
 
-  /** Set sex */
-  function setSex(bytes32 cat_id, bool sex) internal {
+  /** Set ownerId */
+  function setOwnerId(bytes32 cat_id, bytes32 ownerId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((sex)));
+    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((ownerId)));
   }
 
-  /** Set sex (using the specified store) */
-  function setSex(IStore _store, bytes32 cat_id, bool sex) internal {
+  /** Set ownerId (using the specified store) */
+  function setOwnerId(IStore _store, bytes32 cat_id, bytes32 ownerId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((sex)));
-  }
-
-  /** Get fatherId */
-  function getFatherId(bytes32 cat_id) internal view returns (uint256 fatherId) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = cat_id;
-
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
-    return (uint256(Bytes.slice32(_blob, 0)));
-  }
-
-  /** Get fatherId (using the specified store) */
-  function getFatherId(IStore _store, bytes32 cat_id) internal view returns (uint256 fatherId) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = cat_id;
-
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
-    return (uint256(Bytes.slice32(_blob, 0)));
-  }
-
-  /** Set fatherId */
-  function setFatherId(bytes32 cat_id, uint256 fatherId) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = cat_id;
-
-    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((fatherId)));
-  }
-
-  /** Set fatherId (using the specified store) */
-  function setFatherId(IStore _store, bytes32 cat_id, uint256 fatherId) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = cat_id;
-
-    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((fatherId)));
-  }
-
-  /** Get motherId */
-  function getMotherId(bytes32 cat_id) internal view returns (uint256 motherId) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = cat_id;
-
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
-    return (uint256(Bytes.slice32(_blob, 0)));
-  }
-
-  /** Get motherId (using the specified store) */
-  function getMotherId(IStore _store, bytes32 cat_id) internal view returns (uint256 motherId) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = cat_id;
-
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
-    return (uint256(Bytes.slice32(_blob, 0)));
-  }
-
-  /** Set motherId */
-  function setMotherId(bytes32 cat_id, uint256 motherId) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = cat_id;
-
-    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((motherId)));
-  }
-
-  /** Set motherId (using the specified store) */
-  function setMotherId(IStore _store, bytes32 cat_id, uint256 motherId) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = cat_id;
-
-    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((motherId)));
-  }
-
-  /** Get personality */
-  function getPersonality(bytes32 cat_id) internal view returns (uint256 personality) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = cat_id;
-
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
-    return (uint256(Bytes.slice32(_blob, 0)));
-  }
-
-  /** Get personality (using the specified store) */
-  function getPersonality(IStore _store, bytes32 cat_id) internal view returns (uint256 personality) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = cat_id;
-
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
-    return (uint256(Bytes.slice32(_blob, 0)));
-  }
-
-  /** Set personality */
-  function setPersonality(bytes32 cat_id, uint256 personality) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = cat_id;
-
-    StoreSwitch.setField(_tableId, _keyTuple, 3, abi.encodePacked((personality)));
-  }
-
-  /** Set personality (using the specified store) */
-  function setPersonality(IStore _store, bytes32 cat_id, uint256 personality) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = cat_id;
-
-    _store.setField(_tableId, _keyTuple, 3, abi.encodePacked((personality)));
-  }
-
-  /** Get skin */
-  function getSkin(bytes32 cat_id) internal view returns (uint256 skin) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = cat_id;
-
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 4);
-    return (uint256(Bytes.slice32(_blob, 0)));
-  }
-
-  /** Get skin (using the specified store) */
-  function getSkin(IStore _store, bytes32 cat_id) internal view returns (uint256 skin) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = cat_id;
-
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 4);
-    return (uint256(Bytes.slice32(_blob, 0)));
-  }
-
-  /** Set skin */
-  function setSkin(bytes32 cat_id, uint256 skin) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = cat_id;
-
-    StoreSwitch.setField(_tableId, _keyTuple, 4, abi.encodePacked((skin)));
-  }
-
-  /** Set skin (using the specified store) */
-  function setSkin(IStore _store, bytes32 cat_id, uint256 skin) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = cat_id;
-
-    _store.setField(_tableId, _keyTuple, 4, abi.encodePacked((skin)));
+    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((ownerId)));
   }
 
   /** Get exp */
@@ -277,7 +132,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 5);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
@@ -286,7 +141,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 5);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
@@ -295,7 +150,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 5, abi.encodePacked((exp)));
+    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((exp)));
   }
 
   /** Set exp (using the specified store) */
@@ -303,7 +158,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    _store.setField(_tableId, _keyTuple, 5, abi.encodePacked((exp)));
+    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((exp)));
   }
 
   /** Get level */
@@ -311,7 +166,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 6);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
@@ -320,7 +175,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 6);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
@@ -329,7 +184,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 6, abi.encodePacked((level)));
+    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((level)));
   }
 
   /** Set level (using the specified store) */
@@ -337,7 +192,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    _store.setField(_tableId, _keyTuple, 6, abi.encodePacked((level)));
+    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((level)));
   }
 
   /** Get hunger */
@@ -345,7 +200,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 7);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
@@ -354,7 +209,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 7);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
@@ -363,7 +218,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 7, abi.encodePacked((hunger)));
+    StoreSwitch.setField(_tableId, _keyTuple, 3, abi.encodePacked((hunger)));
   }
 
   /** Set hunger (using the specified store) */
@@ -371,7 +226,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    _store.setField(_tableId, _keyTuple, 7, abi.encodePacked((hunger)));
+    _store.setField(_tableId, _keyTuple, 3, abi.encodePacked((hunger)));
   }
 
   /** Get fun */
@@ -379,7 +234,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 8);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 4);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
@@ -388,7 +243,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 8);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 4);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
@@ -397,7 +252,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 8, abi.encodePacked((fun)));
+    StoreSwitch.setField(_tableId, _keyTuple, 4, abi.encodePacked((fun)));
   }
 
   /** Set fun (using the specified store) */
@@ -405,7 +260,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    _store.setField(_tableId, _keyTuple, 8, abi.encodePacked((fun)));
+    _store.setField(_tableId, _keyTuple, 4, abi.encodePacked((fun)));
   }
 
   /** Get health */
@@ -413,7 +268,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 9);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 5);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
@@ -422,7 +277,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 9);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 5);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
@@ -431,7 +286,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 9, abi.encodePacked((health)));
+    StoreSwitch.setField(_tableId, _keyTuple, 5, abi.encodePacked((health)));
   }
 
   /** Set health (using the specified store) */
@@ -439,7 +294,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    _store.setField(_tableId, _keyTuple, 9, abi.encodePacked((health)));
+    _store.setField(_tableId, _keyTuple, 5, abi.encodePacked((health)));
   }
 
   /** Get cleanLevel */
@@ -447,7 +302,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 10);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 6);
     return (uint8(Bytes.slice1(_blob, 0)));
   }
 
@@ -456,7 +311,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 10);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 6);
     return (uint8(Bytes.slice1(_blob, 0)));
   }
 
@@ -465,7 +320,7 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 10, abi.encodePacked((cleanLevel)));
+    StoreSwitch.setField(_tableId, _keyTuple, 6, abi.encodePacked((cleanLevel)));
   }
 
   /** Set cleanLevel (using the specified store) */
@@ -473,41 +328,75 @@ library Cats {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    _store.setField(_tableId, _keyTuple, 10, abi.encodePacked((cleanLevel)));
+    _store.setField(_tableId, _keyTuple, 6, abi.encodePacked((cleanLevel)));
   }
 
-  /** Get birthTime */
-  function getBirthTime(bytes32 cat_id) internal view returns (uint256 birthTime) {
+  /** Get starvingTime */
+  function getStarvingTime(bytes32 cat_id) internal view returns (uint256 starvingTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 11);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 7);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
-  /** Get birthTime (using the specified store) */
-  function getBirthTime(IStore _store, bytes32 cat_id) internal view returns (uint256 birthTime) {
+  /** Get starvingTime (using the specified store) */
+  function getStarvingTime(IStore _store, bytes32 cat_id) internal view returns (uint256 starvingTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 11);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 7);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
-  /** Set birthTime */
-  function setBirthTime(bytes32 cat_id, uint256 birthTime) internal {
+  /** Set starvingTime */
+  function setStarvingTime(bytes32 cat_id, uint256 starvingTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 11, abi.encodePacked((birthTime)));
+    StoreSwitch.setField(_tableId, _keyTuple, 7, abi.encodePacked((starvingTime)));
   }
 
-  /** Set birthTime (using the specified store) */
-  function setBirthTime(IStore _store, bytes32 cat_id, uint256 birthTime) internal {
+  /** Set starvingTime (using the specified store) */
+  function setStarvingTime(IStore _store, bytes32 cat_id, uint256 starvingTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
 
-    _store.setField(_tableId, _keyTuple, 11, abi.encodePacked((birthTime)));
+    _store.setField(_tableId, _keyTuple, 7, abi.encodePacked((starvingTime)));
+  }
+
+  /** Get lastUpdateTime */
+  function getLastUpdateTime(bytes32 cat_id) internal view returns (uint256 lastUpdateTime) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = cat_id;
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 8);
+    return (uint256(Bytes.slice32(_blob, 0)));
+  }
+
+  /** Get lastUpdateTime (using the specified store) */
+  function getLastUpdateTime(IStore _store, bytes32 cat_id) internal view returns (uint256 lastUpdateTime) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = cat_id;
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 8);
+    return (uint256(Bytes.slice32(_blob, 0)));
+  }
+
+  /** Set lastUpdateTime */
+  function setLastUpdateTime(bytes32 cat_id, uint256 lastUpdateTime) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = cat_id;
+
+    StoreSwitch.setField(_tableId, _keyTuple, 8, abi.encodePacked((lastUpdateTime)));
+  }
+
+  /** Set lastUpdateTime (using the specified store) */
+  function setLastUpdateTime(IStore _store, bytes32 cat_id, uint256 lastUpdateTime) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = cat_id;
+
+    _store.setField(_tableId, _keyTuple, 8, abi.encodePacked((lastUpdateTime)));
   }
 
   /** Get the full data */
@@ -531,33 +420,17 @@ library Cats {
   /** Set the full data using individual values */
   function set(
     bytes32 cat_id,
-    bool sex,
-    uint256 fatherId,
-    uint256 motherId,
-    uint256 personality,
-    uint256 skin,
+    bytes32 ownerId,
     uint32 exp,
     uint32 level,
     uint32 hunger,
     uint32 fun,
     uint32 health,
     uint8 cleanLevel,
-    uint256 birthTime
+    uint256 starvingTime,
+    uint256 lastUpdateTime
   ) internal {
-    bytes memory _data = encode(
-      sex,
-      fatherId,
-      motherId,
-      personality,
-      skin,
-      exp,
-      level,
-      hunger,
-      fun,
-      health,
-      cleanLevel,
-      birthTime
-    );
+    bytes memory _data = encode(ownerId, exp, level, hunger, fun, health, cleanLevel, starvingTime, lastUpdateTime);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
@@ -569,33 +442,17 @@ library Cats {
   function set(
     IStore _store,
     bytes32 cat_id,
-    bool sex,
-    uint256 fatherId,
-    uint256 motherId,
-    uint256 personality,
-    uint256 skin,
+    bytes32 ownerId,
     uint32 exp,
     uint32 level,
     uint32 hunger,
     uint32 fun,
     uint32 health,
     uint8 cleanLevel,
-    uint256 birthTime
+    uint256 starvingTime,
+    uint256 lastUpdateTime
   ) internal {
-    bytes memory _data = encode(
-      sex,
-      fatherId,
-      motherId,
-      personality,
-      skin,
-      exp,
-      level,
-      hunger,
-      fun,
-      health,
-      cleanLevel,
-      birthTime
-    );
+    bytes memory _data = encode(ownerId, exp, level, hunger, fun, health, cleanLevel, starvingTime, lastUpdateTime);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = cat_id;
@@ -607,18 +464,15 @@ library Cats {
   function set(bytes32 cat_id, CatsData memory _table) internal {
     set(
       cat_id,
-      _table.sex,
-      _table.fatherId,
-      _table.motherId,
-      _table.personality,
-      _table.skin,
+      _table.ownerId,
       _table.exp,
       _table.level,
       _table.hunger,
       _table.fun,
       _table.health,
       _table.cleanLevel,
-      _table.birthTime
+      _table.starvingTime,
+      _table.lastUpdateTime
     );
   }
 
@@ -627,78 +481,52 @@ library Cats {
     set(
       _store,
       cat_id,
-      _table.sex,
-      _table.fatherId,
-      _table.motherId,
-      _table.personality,
-      _table.skin,
+      _table.ownerId,
       _table.exp,
       _table.level,
       _table.hunger,
       _table.fun,
       _table.health,
       _table.cleanLevel,
-      _table.birthTime
+      _table.starvingTime,
+      _table.lastUpdateTime
     );
   }
 
   /** Decode the tightly packed blob using this table's schema */
   function decode(bytes memory _blob) internal pure returns (CatsData memory _table) {
-    _table.sex = (_toBool(uint8(Bytes.slice1(_blob, 0))));
+    _table.ownerId = (Bytes.slice32(_blob, 0));
 
-    _table.fatherId = (uint256(Bytes.slice32(_blob, 1)));
+    _table.exp = (uint32(Bytes.slice4(_blob, 32)));
 
-    _table.motherId = (uint256(Bytes.slice32(_blob, 33)));
+    _table.level = (uint32(Bytes.slice4(_blob, 36)));
 
-    _table.personality = (uint256(Bytes.slice32(_blob, 65)));
+    _table.hunger = (uint32(Bytes.slice4(_blob, 40)));
 
-    _table.skin = (uint256(Bytes.slice32(_blob, 97)));
+    _table.fun = (uint32(Bytes.slice4(_blob, 44)));
 
-    _table.exp = (uint32(Bytes.slice4(_blob, 129)));
+    _table.health = (uint32(Bytes.slice4(_blob, 48)));
 
-    _table.level = (uint32(Bytes.slice4(_blob, 133)));
+    _table.cleanLevel = (uint8(Bytes.slice1(_blob, 52)));
 
-    _table.hunger = (uint32(Bytes.slice4(_blob, 137)));
+    _table.starvingTime = (uint256(Bytes.slice32(_blob, 53)));
 
-    _table.fun = (uint32(Bytes.slice4(_blob, 141)));
-
-    _table.health = (uint32(Bytes.slice4(_blob, 145)));
-
-    _table.cleanLevel = (uint8(Bytes.slice1(_blob, 149)));
-
-    _table.birthTime = (uint256(Bytes.slice32(_blob, 150)));
+    _table.lastUpdateTime = (uint256(Bytes.slice32(_blob, 85)));
   }
 
   /** Tightly pack full data using this table's schema */
   function encode(
-    bool sex,
-    uint256 fatherId,
-    uint256 motherId,
-    uint256 personality,
-    uint256 skin,
+    bytes32 ownerId,
     uint32 exp,
     uint32 level,
     uint32 hunger,
     uint32 fun,
     uint32 health,
     uint8 cleanLevel,
-    uint256 birthTime
+    uint256 starvingTime,
+    uint256 lastUpdateTime
   ) internal view returns (bytes memory) {
-    return
-      abi.encodePacked(
-        sex,
-        fatherId,
-        motherId,
-        personality,
-        skin,
-        exp,
-        level,
-        hunger,
-        fun,
-        health,
-        cleanLevel,
-        birthTime
-      );
+    return abi.encodePacked(ownerId, exp, level, hunger, fun, health, cleanLevel, starvingTime, lastUpdateTime);
   }
 
   /** Encode keys as a bytes32 array using this table's schema */
@@ -721,11 +549,5 @@ library Cats {
     _keyTuple[0] = cat_id;
 
     _store.deleteRecord(_tableId, _keyTuple);
-  }
-}
-
-function _toBool(uint8 value) pure returns (bool result) {
-  assembly {
-    result := value
   }
 }

@@ -6,5 +6,31 @@ pragma solidity >=0.8.0;
 interface ICatSystem {
   function adoptInitCat() external;
 
-  function feed(bytes32 catId, uint256 itemId, uint32 quantity) external;
+  function getCatHunger(bytes32 catId) external returns (uint32);
+
+  function getCatFun(bytes32 catId) external returns (uint32);
+
+  function getCatHungerAndFun(bytes32 catId) external returns (uint32, uint32);
+
+  function feed(bytes32 catId, bytes32 itemId, uint32 quantity) external;
+
+  function callBack(bytes32 catId) external;
+
+  function canLiveUpdate(bytes32 catId) external view returns (bool);
+
+  function autoFeederFeedAll(bytes32[] calldata catIds) external;
+
+  function autoFeederFeed(bytes32 catId) external;
+
+  function updateHobbyHungerConsumption(bytes32 catId) external returns (uint32);
+
+  function updateStarvingStartTime(bytes32 catId) external;
+
+  function starvingCheck(bytes32 catId) external;
+
+  function calculateBasicHungerConsumption(bytes32 catId, uint256 timeDiff) external view returns (uint32);
+
+  function calculateBasicFunConsumption(bytes32 catId, uint256 timeDiff) external view returns (uint32);
+
+  function liveUpdate(bytes32 catId) external;
 }

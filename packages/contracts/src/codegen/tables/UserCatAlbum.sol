@@ -21,7 +21,7 @@ bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("UserC
 bytes32 constant UserCatAlbumTableId = _tableId;
 
 struct UserCatAlbumData {
-  uint256 photoId;
+  bytes32 photoId;
   uint256 obtainTime;
   uint8 status;
   uint256[] catIds;
@@ -31,7 +31,7 @@ library UserCatAlbum {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
     SchemaType[] memory _schema = new SchemaType[](4);
-    _schema[0] = SchemaType.UINT256;
+    _schema[0] = SchemaType.BYTES32;
     _schema[1] = SchemaType.UINT256;
     _schema[2] = SchemaType.UINT8;
     _schema[3] = SchemaType.UINT256_ARRAY;
@@ -79,25 +79,25 @@ library UserCatAlbum {
   }
 
   /** Get photoId */
-  function getPhotoId(bytes32 userId) internal view returns (uint256 photoId) {
+  function getPhotoId(bytes32 userId) internal view returns (bytes32 photoId) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 0);
-    return (uint256(Bytes.slice32(_blob, 0)));
+    return (Bytes.slice32(_blob, 0));
   }
 
   /** Get photoId (using the specified store) */
-  function getPhotoId(IStore _store, bytes32 userId) internal view returns (uint256 photoId) {
+  function getPhotoId(IStore _store, bytes32 userId) internal view returns (bytes32 photoId) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 0);
-    return (uint256(Bytes.slice32(_blob, 0)));
+    return (Bytes.slice32(_blob, 0));
   }
 
   /** Set photoId */
-  function setPhotoId(bytes32 userId, uint256 photoId) internal {
+  function setPhotoId(bytes32 userId, bytes32 photoId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
@@ -105,7 +105,7 @@ library UserCatAlbum {
   }
 
   /** Set photoId (using the specified store) */
-  function setPhotoId(IStore _store, bytes32 userId, uint256 photoId) internal {
+  function setPhotoId(IStore _store, bytes32 userId, bytes32 photoId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
@@ -317,7 +317,7 @@ library UserCatAlbum {
   }
 
   /** Set the full data using individual values */
-  function set(bytes32 userId, uint256 photoId, uint256 obtainTime, uint8 status, uint256[] memory catIds) internal {
+  function set(bytes32 userId, bytes32 photoId, uint256 obtainTime, uint8 status, uint256[] memory catIds) internal {
     bytes memory _data = encode(photoId, obtainTime, status, catIds);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
@@ -330,7 +330,7 @@ library UserCatAlbum {
   function set(
     IStore _store,
     bytes32 userId,
-    uint256 photoId,
+    bytes32 photoId,
     uint256 obtainTime,
     uint8 status,
     uint256[] memory catIds
@@ -358,7 +358,7 @@ library UserCatAlbum {
     // 65 is the total byte length of static data
     PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 65));
 
-    _table.photoId = (uint256(Bytes.slice32(_blob, 0)));
+    _table.photoId = (Bytes.slice32(_blob, 0));
 
     _table.obtainTime = (uint256(Bytes.slice32(_blob, 32)));
 
@@ -378,7 +378,7 @@ library UserCatAlbum {
 
   /** Tightly pack full data using this table's schema */
   function encode(
-    uint256 photoId,
+    bytes32 photoId,
     uint256 obtainTime,
     uint8 status,
     uint256[] memory catIds

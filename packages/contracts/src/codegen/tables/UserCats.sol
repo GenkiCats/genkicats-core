@@ -21,7 +21,8 @@ bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("UserC
 bytes32 constant UserCatsTableId = _tableId;
 
 struct UserCatsData {
-  uint32 friendship;
+  uint32 friendshipExp;
+  uint32 friendshipLevel;
   uint256 obtainTime;
   uint256 lostTime;
   uint8 obtainMethod;
@@ -31,12 +32,13 @@ struct UserCatsData {
 library UserCats {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](5);
+    SchemaType[] memory _schema = new SchemaType[](6);
     _schema[0] = SchemaType.UINT32;
-    _schema[1] = SchemaType.UINT256;
+    _schema[1] = SchemaType.UINT32;
     _schema[2] = SchemaType.UINT256;
-    _schema[3] = SchemaType.UINT8;
+    _schema[3] = SchemaType.UINT256;
     _schema[4] = SchemaType.UINT8;
+    _schema[5] = SchemaType.UINT8;
 
     return SchemaLib.encode(_schema);
   }
@@ -51,12 +53,13 @@ library UserCats {
 
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
-    string[] memory _fieldNames = new string[](5);
-    _fieldNames[0] = "friendship";
-    _fieldNames[1] = "obtainTime";
-    _fieldNames[2] = "lostTime";
-    _fieldNames[3] = "obtainMethod";
-    _fieldNames[4] = "status";
+    string[] memory _fieldNames = new string[](6);
+    _fieldNames[0] = "friendshipExp";
+    _fieldNames[1] = "friendshipLevel";
+    _fieldNames[2] = "obtainTime";
+    _fieldNames[3] = "lostTime";
+    _fieldNames[4] = "obtainMethod";
+    _fieldNames[5] = "status";
     return ("UserCats", _fieldNames);
   }
 
@@ -82,8 +85,8 @@ library UserCats {
     _store.setMetadata(_tableId, _tableName, _fieldNames);
   }
 
-  /** Get friendship */
-  function getFriendship(bytes32 userId, bytes32 catId) internal view returns (uint32 friendship) {
+  /** Get friendshipExp */
+  function getFriendshipExp(bytes32 userId, bytes32 catId) internal view returns (uint32 friendshipExp) {
     bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
@@ -92,8 +95,8 @@ library UserCats {
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Get friendship (using the specified store) */
-  function getFriendship(IStore _store, bytes32 userId, bytes32 catId) internal view returns (uint32 friendship) {
+  /** Get friendshipExp (using the specified store) */
+  function getFriendshipExp(IStore _store, bytes32 userId, bytes32 catId) internal view returns (uint32 friendshipExp) {
     bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
@@ -102,22 +105,64 @@ library UserCats {
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Set friendship */
-  function setFriendship(bytes32 userId, bytes32 catId, uint32 friendship) internal {
+  /** Set friendshipExp */
+  function setFriendshipExp(bytes32 userId, bytes32 catId, uint32 friendshipExp) internal {
     bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((friendship)));
+    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((friendshipExp)));
   }
 
-  /** Set friendship (using the specified store) */
-  function setFriendship(IStore _store, bytes32 userId, bytes32 catId, uint32 friendship) internal {
+  /** Set friendshipExp (using the specified store) */
+  function setFriendshipExp(IStore _store, bytes32 userId, bytes32 catId, uint32 friendshipExp) internal {
     bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((friendship)));
+    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((friendshipExp)));
+  }
+
+  /** Get friendshipLevel */
+  function getFriendshipLevel(bytes32 userId, bytes32 catId) internal view returns (uint32 friendshipLevel) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = userId;
+    _keyTuple[1] = catId;
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
+    return (uint32(Bytes.slice4(_blob, 0)));
+  }
+
+  /** Get friendshipLevel (using the specified store) */
+  function getFriendshipLevel(
+    IStore _store,
+    bytes32 userId,
+    bytes32 catId
+  ) internal view returns (uint32 friendshipLevel) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = userId;
+    _keyTuple[1] = catId;
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
+    return (uint32(Bytes.slice4(_blob, 0)));
+  }
+
+  /** Set friendshipLevel */
+  function setFriendshipLevel(bytes32 userId, bytes32 catId, uint32 friendshipLevel) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = userId;
+    _keyTuple[1] = catId;
+
+    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((friendshipLevel)));
+  }
+
+  /** Set friendshipLevel (using the specified store) */
+  function setFriendshipLevel(IStore _store, bytes32 userId, bytes32 catId, uint32 friendshipLevel) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = userId;
+    _keyTuple[1] = catId;
+
+    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((friendshipLevel)));
   }
 
   /** Get obtainTime */
@@ -126,7 +171,7 @@ library UserCats {
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
@@ -136,7 +181,7 @@ library UserCats {
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
@@ -146,7 +191,7 @@ library UserCats {
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((obtainTime)));
+    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((obtainTime)));
   }
 
   /** Set obtainTime (using the specified store) */
@@ -155,7 +200,7 @@ library UserCats {
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((obtainTime)));
+    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((obtainTime)));
   }
 
   /** Get lostTime */
@@ -164,7 +209,7 @@ library UserCats {
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
@@ -174,7 +219,7 @@ library UserCats {
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
@@ -184,7 +229,7 @@ library UserCats {
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((lostTime)));
+    StoreSwitch.setField(_tableId, _keyTuple, 3, abi.encodePacked((lostTime)));
   }
 
   /** Set lostTime (using the specified store) */
@@ -193,7 +238,7 @@ library UserCats {
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((lostTime)));
+    _store.setField(_tableId, _keyTuple, 3, abi.encodePacked((lostTime)));
   }
 
   /** Get obtainMethod */
@@ -202,7 +247,7 @@ library UserCats {
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 4);
     return (uint8(Bytes.slice1(_blob, 0)));
   }
 
@@ -212,7 +257,7 @@ library UserCats {
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 4);
     return (uint8(Bytes.slice1(_blob, 0)));
   }
 
@@ -222,7 +267,7 @@ library UserCats {
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 3, abi.encodePacked((obtainMethod)));
+    StoreSwitch.setField(_tableId, _keyTuple, 4, abi.encodePacked((obtainMethod)));
   }
 
   /** Set obtainMethod (using the specified store) */
@@ -231,7 +276,7 @@ library UserCats {
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    _store.setField(_tableId, _keyTuple, 3, abi.encodePacked((obtainMethod)));
+    _store.setField(_tableId, _keyTuple, 4, abi.encodePacked((obtainMethod)));
   }
 
   /** Get status */
@@ -240,7 +285,7 @@ library UserCats {
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 4);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 5);
     return (uint8(Bytes.slice1(_blob, 0)));
   }
 
@@ -250,7 +295,7 @@ library UserCats {
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 4);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 5);
     return (uint8(Bytes.slice1(_blob, 0)));
   }
 
@@ -260,7 +305,7 @@ library UserCats {
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 4, abi.encodePacked((status)));
+    StoreSwitch.setField(_tableId, _keyTuple, 5, abi.encodePacked((status)));
   }
 
   /** Set status (using the specified store) */
@@ -269,7 +314,7 @@ library UserCats {
     _keyTuple[0] = userId;
     _keyTuple[1] = catId;
 
-    _store.setField(_tableId, _keyTuple, 4, abi.encodePacked((status)));
+    _store.setField(_tableId, _keyTuple, 5, abi.encodePacked((status)));
   }
 
   /** Get the full data */
@@ -296,13 +341,14 @@ library UserCats {
   function set(
     bytes32 userId,
     bytes32 catId,
-    uint32 friendship,
+    uint32 friendshipExp,
+    uint32 friendshipLevel,
     uint256 obtainTime,
     uint256 lostTime,
     uint8 obtainMethod,
     uint8 status
   ) internal {
-    bytes memory _data = encode(friendship, obtainTime, lostTime, obtainMethod, status);
+    bytes memory _data = encode(friendshipExp, friendshipLevel, obtainTime, lostTime, obtainMethod, status);
 
     bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
@@ -316,13 +362,14 @@ library UserCats {
     IStore _store,
     bytes32 userId,
     bytes32 catId,
-    uint32 friendship,
+    uint32 friendshipExp,
+    uint32 friendshipLevel,
     uint256 obtainTime,
     uint256 lostTime,
     uint8 obtainMethod,
     uint8 status
   ) internal {
-    bytes memory _data = encode(friendship, obtainTime, lostTime, obtainMethod, status);
+    bytes memory _data = encode(friendshipExp, friendshipLevel, obtainTime, lostTime, obtainMethod, status);
 
     bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = userId;
@@ -333,7 +380,16 @@ library UserCats {
 
   /** Set the full data using the data struct */
   function set(bytes32 userId, bytes32 catId, UserCatsData memory _table) internal {
-    set(userId, catId, _table.friendship, _table.obtainTime, _table.lostTime, _table.obtainMethod, _table.status);
+    set(
+      userId,
+      catId,
+      _table.friendshipExp,
+      _table.friendshipLevel,
+      _table.obtainTime,
+      _table.lostTime,
+      _table.obtainMethod,
+      _table.status
+    );
   }
 
   /** Set the full data using the data struct (using the specified store) */
@@ -342,7 +398,8 @@ library UserCats {
       _store,
       userId,
       catId,
-      _table.friendship,
+      _table.friendshipExp,
+      _table.friendshipLevel,
       _table.obtainTime,
       _table.lostTime,
       _table.obtainMethod,
@@ -352,26 +409,29 @@ library UserCats {
 
   /** Decode the tightly packed blob using this table's schema */
   function decode(bytes memory _blob) internal pure returns (UserCatsData memory _table) {
-    _table.friendship = (uint32(Bytes.slice4(_blob, 0)));
+    _table.friendshipExp = (uint32(Bytes.slice4(_blob, 0)));
 
-    _table.obtainTime = (uint256(Bytes.slice32(_blob, 4)));
+    _table.friendshipLevel = (uint32(Bytes.slice4(_blob, 4)));
 
-    _table.lostTime = (uint256(Bytes.slice32(_blob, 36)));
+    _table.obtainTime = (uint256(Bytes.slice32(_blob, 8)));
 
-    _table.obtainMethod = (uint8(Bytes.slice1(_blob, 68)));
+    _table.lostTime = (uint256(Bytes.slice32(_blob, 40)));
 
-    _table.status = (uint8(Bytes.slice1(_blob, 69)));
+    _table.obtainMethod = (uint8(Bytes.slice1(_blob, 72)));
+
+    _table.status = (uint8(Bytes.slice1(_blob, 73)));
   }
 
   /** Tightly pack full data using this table's schema */
   function encode(
-    uint32 friendship,
+    uint32 friendshipExp,
+    uint32 friendshipLevel,
     uint256 obtainTime,
     uint256 lostTime,
     uint8 obtainMethod,
     uint8 status
   ) internal view returns (bytes memory) {
-    return abi.encodePacked(friendship, obtainTime, lostTime, obtainMethod, status);
+    return abi.encodePacked(friendshipExp, friendshipLevel, obtainTime, lostTime, obtainMethod, status);
   }
 
   /** Encode keys as a bytes32 array using this table's schema */

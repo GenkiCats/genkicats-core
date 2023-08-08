@@ -21,7 +21,7 @@ bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("ItemL
 bytes32 constant ItemListTableId = _tableId;
 
 struct ItemListData {
-  uint256 itemId;
+  bytes32 itemId;
   uint256 itemNum;
 }
 
@@ -29,7 +29,7 @@ library ItemList {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
     SchemaType[] memory _schema = new SchemaType[](2);
-    _schema[0] = SchemaType.UINT256;
+    _schema[0] = SchemaType.BYTES32;
     _schema[1] = SchemaType.UINT256;
 
     return SchemaLib.encode(_schema);
@@ -73,25 +73,25 @@ library ItemList {
   }
 
   /** Get itemId */
-  function getItemId(bytes32 event_hash) internal view returns (uint256 itemId) {
+  function getItemId(bytes32 event_hash) internal view returns (bytes32 itemId) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = event_hash;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 0);
-    return (uint256(Bytes.slice32(_blob, 0)));
+    return (Bytes.slice32(_blob, 0));
   }
 
   /** Get itemId (using the specified store) */
-  function getItemId(IStore _store, bytes32 event_hash) internal view returns (uint256 itemId) {
+  function getItemId(IStore _store, bytes32 event_hash) internal view returns (bytes32 itemId) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = event_hash;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 0);
-    return (uint256(Bytes.slice32(_blob, 0)));
+    return (Bytes.slice32(_blob, 0));
   }
 
   /** Set itemId */
-  function setItemId(bytes32 event_hash, uint256 itemId) internal {
+  function setItemId(bytes32 event_hash, bytes32 itemId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = event_hash;
 
@@ -99,7 +99,7 @@ library ItemList {
   }
 
   /** Set itemId (using the specified store) */
-  function setItemId(IStore _store, bytes32 event_hash, uint256 itemId) internal {
+  function setItemId(IStore _store, bytes32 event_hash, bytes32 itemId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = event_hash;
 
@@ -159,7 +159,7 @@ library ItemList {
   }
 
   /** Set the full data using individual values */
-  function set(bytes32 event_hash, uint256 itemId, uint256 itemNum) internal {
+  function set(bytes32 event_hash, bytes32 itemId, uint256 itemNum) internal {
     bytes memory _data = encode(itemId, itemNum);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
@@ -169,7 +169,7 @@ library ItemList {
   }
 
   /** Set the full data using individual values (using the specified store) */
-  function set(IStore _store, bytes32 event_hash, uint256 itemId, uint256 itemNum) internal {
+  function set(IStore _store, bytes32 event_hash, bytes32 itemId, uint256 itemNum) internal {
     bytes memory _data = encode(itemId, itemNum);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
@@ -190,13 +190,13 @@ library ItemList {
 
   /** Decode the tightly packed blob using this table's schema */
   function decode(bytes memory _blob) internal pure returns (ItemListData memory _table) {
-    _table.itemId = (uint256(Bytes.slice32(_blob, 0)));
+    _table.itemId = (Bytes.slice32(_blob, 0));
 
     _table.itemNum = (uint256(Bytes.slice32(_blob, 32)));
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint256 itemId, uint256 itemNum) internal view returns (bytes memory) {
+  function encode(bytes32 itemId, uint256 itemNum) internal view returns (bytes memory) {
     return abi.encodePacked(itemId, itemNum);
   }
 

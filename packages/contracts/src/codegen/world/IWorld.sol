@@ -6,18 +6,23 @@ pragma solidity >=0.8.0;
 import { IBaseWorld } from "@latticexyz/world/src/interfaces/IBaseWorld.sol";
 
 import { IAdminSystem } from "./IAdminSystem.sol";
-import { ICatConfigSystem } from "./ICatConfigSystem.sol";
+import { ICatLevelConfigSystem } from "./ICatLevelConfigSystem.sol";
 import { ICatSystem } from "./ICatSystem.sol";
 import { IFoodConfigSystem } from "./IFoodConfigSystem.sol";
-import { ILevelConfigSystem } from "./ILevelConfigSystem.sol";
+import { IHobbyConfigSystem } from "./IHobbyConfigSystem.sol";
+import { IHobbySystem } from "./IHobbySystem.sol";
+import { ILevelHelperSystem } from "./ILevelHelperSystem.sol";
 import { IPeriodEventsSystem } from "./IPeriodEventsSystem.sol";
 import { IQuantityHelperSystem } from "./IQuantityHelperSystem.sol";
+import { IRandDisturbHelperSystem } from "./IRandDisturbHelperSystem.sol";
 import { IShopConfigSystem } from "./IShopConfigSystem.sol";
 import { IShopSystem } from "./IShopSystem.sol";
 import { ITaskConfigSystem } from "./ITaskConfigSystem.sol";
 import { ITaskSystem } from "./ITaskSystem.sol";
 import { ITimeZoneSystem } from "./ITimeZoneSystem.sol";
+import { IUserLevelConfigSystem } from "./IUserLevelConfigSystem.sol";
 import { IUserSystem } from "./IUserSystem.sol";
+import { IWeightedSampleConfigSystem } from "./IWeightedSampleConfigSystem.sol";
 
 /**
  * The IWorld interface includes all systems dynamically added to the World
@@ -26,18 +31,23 @@ import { IUserSystem } from "./IUserSystem.sol";
 interface IWorld is
   IBaseWorld,
   IAdminSystem,
-  ICatConfigSystem,
+  ICatLevelConfigSystem,
   ICatSystem,
   IFoodConfigSystem,
-  ILevelConfigSystem,
+  IHobbyConfigSystem,
+  IHobbySystem,
+  ILevelHelperSystem,
   IPeriodEventsSystem,
   IQuantityHelperSystem,
+  IRandDisturbHelperSystem,
   IShopConfigSystem,
   IShopSystem,
   ITaskConfigSystem,
   ITaskSystem,
   ITimeZoneSystem,
-  IUserSystem
+  IUserLevelConfigSystem,
+  IUserSystem,
+  IWeightedSampleConfigSystem
 {
 
 }

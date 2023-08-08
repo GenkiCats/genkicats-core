@@ -22,31 +22,34 @@ bytes32 constant FoodConfigTableId = _tableId;
 
 struct FoodConfigData {
   uint32 hunger;
-  uint32 travelDropRate;
+  uint32 dropRate;
+  uint32 hungerCoinRate;
 }
 
 library FoodConfig {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](2);
+    SchemaType[] memory _schema = new SchemaType[](3);
     _schema[0] = SchemaType.UINT32;
     _schema[1] = SchemaType.UINT32;
+    _schema[2] = SchemaType.UINT32;
 
     return SchemaLib.encode(_schema);
   }
 
   function getKeySchema() internal pure returns (Schema) {
     SchemaType[] memory _schema = new SchemaType[](1);
-    _schema[0] = SchemaType.UINT256;
+    _schema[0] = SchemaType.BYTES32;
 
     return SchemaLib.encode(_schema);
   }
 
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
-    string[] memory _fieldNames = new string[](2);
+    string[] memory _fieldNames = new string[](3);
     _fieldNames[0] = "hunger";
-    _fieldNames[1] = "travelDropRate";
+    _fieldNames[1] = "dropRate";
+    _fieldNames[2] = "hungerCoinRate";
     return ("FoodConfig", _fieldNames);
   }
 
@@ -73,151 +76,187 @@ library FoodConfig {
   }
 
   /** Get hunger */
-  function getHunger(uint256 itemId) internal view returns (uint32 hunger) {
+  function getHunger(bytes32 itemId) internal view returns (uint32 hunger) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(itemId));
+    _keyTuple[0] = itemId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 0);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Get hunger (using the specified store) */
-  function getHunger(IStore _store, uint256 itemId) internal view returns (uint32 hunger) {
+  function getHunger(IStore _store, bytes32 itemId) internal view returns (uint32 hunger) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(itemId));
+    _keyTuple[0] = itemId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 0);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Set hunger */
-  function setHunger(uint256 itemId, uint32 hunger) internal {
+  function setHunger(bytes32 itemId, uint32 hunger) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(itemId));
+    _keyTuple[0] = itemId;
 
     StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((hunger)));
   }
 
   /** Set hunger (using the specified store) */
-  function setHunger(IStore _store, uint256 itemId, uint32 hunger) internal {
+  function setHunger(IStore _store, bytes32 itemId, uint32 hunger) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(itemId));
+    _keyTuple[0] = itemId;
 
     _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((hunger)));
   }
 
-  /** Get travelDropRate */
-  function getTravelDropRate(uint256 itemId) internal view returns (uint32 travelDropRate) {
+  /** Get dropRate */
+  function getDropRate(bytes32 itemId) internal view returns (uint32 dropRate) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(itemId));
+    _keyTuple[0] = itemId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Get travelDropRate (using the specified store) */
-  function getTravelDropRate(IStore _store, uint256 itemId) internal view returns (uint32 travelDropRate) {
+  /** Get dropRate (using the specified store) */
+  function getDropRate(IStore _store, bytes32 itemId) internal view returns (uint32 dropRate) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(itemId));
+    _keyTuple[0] = itemId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Set travelDropRate */
-  function setTravelDropRate(uint256 itemId, uint32 travelDropRate) internal {
+  /** Set dropRate */
+  function setDropRate(bytes32 itemId, uint32 dropRate) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(itemId));
+    _keyTuple[0] = itemId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((travelDropRate)));
+    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((dropRate)));
   }
 
-  /** Set travelDropRate (using the specified store) */
-  function setTravelDropRate(IStore _store, uint256 itemId, uint32 travelDropRate) internal {
+  /** Set dropRate (using the specified store) */
+  function setDropRate(IStore _store, bytes32 itemId, uint32 dropRate) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(itemId));
+    _keyTuple[0] = itemId;
 
-    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((travelDropRate)));
+    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((dropRate)));
+  }
+
+  /** Get hungerCoinRate */
+  function getHungerCoinRate(bytes32 itemId) internal view returns (uint32 hungerCoinRate) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = itemId;
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
+    return (uint32(Bytes.slice4(_blob, 0)));
+  }
+
+  /** Get hungerCoinRate (using the specified store) */
+  function getHungerCoinRate(IStore _store, bytes32 itemId) internal view returns (uint32 hungerCoinRate) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = itemId;
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
+    return (uint32(Bytes.slice4(_blob, 0)));
+  }
+
+  /** Set hungerCoinRate */
+  function setHungerCoinRate(bytes32 itemId, uint32 hungerCoinRate) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = itemId;
+
+    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((hungerCoinRate)));
+  }
+
+  /** Set hungerCoinRate (using the specified store) */
+  function setHungerCoinRate(IStore _store, bytes32 itemId, uint32 hungerCoinRate) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = itemId;
+
+    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((hungerCoinRate)));
   }
 
   /** Get the full data */
-  function get(uint256 itemId) internal view returns (FoodConfigData memory _table) {
+  function get(bytes32 itemId) internal view returns (FoodConfigData memory _table) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(itemId));
+    _keyTuple[0] = itemId;
 
     bytes memory _blob = StoreSwitch.getRecord(_tableId, _keyTuple, getSchema());
     return decode(_blob);
   }
 
   /** Get the full data (using the specified store) */
-  function get(IStore _store, uint256 itemId) internal view returns (FoodConfigData memory _table) {
+  function get(IStore _store, bytes32 itemId) internal view returns (FoodConfigData memory _table) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(itemId));
+    _keyTuple[0] = itemId;
 
     bytes memory _blob = _store.getRecord(_tableId, _keyTuple, getSchema());
     return decode(_blob);
   }
 
   /** Set the full data using individual values */
-  function set(uint256 itemId, uint32 hunger, uint32 travelDropRate) internal {
-    bytes memory _data = encode(hunger, travelDropRate);
+  function set(bytes32 itemId, uint32 hunger, uint32 dropRate, uint32 hungerCoinRate) internal {
+    bytes memory _data = encode(hunger, dropRate, hungerCoinRate);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(itemId));
+    _keyTuple[0] = itemId;
 
     StoreSwitch.setRecord(_tableId, _keyTuple, _data);
   }
 
   /** Set the full data using individual values (using the specified store) */
-  function set(IStore _store, uint256 itemId, uint32 hunger, uint32 travelDropRate) internal {
-    bytes memory _data = encode(hunger, travelDropRate);
+  function set(IStore _store, bytes32 itemId, uint32 hunger, uint32 dropRate, uint32 hungerCoinRate) internal {
+    bytes memory _data = encode(hunger, dropRate, hungerCoinRate);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(itemId));
+    _keyTuple[0] = itemId;
 
     _store.setRecord(_tableId, _keyTuple, _data);
   }
 
   /** Set the full data using the data struct */
-  function set(uint256 itemId, FoodConfigData memory _table) internal {
-    set(itemId, _table.hunger, _table.travelDropRate);
+  function set(bytes32 itemId, FoodConfigData memory _table) internal {
+    set(itemId, _table.hunger, _table.dropRate, _table.hungerCoinRate);
   }
 
   /** Set the full data using the data struct (using the specified store) */
-  function set(IStore _store, uint256 itemId, FoodConfigData memory _table) internal {
-    set(_store, itemId, _table.hunger, _table.travelDropRate);
+  function set(IStore _store, bytes32 itemId, FoodConfigData memory _table) internal {
+    set(_store, itemId, _table.hunger, _table.dropRate, _table.hungerCoinRate);
   }
 
   /** Decode the tightly packed blob using this table's schema */
   function decode(bytes memory _blob) internal pure returns (FoodConfigData memory _table) {
     _table.hunger = (uint32(Bytes.slice4(_blob, 0)));
 
-    _table.travelDropRate = (uint32(Bytes.slice4(_blob, 4)));
+    _table.dropRate = (uint32(Bytes.slice4(_blob, 4)));
+
+    _table.hungerCoinRate = (uint32(Bytes.slice4(_blob, 8)));
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint32 hunger, uint32 travelDropRate) internal view returns (bytes memory) {
-    return abi.encodePacked(hunger, travelDropRate);
+  function encode(uint32 hunger, uint32 dropRate, uint32 hungerCoinRate) internal view returns (bytes memory) {
+    return abi.encodePacked(hunger, dropRate, hungerCoinRate);
   }
 
   /** Encode keys as a bytes32 array using this table's schema */
-  function encodeKeyTuple(uint256 itemId) internal pure returns (bytes32[] memory _keyTuple) {
+  function encodeKeyTuple(bytes32 itemId) internal pure returns (bytes32[] memory _keyTuple) {
     _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(itemId));
+    _keyTuple[0] = itemId;
   }
 
   /* Delete all data for given keys */
-  function deleteRecord(uint256 itemId) internal {
+  function deleteRecord(bytes32 itemId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(itemId));
+    _keyTuple[0] = itemId;
 
     StoreSwitch.deleteRecord(_tableId, _keyTuple);
   }
 
   /* Delete all data for given keys (using the specified store) */
-  function deleteRecord(IStore _store, uint256 itemId) internal {
+  function deleteRecord(IStore _store, bytes32 itemId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(itemId));
+    _keyTuple[0] = itemId;
 
     _store.deleteRecord(_tableId, _keyTuple);
   }

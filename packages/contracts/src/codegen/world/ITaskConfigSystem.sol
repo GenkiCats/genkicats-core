@@ -5,17 +5,18 @@ pragma solidity >=0.8.0;
 
 interface ITaskConfigSystem {
   function setTask(
-    uint taskId,
+    bytes32 taskId,
     uint32 level,
     uint32 dupPeriod,
     uint32 rewardExp,
     uint256 rewardCoins,
     uint256 rewardDiamonds,
     bool itemConsumed,
-    uint256[] memory itemIds,
+    bytes32[] memory itemIds,
     uint32[] memory itemQuantities,
-    uint256[] memory rewardItemIds,
+    bytes32[] memory rewardItemIds,
     uint32[] memory rewardItemQuantities,
-    string memory uri
+    string memory uri,
+    string memory name
   ) external;
 }

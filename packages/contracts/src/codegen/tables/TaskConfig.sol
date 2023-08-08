@@ -27,42 +27,40 @@ struct TaskConfigData {
   uint256 rewardCoins;
   uint256 rewardDiamonds;
   bool itemConsumed;
-  uint256[] itemIds;
+  bytes32[] itemIds;
   uint32[] itemQuantities;
-  uint256[] rewardItemIds;
+  bytes32[] rewardItemIds;
   uint32[] rewardItemQuantities;
-  string uri;
 }
 
 library TaskConfig {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](11);
+    SchemaType[] memory _schema = new SchemaType[](10);
     _schema[0] = SchemaType.UINT32;
     _schema[1] = SchemaType.UINT32;
     _schema[2] = SchemaType.UINT32;
     _schema[3] = SchemaType.UINT256;
     _schema[4] = SchemaType.UINT256;
     _schema[5] = SchemaType.BOOL;
-    _schema[6] = SchemaType.UINT256_ARRAY;
+    _schema[6] = SchemaType.BYTES32_ARRAY;
     _schema[7] = SchemaType.UINT32_ARRAY;
-    _schema[8] = SchemaType.UINT256_ARRAY;
+    _schema[8] = SchemaType.BYTES32_ARRAY;
     _schema[9] = SchemaType.UINT32_ARRAY;
-    _schema[10] = SchemaType.STRING;
 
     return SchemaLib.encode(_schema);
   }
 
   function getKeySchema() internal pure returns (Schema) {
     SchemaType[] memory _schema = new SchemaType[](1);
-    _schema[0] = SchemaType.UINT256;
+    _schema[0] = SchemaType.BYTES32;
 
     return SchemaLib.encode(_schema);
   }
 
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
-    string[] memory _fieldNames = new string[](11);
+    string[] memory _fieldNames = new string[](10);
     _fieldNames[0] = "level";
     _fieldNames[1] = "dupPeriod";
     _fieldNames[2] = "rewardExp";
@@ -73,7 +71,6 @@ library TaskConfig {
     _fieldNames[7] = "itemQuantities";
     _fieldNames[8] = "rewardItemIds";
     _fieldNames[9] = "rewardItemQuantities";
-    _fieldNames[10] = "uri";
     return ("TaskConfig", _fieldNames);
   }
 
@@ -100,567 +97,567 @@ library TaskConfig {
   }
 
   /** Get level */
-  function getLevel(uint256 taskId) internal view returns (uint32 level) {
+  function getLevel(bytes32 taskId) internal view returns (uint32 level) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 0);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Get level (using the specified store) */
-  function getLevel(IStore _store, uint256 taskId) internal view returns (uint32 level) {
+  function getLevel(IStore _store, bytes32 taskId) internal view returns (uint32 level) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 0);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Set level */
-  function setLevel(uint256 taskId, uint32 level) internal {
+  function setLevel(bytes32 taskId, uint32 level) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((level)));
   }
 
   /** Set level (using the specified store) */
-  function setLevel(IStore _store, uint256 taskId, uint32 level) internal {
+  function setLevel(IStore _store, bytes32 taskId, uint32 level) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((level)));
   }
 
   /** Get dupPeriod */
-  function getDupPeriod(uint256 taskId) internal view returns (uint32 dupPeriod) {
+  function getDupPeriod(bytes32 taskId) internal view returns (uint32 dupPeriod) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Get dupPeriod (using the specified store) */
-  function getDupPeriod(IStore _store, uint256 taskId) internal view returns (uint32 dupPeriod) {
+  function getDupPeriod(IStore _store, bytes32 taskId) internal view returns (uint32 dupPeriod) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Set dupPeriod */
-  function setDupPeriod(uint256 taskId, uint32 dupPeriod) internal {
+  function setDupPeriod(bytes32 taskId, uint32 dupPeriod) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((dupPeriod)));
   }
 
   /** Set dupPeriod (using the specified store) */
-  function setDupPeriod(IStore _store, uint256 taskId, uint32 dupPeriod) internal {
+  function setDupPeriod(IStore _store, bytes32 taskId, uint32 dupPeriod) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((dupPeriod)));
   }
 
   /** Get rewardExp */
-  function getRewardExp(uint256 taskId) internal view returns (uint32 rewardExp) {
+  function getRewardExp(bytes32 taskId) internal view returns (uint32 rewardExp) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Get rewardExp (using the specified store) */
-  function getRewardExp(IStore _store, uint256 taskId) internal view returns (uint32 rewardExp) {
+  function getRewardExp(IStore _store, bytes32 taskId) internal view returns (uint32 rewardExp) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Set rewardExp */
-  function setRewardExp(uint256 taskId, uint32 rewardExp) internal {
+  function setRewardExp(bytes32 taskId, uint32 rewardExp) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((rewardExp)));
   }
 
   /** Set rewardExp (using the specified store) */
-  function setRewardExp(IStore _store, uint256 taskId, uint32 rewardExp) internal {
+  function setRewardExp(IStore _store, bytes32 taskId, uint32 rewardExp) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((rewardExp)));
   }
 
   /** Get rewardCoins */
-  function getRewardCoins(uint256 taskId) internal view returns (uint256 rewardCoins) {
+  function getRewardCoins(bytes32 taskId) internal view returns (uint256 rewardCoins) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Get rewardCoins (using the specified store) */
-  function getRewardCoins(IStore _store, uint256 taskId) internal view returns (uint256 rewardCoins) {
+  function getRewardCoins(IStore _store, bytes32 taskId) internal view returns (uint256 rewardCoins) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Set rewardCoins */
-  function setRewardCoins(uint256 taskId, uint256 rewardCoins) internal {
+  function setRewardCoins(bytes32 taskId, uint256 rewardCoins) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.setField(_tableId, _keyTuple, 3, abi.encodePacked((rewardCoins)));
   }
 
   /** Set rewardCoins (using the specified store) */
-  function setRewardCoins(IStore _store, uint256 taskId, uint256 rewardCoins) internal {
+  function setRewardCoins(IStore _store, bytes32 taskId, uint256 rewardCoins) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.setField(_tableId, _keyTuple, 3, abi.encodePacked((rewardCoins)));
   }
 
   /** Get rewardDiamonds */
-  function getRewardDiamonds(uint256 taskId) internal view returns (uint256 rewardDiamonds) {
+  function getRewardDiamonds(bytes32 taskId) internal view returns (uint256 rewardDiamonds) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 4);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Get rewardDiamonds (using the specified store) */
-  function getRewardDiamonds(IStore _store, uint256 taskId) internal view returns (uint256 rewardDiamonds) {
+  function getRewardDiamonds(IStore _store, bytes32 taskId) internal view returns (uint256 rewardDiamonds) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 4);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
   /** Set rewardDiamonds */
-  function setRewardDiamonds(uint256 taskId, uint256 rewardDiamonds) internal {
+  function setRewardDiamonds(bytes32 taskId, uint256 rewardDiamonds) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.setField(_tableId, _keyTuple, 4, abi.encodePacked((rewardDiamonds)));
   }
 
   /** Set rewardDiamonds (using the specified store) */
-  function setRewardDiamonds(IStore _store, uint256 taskId, uint256 rewardDiamonds) internal {
+  function setRewardDiamonds(IStore _store, bytes32 taskId, uint256 rewardDiamonds) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.setField(_tableId, _keyTuple, 4, abi.encodePacked((rewardDiamonds)));
   }
 
   /** Get itemConsumed */
-  function getItemConsumed(uint256 taskId) internal view returns (bool itemConsumed) {
+  function getItemConsumed(bytes32 taskId) internal view returns (bool itemConsumed) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 5);
     return (_toBool(uint8(Bytes.slice1(_blob, 0))));
   }
 
   /** Get itemConsumed (using the specified store) */
-  function getItemConsumed(IStore _store, uint256 taskId) internal view returns (bool itemConsumed) {
+  function getItemConsumed(IStore _store, bytes32 taskId) internal view returns (bool itemConsumed) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 5);
     return (_toBool(uint8(Bytes.slice1(_blob, 0))));
   }
 
   /** Set itemConsumed */
-  function setItemConsumed(uint256 taskId, bool itemConsumed) internal {
+  function setItemConsumed(bytes32 taskId, bool itemConsumed) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.setField(_tableId, _keyTuple, 5, abi.encodePacked((itemConsumed)));
   }
 
   /** Set itemConsumed (using the specified store) */
-  function setItemConsumed(IStore _store, uint256 taskId, bool itemConsumed) internal {
+  function setItemConsumed(IStore _store, bytes32 taskId, bool itemConsumed) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.setField(_tableId, _keyTuple, 5, abi.encodePacked((itemConsumed)));
   }
 
   /** Get itemIds */
-  function getItemIds(uint256 taskId) internal view returns (uint256[] memory itemIds) {
+  function getItemIds(bytes32 taskId) internal view returns (bytes32[] memory itemIds) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 6);
-    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
+    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_bytes32());
   }
 
   /** Get itemIds (using the specified store) */
-  function getItemIds(IStore _store, uint256 taskId) internal view returns (uint256[] memory itemIds) {
+  function getItemIds(IStore _store, bytes32 taskId) internal view returns (bytes32[] memory itemIds) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 6);
-    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
+    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_bytes32());
   }
 
   /** Set itemIds */
-  function setItemIds(uint256 taskId, uint256[] memory itemIds) internal {
+  function setItemIds(bytes32 taskId, bytes32[] memory itemIds) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.setField(_tableId, _keyTuple, 6, EncodeArray.encode((itemIds)));
   }
 
   /** Set itemIds (using the specified store) */
-  function setItemIds(IStore _store, uint256 taskId, uint256[] memory itemIds) internal {
+  function setItemIds(IStore _store, bytes32 taskId, bytes32[] memory itemIds) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.setField(_tableId, _keyTuple, 6, EncodeArray.encode((itemIds)));
   }
 
   /** Get the length of itemIds */
-  function lengthItemIds(uint256 taskId) internal view returns (uint256) {
+  function lengthItemIds(bytes32 taskId) internal view returns (uint256) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 6, getSchema());
     return _byteLength / 32;
   }
 
   /** Get the length of itemIds (using the specified store) */
-  function lengthItemIds(IStore _store, uint256 taskId) internal view returns (uint256) {
+  function lengthItemIds(IStore _store, bytes32 taskId) internal view returns (uint256) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 6, getSchema());
     return _byteLength / 32;
   }
 
   /** Get an item of itemIds (unchecked, returns invalid data if index overflows) */
-  function getItemItemIds(uint256 taskId, uint256 _index) internal view returns (uint256) {
+  function getItemItemIds(bytes32 taskId, uint256 _index) internal view returns (bytes32) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 6, getSchema(), _index * 32, (_index + 1) * 32);
-    return (uint256(Bytes.slice32(_blob, 0)));
+    return (Bytes.slice32(_blob, 0));
   }
 
   /** Get an item of itemIds (using the specified store) (unchecked, returns invalid data if index overflows) */
-  function getItemItemIds(IStore _store, uint256 taskId, uint256 _index) internal view returns (uint256) {
+  function getItemItemIds(IStore _store, bytes32 taskId, uint256 _index) internal view returns (bytes32) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 6, getSchema(), _index * 32, (_index + 1) * 32);
-    return (uint256(Bytes.slice32(_blob, 0)));
+    return (Bytes.slice32(_blob, 0));
   }
 
   /** Push an element to itemIds */
-  function pushItemIds(uint256 taskId, uint256 _element) internal {
+  function pushItemIds(bytes32 taskId, bytes32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.pushToField(_tableId, _keyTuple, 6, abi.encodePacked((_element)));
   }
 
   /** Push an element to itemIds (using the specified store) */
-  function pushItemIds(IStore _store, uint256 taskId, uint256 _element) internal {
+  function pushItemIds(IStore _store, bytes32 taskId, bytes32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.pushToField(_tableId, _keyTuple, 6, abi.encodePacked((_element)));
   }
 
   /** Pop an element from itemIds */
-  function popItemIds(uint256 taskId) internal {
+  function popItemIds(bytes32 taskId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.popFromField(_tableId, _keyTuple, 6, 32);
   }
 
   /** Pop an element from itemIds (using the specified store) */
-  function popItemIds(IStore _store, uint256 taskId) internal {
+  function popItemIds(IStore _store, bytes32 taskId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.popFromField(_tableId, _keyTuple, 6, 32);
   }
 
   /** Update an element of itemIds at `_index` */
-  function updateItemIds(uint256 taskId, uint256 _index, uint256 _element) internal {
+  function updateItemIds(bytes32 taskId, uint256 _index, bytes32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.updateInField(_tableId, _keyTuple, 6, _index * 32, abi.encodePacked((_element)));
   }
 
   /** Update an element of itemIds (using the specified store) at `_index` */
-  function updateItemIds(IStore _store, uint256 taskId, uint256 _index, uint256 _element) internal {
+  function updateItemIds(IStore _store, bytes32 taskId, uint256 _index, bytes32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.updateInField(_tableId, _keyTuple, 6, _index * 32, abi.encodePacked((_element)));
   }
 
   /** Get itemQuantities */
-  function getItemQuantities(uint256 taskId) internal view returns (uint32[] memory itemQuantities) {
+  function getItemQuantities(bytes32 taskId) internal view returns (uint32[] memory itemQuantities) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 7);
     return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint32());
   }
 
   /** Get itemQuantities (using the specified store) */
-  function getItemQuantities(IStore _store, uint256 taskId) internal view returns (uint32[] memory itemQuantities) {
+  function getItemQuantities(IStore _store, bytes32 taskId) internal view returns (uint32[] memory itemQuantities) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 7);
     return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint32());
   }
 
   /** Set itemQuantities */
-  function setItemQuantities(uint256 taskId, uint32[] memory itemQuantities) internal {
+  function setItemQuantities(bytes32 taskId, uint32[] memory itemQuantities) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.setField(_tableId, _keyTuple, 7, EncodeArray.encode((itemQuantities)));
   }
 
   /** Set itemQuantities (using the specified store) */
-  function setItemQuantities(IStore _store, uint256 taskId, uint32[] memory itemQuantities) internal {
+  function setItemQuantities(IStore _store, bytes32 taskId, uint32[] memory itemQuantities) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.setField(_tableId, _keyTuple, 7, EncodeArray.encode((itemQuantities)));
   }
 
   /** Get the length of itemQuantities */
-  function lengthItemQuantities(uint256 taskId) internal view returns (uint256) {
+  function lengthItemQuantities(bytes32 taskId) internal view returns (uint256) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 7, getSchema());
     return _byteLength / 4;
   }
 
   /** Get the length of itemQuantities (using the specified store) */
-  function lengthItemQuantities(IStore _store, uint256 taskId) internal view returns (uint256) {
+  function lengthItemQuantities(IStore _store, bytes32 taskId) internal view returns (uint256) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 7, getSchema());
     return _byteLength / 4;
   }
 
   /** Get an item of itemQuantities (unchecked, returns invalid data if index overflows) */
-  function getItemItemQuantities(uint256 taskId, uint256 _index) internal view returns (uint32) {
+  function getItemItemQuantities(bytes32 taskId, uint256 _index) internal view returns (uint32) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 7, getSchema(), _index * 4, (_index + 1) * 4);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Get an item of itemQuantities (using the specified store) (unchecked, returns invalid data if index overflows) */
-  function getItemItemQuantities(IStore _store, uint256 taskId, uint256 _index) internal view returns (uint32) {
+  function getItemItemQuantities(IStore _store, bytes32 taskId, uint256 _index) internal view returns (uint32) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 7, getSchema(), _index * 4, (_index + 1) * 4);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Push an element to itemQuantities */
-  function pushItemQuantities(uint256 taskId, uint32 _element) internal {
+  function pushItemQuantities(bytes32 taskId, uint32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.pushToField(_tableId, _keyTuple, 7, abi.encodePacked((_element)));
   }
 
   /** Push an element to itemQuantities (using the specified store) */
-  function pushItemQuantities(IStore _store, uint256 taskId, uint32 _element) internal {
+  function pushItemQuantities(IStore _store, bytes32 taskId, uint32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.pushToField(_tableId, _keyTuple, 7, abi.encodePacked((_element)));
   }
 
   /** Pop an element from itemQuantities */
-  function popItemQuantities(uint256 taskId) internal {
+  function popItemQuantities(bytes32 taskId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.popFromField(_tableId, _keyTuple, 7, 4);
   }
 
   /** Pop an element from itemQuantities (using the specified store) */
-  function popItemQuantities(IStore _store, uint256 taskId) internal {
+  function popItemQuantities(IStore _store, bytes32 taskId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.popFromField(_tableId, _keyTuple, 7, 4);
   }
 
   /** Update an element of itemQuantities at `_index` */
-  function updateItemQuantities(uint256 taskId, uint256 _index, uint32 _element) internal {
+  function updateItemQuantities(bytes32 taskId, uint256 _index, uint32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.updateInField(_tableId, _keyTuple, 7, _index * 4, abi.encodePacked((_element)));
   }
 
   /** Update an element of itemQuantities (using the specified store) at `_index` */
-  function updateItemQuantities(IStore _store, uint256 taskId, uint256 _index, uint32 _element) internal {
+  function updateItemQuantities(IStore _store, bytes32 taskId, uint256 _index, uint32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.updateInField(_tableId, _keyTuple, 7, _index * 4, abi.encodePacked((_element)));
   }
 
   /** Get rewardItemIds */
-  function getRewardItemIds(uint256 taskId) internal view returns (uint256[] memory rewardItemIds) {
+  function getRewardItemIds(bytes32 taskId) internal view returns (bytes32[] memory rewardItemIds) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 8);
-    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
+    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_bytes32());
   }
 
   /** Get rewardItemIds (using the specified store) */
-  function getRewardItemIds(IStore _store, uint256 taskId) internal view returns (uint256[] memory rewardItemIds) {
+  function getRewardItemIds(IStore _store, bytes32 taskId) internal view returns (bytes32[] memory rewardItemIds) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 8);
-    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
+    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_bytes32());
   }
 
   /** Set rewardItemIds */
-  function setRewardItemIds(uint256 taskId, uint256[] memory rewardItemIds) internal {
+  function setRewardItemIds(bytes32 taskId, bytes32[] memory rewardItemIds) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.setField(_tableId, _keyTuple, 8, EncodeArray.encode((rewardItemIds)));
   }
 
   /** Set rewardItemIds (using the specified store) */
-  function setRewardItemIds(IStore _store, uint256 taskId, uint256[] memory rewardItemIds) internal {
+  function setRewardItemIds(IStore _store, bytes32 taskId, bytes32[] memory rewardItemIds) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.setField(_tableId, _keyTuple, 8, EncodeArray.encode((rewardItemIds)));
   }
 
   /** Get the length of rewardItemIds */
-  function lengthRewardItemIds(uint256 taskId) internal view returns (uint256) {
+  function lengthRewardItemIds(bytes32 taskId) internal view returns (uint256) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 8, getSchema());
     return _byteLength / 32;
   }
 
   /** Get the length of rewardItemIds (using the specified store) */
-  function lengthRewardItemIds(IStore _store, uint256 taskId) internal view returns (uint256) {
+  function lengthRewardItemIds(IStore _store, bytes32 taskId) internal view returns (uint256) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 8, getSchema());
     return _byteLength / 32;
   }
 
   /** Get an item of rewardItemIds (unchecked, returns invalid data if index overflows) */
-  function getItemRewardItemIds(uint256 taskId, uint256 _index) internal view returns (uint256) {
+  function getItemRewardItemIds(bytes32 taskId, uint256 _index) internal view returns (bytes32) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 8, getSchema(), _index * 32, (_index + 1) * 32);
-    return (uint256(Bytes.slice32(_blob, 0)));
+    return (Bytes.slice32(_blob, 0));
   }
 
   /** Get an item of rewardItemIds (using the specified store) (unchecked, returns invalid data if index overflows) */
-  function getItemRewardItemIds(IStore _store, uint256 taskId, uint256 _index) internal view returns (uint256) {
+  function getItemRewardItemIds(IStore _store, bytes32 taskId, uint256 _index) internal view returns (bytes32) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 8, getSchema(), _index * 32, (_index + 1) * 32);
-    return (uint256(Bytes.slice32(_blob, 0)));
+    return (Bytes.slice32(_blob, 0));
   }
 
   /** Push an element to rewardItemIds */
-  function pushRewardItemIds(uint256 taskId, uint256 _element) internal {
+  function pushRewardItemIds(bytes32 taskId, bytes32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.pushToField(_tableId, _keyTuple, 8, abi.encodePacked((_element)));
   }
 
   /** Push an element to rewardItemIds (using the specified store) */
-  function pushRewardItemIds(IStore _store, uint256 taskId, uint256 _element) internal {
+  function pushRewardItemIds(IStore _store, bytes32 taskId, bytes32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.pushToField(_tableId, _keyTuple, 8, abi.encodePacked((_element)));
   }
 
   /** Pop an element from rewardItemIds */
-  function popRewardItemIds(uint256 taskId) internal {
+  function popRewardItemIds(bytes32 taskId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.popFromField(_tableId, _keyTuple, 8, 32);
   }
 
   /** Pop an element from rewardItemIds (using the specified store) */
-  function popRewardItemIds(IStore _store, uint256 taskId) internal {
+  function popRewardItemIds(IStore _store, bytes32 taskId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.popFromField(_tableId, _keyTuple, 8, 32);
   }
 
   /** Update an element of rewardItemIds at `_index` */
-  function updateRewardItemIds(uint256 taskId, uint256 _index, uint256 _element) internal {
+  function updateRewardItemIds(bytes32 taskId, uint256 _index, bytes32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.updateInField(_tableId, _keyTuple, 8, _index * 32, abi.encodePacked((_element)));
   }
 
   /** Update an element of rewardItemIds (using the specified store) at `_index` */
-  function updateRewardItemIds(IStore _store, uint256 taskId, uint256 _index, uint256 _element) internal {
+  function updateRewardItemIds(IStore _store, bytes32 taskId, uint256 _index, bytes32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.updateInField(_tableId, _keyTuple, 8, _index * 32, abi.encodePacked((_element)));
   }
 
   /** Get rewardItemQuantities */
-  function getRewardItemQuantities(uint256 taskId) internal view returns (uint32[] memory rewardItemQuantities) {
+  function getRewardItemQuantities(bytes32 taskId) internal view returns (uint32[] memory rewardItemQuantities) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 9);
     return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint32());
@@ -669,246 +666,128 @@ library TaskConfig {
   /** Get rewardItemQuantities (using the specified store) */
   function getRewardItemQuantities(
     IStore _store,
-    uint256 taskId
+    bytes32 taskId
   ) internal view returns (uint32[] memory rewardItemQuantities) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 9);
     return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint32());
   }
 
   /** Set rewardItemQuantities */
-  function setRewardItemQuantities(uint256 taskId, uint32[] memory rewardItemQuantities) internal {
+  function setRewardItemQuantities(bytes32 taskId, uint32[] memory rewardItemQuantities) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.setField(_tableId, _keyTuple, 9, EncodeArray.encode((rewardItemQuantities)));
   }
 
   /** Set rewardItemQuantities (using the specified store) */
-  function setRewardItemQuantities(IStore _store, uint256 taskId, uint32[] memory rewardItemQuantities) internal {
+  function setRewardItemQuantities(IStore _store, bytes32 taskId, uint32[] memory rewardItemQuantities) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.setField(_tableId, _keyTuple, 9, EncodeArray.encode((rewardItemQuantities)));
   }
 
   /** Get the length of rewardItemQuantities */
-  function lengthRewardItemQuantities(uint256 taskId) internal view returns (uint256) {
+  function lengthRewardItemQuantities(bytes32 taskId) internal view returns (uint256) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 9, getSchema());
     return _byteLength / 4;
   }
 
   /** Get the length of rewardItemQuantities (using the specified store) */
-  function lengthRewardItemQuantities(IStore _store, uint256 taskId) internal view returns (uint256) {
+  function lengthRewardItemQuantities(IStore _store, bytes32 taskId) internal view returns (uint256) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 9, getSchema());
     return _byteLength / 4;
   }
 
   /** Get an item of rewardItemQuantities (unchecked, returns invalid data if index overflows) */
-  function getItemRewardItemQuantities(uint256 taskId, uint256 _index) internal view returns (uint32) {
+  function getItemRewardItemQuantities(bytes32 taskId, uint256 _index) internal view returns (uint32) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 9, getSchema(), _index * 4, (_index + 1) * 4);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Get an item of rewardItemQuantities (using the specified store) (unchecked, returns invalid data if index overflows) */
-  function getItemRewardItemQuantities(IStore _store, uint256 taskId, uint256 _index) internal view returns (uint32) {
+  function getItemRewardItemQuantities(IStore _store, bytes32 taskId, uint256 _index) internal view returns (uint32) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 9, getSchema(), _index * 4, (_index + 1) * 4);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Push an element to rewardItemQuantities */
-  function pushRewardItemQuantities(uint256 taskId, uint32 _element) internal {
+  function pushRewardItemQuantities(bytes32 taskId, uint32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.pushToField(_tableId, _keyTuple, 9, abi.encodePacked((_element)));
   }
 
   /** Push an element to rewardItemQuantities (using the specified store) */
-  function pushRewardItemQuantities(IStore _store, uint256 taskId, uint32 _element) internal {
+  function pushRewardItemQuantities(IStore _store, bytes32 taskId, uint32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.pushToField(_tableId, _keyTuple, 9, abi.encodePacked((_element)));
   }
 
   /** Pop an element from rewardItemQuantities */
-  function popRewardItemQuantities(uint256 taskId) internal {
+  function popRewardItemQuantities(bytes32 taskId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.popFromField(_tableId, _keyTuple, 9, 4);
   }
 
   /** Pop an element from rewardItemQuantities (using the specified store) */
-  function popRewardItemQuantities(IStore _store, uint256 taskId) internal {
+  function popRewardItemQuantities(IStore _store, bytes32 taskId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.popFromField(_tableId, _keyTuple, 9, 4);
   }
 
   /** Update an element of rewardItemQuantities at `_index` */
-  function updateRewardItemQuantities(uint256 taskId, uint256 _index, uint32 _element) internal {
+  function updateRewardItemQuantities(bytes32 taskId, uint256 _index, uint32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.updateInField(_tableId, _keyTuple, 9, _index * 4, abi.encodePacked((_element)));
   }
 
   /** Update an element of rewardItemQuantities (using the specified store) at `_index` */
-  function updateRewardItemQuantities(IStore _store, uint256 taskId, uint256 _index, uint32 _element) internal {
+  function updateRewardItemQuantities(IStore _store, bytes32 taskId, uint256 _index, uint32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.updateInField(_tableId, _keyTuple, 9, _index * 4, abi.encodePacked((_element)));
   }
 
-  /** Get uri */
-  function getUri(uint256 taskId) internal view returns (string memory uri) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
-
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 10);
-    return (string(_blob));
-  }
-
-  /** Get uri (using the specified store) */
-  function getUri(IStore _store, uint256 taskId) internal view returns (string memory uri) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
-
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 10);
-    return (string(_blob));
-  }
-
-  /** Set uri */
-  function setUri(uint256 taskId, string memory uri) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
-
-    StoreSwitch.setField(_tableId, _keyTuple, 10, bytes((uri)));
-  }
-
-  /** Set uri (using the specified store) */
-  function setUri(IStore _store, uint256 taskId, string memory uri) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
-
-    _store.setField(_tableId, _keyTuple, 10, bytes((uri)));
-  }
-
-  /** Get the length of uri */
-  function lengthUri(uint256 taskId) internal view returns (uint256) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
-
-    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 10, getSchema());
-    return _byteLength / 1;
-  }
-
-  /** Get the length of uri (using the specified store) */
-  function lengthUri(IStore _store, uint256 taskId) internal view returns (uint256) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
-
-    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 10, getSchema());
-    return _byteLength / 1;
-  }
-
-  /** Get an item of uri (unchecked, returns invalid data if index overflows) */
-  function getItemUri(uint256 taskId, uint256 _index) internal view returns (string memory) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
-
-    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 10, getSchema(), _index * 1, (_index + 1) * 1);
-    return (string(_blob));
-  }
-
-  /** Get an item of uri (using the specified store) (unchecked, returns invalid data if index overflows) */
-  function getItemUri(IStore _store, uint256 taskId, uint256 _index) internal view returns (string memory) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
-
-    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 10, getSchema(), _index * 1, (_index + 1) * 1);
-    return (string(_blob));
-  }
-
-  /** Push a slice to uri */
-  function pushUri(uint256 taskId, string memory _slice) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
-
-    StoreSwitch.pushToField(_tableId, _keyTuple, 10, bytes((_slice)));
-  }
-
-  /** Push a slice to uri (using the specified store) */
-  function pushUri(IStore _store, uint256 taskId, string memory _slice) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
-
-    _store.pushToField(_tableId, _keyTuple, 10, bytes((_slice)));
-  }
-
-  /** Pop a slice from uri */
-  function popUri(uint256 taskId) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
-
-    StoreSwitch.popFromField(_tableId, _keyTuple, 10, 1);
-  }
-
-  /** Pop a slice from uri (using the specified store) */
-  function popUri(IStore _store, uint256 taskId) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
-
-    _store.popFromField(_tableId, _keyTuple, 10, 1);
-  }
-
-  /** Update a slice of uri at `_index` */
-  function updateUri(uint256 taskId, uint256 _index, string memory _slice) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
-
-    StoreSwitch.updateInField(_tableId, _keyTuple, 10, _index * 1, bytes((_slice)));
-  }
-
-  /** Update a slice of uri (using the specified store) at `_index` */
-  function updateUri(IStore _store, uint256 taskId, uint256 _index, string memory _slice) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
-
-    _store.updateInField(_tableId, _keyTuple, 10, _index * 1, bytes((_slice)));
-  }
-
   /** Get the full data */
-  function get(uint256 taskId) internal view returns (TaskConfigData memory _table) {
+  function get(bytes32 taskId) internal view returns (TaskConfigData memory _table) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = StoreSwitch.getRecord(_tableId, _keyTuple, getSchema());
     return decode(_blob);
   }
 
   /** Get the full data (using the specified store) */
-  function get(IStore _store, uint256 taskId) internal view returns (TaskConfigData memory _table) {
+  function get(IStore _store, bytes32 taskId) internal view returns (TaskConfigData memory _table) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = _store.getRecord(_tableId, _keyTuple, getSchema());
     return decode(_blob);
@@ -916,18 +795,17 @@ library TaskConfig {
 
   /** Set the full data using individual values */
   function set(
-    uint256 taskId,
+    bytes32 taskId,
     uint32 level,
     uint32 dupPeriod,
     uint32 rewardExp,
     uint256 rewardCoins,
     uint256 rewardDiamonds,
     bool itemConsumed,
-    uint256[] memory itemIds,
+    bytes32[] memory itemIds,
     uint32[] memory itemQuantities,
-    uint256[] memory rewardItemIds,
-    uint32[] memory rewardItemQuantities,
-    string memory uri
+    bytes32[] memory rewardItemIds,
+    uint32[] memory rewardItemQuantities
   ) internal {
     bytes memory _data = encode(
       level,
@@ -939,12 +817,11 @@ library TaskConfig {
       itemIds,
       itemQuantities,
       rewardItemIds,
-      rewardItemQuantities,
-      uri
+      rewardItemQuantities
     );
 
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.setRecord(_tableId, _keyTuple, _data);
   }
@@ -952,18 +829,17 @@ library TaskConfig {
   /** Set the full data using individual values (using the specified store) */
   function set(
     IStore _store,
-    uint256 taskId,
+    bytes32 taskId,
     uint32 level,
     uint32 dupPeriod,
     uint32 rewardExp,
     uint256 rewardCoins,
     uint256 rewardDiamonds,
     bool itemConsumed,
-    uint256[] memory itemIds,
+    bytes32[] memory itemIds,
     uint32[] memory itemQuantities,
-    uint256[] memory rewardItemIds,
-    uint32[] memory rewardItemQuantities,
-    string memory uri
+    bytes32[] memory rewardItemIds,
+    uint32[] memory rewardItemQuantities
   ) internal {
     bytes memory _data = encode(
       level,
@@ -975,18 +851,17 @@ library TaskConfig {
       itemIds,
       itemQuantities,
       rewardItemIds,
-      rewardItemQuantities,
-      uri
+      rewardItemQuantities
     );
 
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.setRecord(_tableId, _keyTuple, _data);
   }
 
   /** Set the full data using the data struct */
-  function set(uint256 taskId, TaskConfigData memory _table) internal {
+  function set(bytes32 taskId, TaskConfigData memory _table) internal {
     set(
       taskId,
       _table.level,
@@ -998,13 +873,12 @@ library TaskConfig {
       _table.itemIds,
       _table.itemQuantities,
       _table.rewardItemIds,
-      _table.rewardItemQuantities,
-      _table.uri
+      _table.rewardItemQuantities
     );
   }
 
   /** Set the full data using the data struct (using the specified store) */
-  function set(IStore _store, uint256 taskId, TaskConfigData memory _table) internal {
+  function set(IStore _store, bytes32 taskId, TaskConfigData memory _table) internal {
     set(
       _store,
       taskId,
@@ -1017,8 +891,7 @@ library TaskConfig {
       _table.itemIds,
       _table.itemQuantities,
       _table.rewardItemIds,
-      _table.rewardItemQuantities,
-      _table.uri
+      _table.rewardItemQuantities
     );
   }
 
@@ -1047,7 +920,7 @@ library TaskConfig {
 
       _start = _end;
       _end += _encodedLengths.atIndex(0);
-      _table.itemIds = (SliceLib.getSubslice(_blob, _start, _end).decodeArray_uint256());
+      _table.itemIds = (SliceLib.getSubslice(_blob, _start, _end).decodeArray_bytes32());
 
       _start = _end;
       _end += _encodedLengths.atIndex(1);
@@ -1055,15 +928,11 @@ library TaskConfig {
 
       _start = _end;
       _end += _encodedLengths.atIndex(2);
-      _table.rewardItemIds = (SliceLib.getSubslice(_blob, _start, _end).decodeArray_uint256());
+      _table.rewardItemIds = (SliceLib.getSubslice(_blob, _start, _end).decodeArray_bytes32());
 
       _start = _end;
       _end += _encodedLengths.atIndex(3);
       _table.rewardItemQuantities = (SliceLib.getSubslice(_blob, _start, _end).decodeArray_uint32());
-
-      _start = _end;
-      _end += _encodedLengths.atIndex(4);
-      _table.uri = (string(SliceLib.getSubslice(_blob, _start, _end).toBytes()));
     }
   }
 
@@ -1075,18 +944,16 @@ library TaskConfig {
     uint256 rewardCoins,
     uint256 rewardDiamonds,
     bool itemConsumed,
-    uint256[] memory itemIds,
+    bytes32[] memory itemIds,
     uint32[] memory itemQuantities,
-    uint256[] memory rewardItemIds,
-    uint32[] memory rewardItemQuantities,
-    string memory uri
+    bytes32[] memory rewardItemIds,
+    uint32[] memory rewardItemQuantities
   ) internal view returns (bytes memory) {
-    uint40[] memory _counters = new uint40[](5);
+    uint40[] memory _counters = new uint40[](4);
     _counters[0] = uint40(itemIds.length * 32);
     _counters[1] = uint40(itemQuantities.length * 4);
     _counters[2] = uint40(rewardItemIds.length * 32);
     _counters[3] = uint40(rewardItemQuantities.length * 4);
-    _counters[4] = uint40(bytes(uri).length);
     PackedCounter _encodedLengths = PackedCounterLib.pack(_counters);
 
     return
@@ -1101,29 +968,28 @@ library TaskConfig {
         EncodeArray.encode((itemIds)),
         EncodeArray.encode((itemQuantities)),
         EncodeArray.encode((rewardItemIds)),
-        EncodeArray.encode((rewardItemQuantities)),
-        bytes((uri))
+        EncodeArray.encode((rewardItemQuantities))
       );
   }
 
   /** Encode keys as a bytes32 array using this table's schema */
-  function encodeKeyTuple(uint256 taskId) internal pure returns (bytes32[] memory _keyTuple) {
+  function encodeKeyTuple(bytes32 taskId) internal pure returns (bytes32[] memory _keyTuple) {
     _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
   }
 
   /* Delete all data for given keys */
-  function deleteRecord(uint256 taskId) internal {
+  function deleteRecord(bytes32 taskId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     StoreSwitch.deleteRecord(_tableId, _keyTuple);
   }
 
   /* Delete all data for given keys (using the specified store) */
-  function deleteRecord(IStore _store, uint256 taskId) internal {
+  function deleteRecord(IStore _store, bytes32 taskId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(taskId));
+    _keyTuple[0] = taskId;
 
     _store.deleteRecord(_tableId, _keyTuple);
   }

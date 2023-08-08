@@ -16,7 +16,8 @@ contract CommonTest is MudV2Test {
 
   address public admin;
 
-  uint256 public foodID1 = 1000101;
+  bytes32 public foodId1 = bytes32(uint256(1000101));
+  bytes32 public taskId1 = bytes32(uint256(1001));
 
   function setUp() public override {
     super.setUp();
@@ -36,48 +37,51 @@ contract CommonTest is MudV2Test {
      *
      */
     // set food
-    world.setFood(foodID1, 50, 5000, 0, "Fish Can", "");
+    world.setFood(foodId1, 50, 5000, 0, 4, "Fish Can", "");
 
     // list food
-    world.listBasicItem(foodID1, 10, 1);
+    world.listBasicItem(foodId1, 10, 1);
 
     /**
      * Set up tasks
      */
     // Novice tasks
-    uint[] memory rewardItemIds = new uint[](1);
-    rewardItemIds[0] = foodID1;
+    bytes32[] memory rewardItemIds = new bytes32[](1);
+    rewardItemIds[0] = foodId1;
     uint32[] memory rewardItemQuantities = new uint32[](1);
     rewardItemQuantities[0] = 2;
     world.setTask(
-      1001,
+      taskId1,
       0,
       0,
       80,
       50,
       10,
       false,
-      new uint256[](1),
+      new bytes32[](1),
       new uint32[](1),
       rewardItemIds,
       rewardItemQuantities,
-      "BeginnerTask"
+      "BeginnerTask",
+      ""
     );
   }
 
   function testFinishTask() public {
     bytes32 userId = Address2User.get(world, user1);
 
+    bytes32 itemId = bytes32(foodId1);
+
     vm.startPrank(user1);
-    world.finishTask(1001);
+    world.finishTask(taskId1);
     vm.stopPrank();
 
-    assertEq(UserItems.getItemNum(world, userId, 1000101), 2);
+    assertEq(UserItems.getItemNum(world, userId, itemId), 2);
     vm.startPrank(user1);
-    world.finishTask(1001);
+    world.finishTask(taskId1);
     vm.stopPrank();
 
-    assertEq(UserItems.getItemNum(world, userId, 1000101), 4);
+    assertEq(UserItems.getItemNum(world, userId, itemId), 4);
   }
 
   function testChores() public {
@@ -114,14 +118,14 @@ contract CommonTest is MudV2Test {
     vm.startPrank(user1);
     world.adoptInitCat();
 
-    bytes32 catId = UserCatList.getItem(world, userId1, 0);
+    bytes32 catId = UserCatList.getItemCatIds(world, userId1, 0);
 
-    world.finishTask(1001);
+    world.finishTask(taskId1);
 
     uint32 hungerBefore = Cats.getHunger(world, catId);
-    world.feed(catId, foodID1, 1);
+    world.feed(catId, foodId1, 1);
     uint32 hungerAfter = Cats.getHunger(world, catId);
-    uint32 foodHunger = FoodConfig.getHunger(world, foodID1);
+    uint32 foodHunger = FoodConfig.getHunger(world, foodId1);
     console.log(foodHunger);
     assertEq(hungerBefore - hungerAfter, foodHunger);
 
@@ -131,10 +135,10 @@ contract CommonTest is MudV2Test {
   function testBuyItem() public {
     vm.startPrank(user1);
 
-    world.finishTask(1001);
-    uint32 itemNumBefore = UserItems.getItemNum(world, userId1, foodID1);
-    world.buyItem(foodID1, 1, 0);
-    uint32 itemNumAfter = UserItems.getItemNum(world, userId1, foodID1);
+    world.finishTask(taskId1);
+    uint32 itemNumBefore = UserItems.getItemNum(world, userId1, foodId1);
+    world.buyItem(foodId1, 1, 0);
+    uint32 itemNumAfter = UserItems.getItemNum(world, userId1, foodId1);
     assertEq(itemNumAfter - itemNumBefore, 1);
     vm.stopPrank();
   }

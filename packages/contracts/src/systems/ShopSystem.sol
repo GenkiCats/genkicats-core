@@ -15,7 +15,7 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 // import {addItem, decCoin, decDiamond} from "./QuantitiHelperSystem.sol";
 
 contract ShopSystem is System {
-  function buyItem(uint256 itemId, uint32 itemNum, uint32 currencyCode) public {
+  function buyItem(bytes32 itemId, uint32 itemNum, uint32 currencyCode) public {
     // get user id
     bytes32 userId = getUserId(_msgSender());
     // get world

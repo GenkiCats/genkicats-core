@@ -6,7 +6,7 @@ import { UserStatus, UserItems, ItemConfig } from "../codegen/Tables.sol";
 
 contract QuantityHelperSystem is System {
   // Notice: even if the itemId does not exist, this function will also work
-  function addItem(bytes32 userId, uint256 itemId, uint32 quantity) public {
+  function addItem(bytes32 userId, bytes32 itemId, uint32 quantity) public {
     uint32 currentQuantity = UserItems.getItemNum(userId, itemId);
     uint32 maxItemQuantity = ItemConfig.getMaxItemQuantity(itemId);
     uint32 newQuantity = currentQuantity + quantity;
@@ -17,7 +17,7 @@ contract QuantityHelperSystem is System {
     UserItems.set(userId, itemId, newQuantity, 0);
   }
 
-  function decItem(bytes32 userId, uint256 itemId, uint32 quantity) public {
+  function decItem(bytes32 userId, bytes32 itemId, uint32 quantity) public {
     uint32 currentQuantity = UserItems.getItemNum(userId, itemId);
     uint32 newQuantity = currentQuantity - quantity;
     require(newQuantity >= 0, "not enough item");

@@ -5,10 +5,11 @@ pragma solidity >=0.8.0;
 
 interface IFoodConfigSystem {
   function setFood(
-    uint itemId,
+    bytes32 itemId,
     uint32 hunger,
-    uint32 travelDropRate,
+    uint32 dropRate,
     uint32 maxItemQuantity,
+    uint32 hungerCoinRate,
     string memory name,
     string memory uri
   ) external;

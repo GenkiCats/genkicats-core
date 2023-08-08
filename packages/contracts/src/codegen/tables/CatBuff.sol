@@ -21,35 +21,44 @@ bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("CatBu
 bytes32 constant CatBuffTableId = _tableId;
 
 struct CatBuffData {
-  uint256 buffId;
+  bytes32 buffId;
+  uint256 buffEffectValue;
   uint256 startTime;
   uint256 duration;
+  uint32 times;
+  uint256[] extendedBuffEffectValues;
 }
 
 library CatBuff {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](3);
-    _schema[0] = SchemaType.UINT256;
+    SchemaType[] memory _schema = new SchemaType[](6);
+    _schema[0] = SchemaType.BYTES32;
     _schema[1] = SchemaType.UINT256;
     _schema[2] = SchemaType.UINT256;
+    _schema[3] = SchemaType.UINT256;
+    _schema[4] = SchemaType.UINT32;
+    _schema[5] = SchemaType.UINT256_ARRAY;
 
     return SchemaLib.encode(_schema);
   }
 
   function getKeySchema() internal pure returns (Schema) {
     SchemaType[] memory _schema = new SchemaType[](1);
-    _schema[0] = SchemaType.UINT256;
+    _schema[0] = SchemaType.BYTES32;
 
     return SchemaLib.encode(_schema);
   }
 
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
-    string[] memory _fieldNames = new string[](3);
+    string[] memory _fieldNames = new string[](6);
     _fieldNames[0] = "buffId";
-    _fieldNames[1] = "startTime";
-    _fieldNames[2] = "duration";
+    _fieldNames[1] = "buffEffectValue";
+    _fieldNames[2] = "startTime";
+    _fieldNames[3] = "duration";
+    _fieldNames[4] = "times";
+    _fieldNames[5] = "extendedBuffEffectValues";
     return ("CatBuff", _fieldNames);
   }
 
@@ -76,187 +85,458 @@ library CatBuff {
   }
 
   /** Get buffId */
-  function getBuffId(uint256 catId) internal view returns (uint256 buffId) {
+  function getBuffId(bytes32 catId) internal view returns (bytes32 buffId) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 0);
-    return (uint256(Bytes.slice32(_blob, 0)));
+    return (Bytes.slice32(_blob, 0));
   }
 
   /** Get buffId (using the specified store) */
-  function getBuffId(IStore _store, uint256 catId) internal view returns (uint256 buffId) {
+  function getBuffId(IStore _store, bytes32 catId) internal view returns (bytes32 buffId) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 0);
-    return (uint256(Bytes.slice32(_blob, 0)));
+    return (Bytes.slice32(_blob, 0));
   }
 
   /** Set buffId */
-  function setBuffId(uint256 catId, uint256 buffId) internal {
+  function setBuffId(bytes32 catId, bytes32 buffId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
     StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((buffId)));
   }
 
   /** Set buffId (using the specified store) */
-  function setBuffId(IStore _store, uint256 catId, uint256 buffId) internal {
+  function setBuffId(IStore _store, bytes32 catId, bytes32 buffId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
     _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((buffId)));
   }
 
-  /** Get startTime */
-  function getStartTime(uint256 catId) internal view returns (uint256 startTime) {
+  /** Get buffEffectValue */
+  function getBuffEffectValue(bytes32 catId) internal view returns (uint256 buffEffectValue) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
-  /** Get startTime (using the specified store) */
-  function getStartTime(IStore _store, uint256 catId) internal view returns (uint256 startTime) {
+  /** Get buffEffectValue (using the specified store) */
+  function getBuffEffectValue(IStore _store, bytes32 catId) internal view returns (uint256 buffEffectValue) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
-  /** Set startTime */
-  function setStartTime(uint256 catId, uint256 startTime) internal {
+  /** Set buffEffectValue */
+  function setBuffEffectValue(bytes32 catId, uint256 buffEffectValue) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((startTime)));
+    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((buffEffectValue)));
   }
 
-  /** Set startTime (using the specified store) */
-  function setStartTime(IStore _store, uint256 catId, uint256 startTime) internal {
+  /** Set buffEffectValue (using the specified store) */
+  function setBuffEffectValue(IStore _store, bytes32 catId, uint256 buffEffectValue) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
-    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((startTime)));
+    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((buffEffectValue)));
   }
 
-  /** Get duration */
-  function getDuration(uint256 catId) internal view returns (uint256 duration) {
+  /** Get startTime */
+  function getStartTime(bytes32 catId) internal view returns (uint256 startTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
-  /** Get duration (using the specified store) */
-  function getDuration(IStore _store, uint256 catId) internal view returns (uint256 duration) {
+  /** Get startTime (using the specified store) */
+  function getStartTime(IStore _store, bytes32 catId) internal view returns (uint256 startTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
-  /** Set duration */
-  function setDuration(uint256 catId, uint256 duration) internal {
+  /** Set startTime */
+  function setStartTime(bytes32 catId, uint256 startTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((duration)));
+    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((startTime)));
+  }
+
+  /** Set startTime (using the specified store) */
+  function setStartTime(IStore _store, bytes32 catId, uint256 startTime) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((startTime)));
+  }
+
+  /** Get duration */
+  function getDuration(bytes32 catId) internal view returns (uint256 duration) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
+    return (uint256(Bytes.slice32(_blob, 0)));
+  }
+
+  /** Get duration (using the specified store) */
+  function getDuration(IStore _store, bytes32 catId) internal view returns (uint256 duration) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
+    return (uint256(Bytes.slice32(_blob, 0)));
+  }
+
+  /** Set duration */
+  function setDuration(bytes32 catId, uint256 duration) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    StoreSwitch.setField(_tableId, _keyTuple, 3, abi.encodePacked((duration)));
   }
 
   /** Set duration (using the specified store) */
-  function setDuration(IStore _store, uint256 catId, uint256 duration) internal {
+  function setDuration(IStore _store, bytes32 catId, uint256 duration) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
-    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((duration)));
+    _store.setField(_tableId, _keyTuple, 3, abi.encodePacked((duration)));
+  }
+
+  /** Get times */
+  function getTimes(bytes32 catId) internal view returns (uint32 times) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 4);
+    return (uint32(Bytes.slice4(_blob, 0)));
+  }
+
+  /** Get times (using the specified store) */
+  function getTimes(IStore _store, bytes32 catId) internal view returns (uint32 times) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 4);
+    return (uint32(Bytes.slice4(_blob, 0)));
+  }
+
+  /** Set times */
+  function setTimes(bytes32 catId, uint32 times) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    StoreSwitch.setField(_tableId, _keyTuple, 4, abi.encodePacked((times)));
+  }
+
+  /** Set times (using the specified store) */
+  function setTimes(IStore _store, bytes32 catId, uint32 times) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    _store.setField(_tableId, _keyTuple, 4, abi.encodePacked((times)));
+  }
+
+  /** Get extendedBuffEffectValues */
+  function getExtendedBuffEffectValues(
+    bytes32 catId
+  ) internal view returns (uint256[] memory extendedBuffEffectValues) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 5);
+    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
+  }
+
+  /** Get extendedBuffEffectValues (using the specified store) */
+  function getExtendedBuffEffectValues(
+    IStore _store,
+    bytes32 catId
+  ) internal view returns (uint256[] memory extendedBuffEffectValues) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 5);
+    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
+  }
+
+  /** Set extendedBuffEffectValues */
+  function setExtendedBuffEffectValues(bytes32 catId, uint256[] memory extendedBuffEffectValues) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    StoreSwitch.setField(_tableId, _keyTuple, 5, EncodeArray.encode((extendedBuffEffectValues)));
+  }
+
+  /** Set extendedBuffEffectValues (using the specified store) */
+  function setExtendedBuffEffectValues(
+    IStore _store,
+    bytes32 catId,
+    uint256[] memory extendedBuffEffectValues
+  ) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    _store.setField(_tableId, _keyTuple, 5, EncodeArray.encode((extendedBuffEffectValues)));
+  }
+
+  /** Get the length of extendedBuffEffectValues */
+  function lengthExtendedBuffEffectValues(bytes32 catId) internal view returns (uint256) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 5, getSchema());
+    return _byteLength / 32;
+  }
+
+  /** Get the length of extendedBuffEffectValues (using the specified store) */
+  function lengthExtendedBuffEffectValues(IStore _store, bytes32 catId) internal view returns (uint256) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 5, getSchema());
+    return _byteLength / 32;
+  }
+
+  /** Get an item of extendedBuffEffectValues (unchecked, returns invalid data if index overflows) */
+  function getItemExtendedBuffEffectValues(bytes32 catId, uint256 _index) internal view returns (uint256) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 5, getSchema(), _index * 32, (_index + 1) * 32);
+    return (uint256(Bytes.slice32(_blob, 0)));
+  }
+
+  /** Get an item of extendedBuffEffectValues (using the specified store) (unchecked, returns invalid data if index overflows) */
+  function getItemExtendedBuffEffectValues(
+    IStore _store,
+    bytes32 catId,
+    uint256 _index
+  ) internal view returns (uint256) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 5, getSchema(), _index * 32, (_index + 1) * 32);
+    return (uint256(Bytes.slice32(_blob, 0)));
+  }
+
+  /** Push an element to extendedBuffEffectValues */
+  function pushExtendedBuffEffectValues(bytes32 catId, uint256 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    StoreSwitch.pushToField(_tableId, _keyTuple, 5, abi.encodePacked((_element)));
+  }
+
+  /** Push an element to extendedBuffEffectValues (using the specified store) */
+  function pushExtendedBuffEffectValues(IStore _store, bytes32 catId, uint256 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    _store.pushToField(_tableId, _keyTuple, 5, abi.encodePacked((_element)));
+  }
+
+  /** Pop an element from extendedBuffEffectValues */
+  function popExtendedBuffEffectValues(bytes32 catId) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    StoreSwitch.popFromField(_tableId, _keyTuple, 5, 32);
+  }
+
+  /** Pop an element from extendedBuffEffectValues (using the specified store) */
+  function popExtendedBuffEffectValues(IStore _store, bytes32 catId) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    _store.popFromField(_tableId, _keyTuple, 5, 32);
+  }
+
+  /** Update an element of extendedBuffEffectValues at `_index` */
+  function updateExtendedBuffEffectValues(bytes32 catId, uint256 _index, uint256 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    StoreSwitch.updateInField(_tableId, _keyTuple, 5, _index * 32, abi.encodePacked((_element)));
+  }
+
+  /** Update an element of extendedBuffEffectValues (using the specified store) at `_index` */
+  function updateExtendedBuffEffectValues(IStore _store, bytes32 catId, uint256 _index, uint256 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = catId;
+
+    _store.updateInField(_tableId, _keyTuple, 5, _index * 32, abi.encodePacked((_element)));
   }
 
   /** Get the full data */
-  function get(uint256 catId) internal view returns (CatBuffData memory _table) {
+  function get(bytes32 catId) internal view returns (CatBuffData memory _table) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
     bytes memory _blob = StoreSwitch.getRecord(_tableId, _keyTuple, getSchema());
     return decode(_blob);
   }
 
   /** Get the full data (using the specified store) */
-  function get(IStore _store, uint256 catId) internal view returns (CatBuffData memory _table) {
+  function get(IStore _store, bytes32 catId) internal view returns (CatBuffData memory _table) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
     bytes memory _blob = _store.getRecord(_tableId, _keyTuple, getSchema());
     return decode(_blob);
   }
 
   /** Set the full data using individual values */
-  function set(uint256 catId, uint256 buffId, uint256 startTime, uint256 duration) internal {
-    bytes memory _data = encode(buffId, startTime, duration);
+  function set(
+    bytes32 catId,
+    bytes32 buffId,
+    uint256 buffEffectValue,
+    uint256 startTime,
+    uint256 duration,
+    uint32 times,
+    uint256[] memory extendedBuffEffectValues
+  ) internal {
+    bytes memory _data = encode(buffId, buffEffectValue, startTime, duration, times, extendedBuffEffectValues);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
     StoreSwitch.setRecord(_tableId, _keyTuple, _data);
   }
 
   /** Set the full data using individual values (using the specified store) */
-  function set(IStore _store, uint256 catId, uint256 buffId, uint256 startTime, uint256 duration) internal {
-    bytes memory _data = encode(buffId, startTime, duration);
+  function set(
+    IStore _store,
+    bytes32 catId,
+    bytes32 buffId,
+    uint256 buffEffectValue,
+    uint256 startTime,
+    uint256 duration,
+    uint32 times,
+    uint256[] memory extendedBuffEffectValues
+  ) internal {
+    bytes memory _data = encode(buffId, buffEffectValue, startTime, duration, times, extendedBuffEffectValues);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
     _store.setRecord(_tableId, _keyTuple, _data);
   }
 
   /** Set the full data using the data struct */
-  function set(uint256 catId, CatBuffData memory _table) internal {
-    set(catId, _table.buffId, _table.startTime, _table.duration);
+  function set(bytes32 catId, CatBuffData memory _table) internal {
+    set(
+      catId,
+      _table.buffId,
+      _table.buffEffectValue,
+      _table.startTime,
+      _table.duration,
+      _table.times,
+      _table.extendedBuffEffectValues
+    );
   }
 
   /** Set the full data using the data struct (using the specified store) */
-  function set(IStore _store, uint256 catId, CatBuffData memory _table) internal {
-    set(_store, catId, _table.buffId, _table.startTime, _table.duration);
+  function set(IStore _store, bytes32 catId, CatBuffData memory _table) internal {
+    set(
+      _store,
+      catId,
+      _table.buffId,
+      _table.buffEffectValue,
+      _table.startTime,
+      _table.duration,
+      _table.times,
+      _table.extendedBuffEffectValues
+    );
   }
 
   /** Decode the tightly packed blob using this table's schema */
-  function decode(bytes memory _blob) internal pure returns (CatBuffData memory _table) {
-    _table.buffId = (uint256(Bytes.slice32(_blob, 0)));
+  function decode(bytes memory _blob) internal view returns (CatBuffData memory _table) {
+    // 132 is the total byte length of static data
+    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 132));
 
-    _table.startTime = (uint256(Bytes.slice32(_blob, 32)));
+    _table.buffId = (Bytes.slice32(_blob, 0));
 
-    _table.duration = (uint256(Bytes.slice32(_blob, 64)));
+    _table.buffEffectValue = (uint256(Bytes.slice32(_blob, 32)));
+
+    _table.startTime = (uint256(Bytes.slice32(_blob, 64)));
+
+    _table.duration = (uint256(Bytes.slice32(_blob, 96)));
+
+    _table.times = (uint32(Bytes.slice4(_blob, 128)));
+
+    // Store trims the blob if dynamic fields are all empty
+    if (_blob.length > 132) {
+      uint256 _start;
+      // skip static data length + dynamic lengths word
+      uint256 _end = 164;
+
+      _start = _end;
+      _end += _encodedLengths.atIndex(0);
+      _table.extendedBuffEffectValues = (SliceLib.getSubslice(_blob, _start, _end).decodeArray_uint256());
+    }
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint256 buffId, uint256 startTime, uint256 duration) internal view returns (bytes memory) {
-    return abi.encodePacked(buffId, startTime, duration);
+  function encode(
+    bytes32 buffId,
+    uint256 buffEffectValue,
+    uint256 startTime,
+    uint256 duration,
+    uint32 times,
+    uint256[] memory extendedBuffEffectValues
+  ) internal view returns (bytes memory) {
+    uint40[] memory _counters = new uint40[](1);
+    _counters[0] = uint40(extendedBuffEffectValues.length * 32);
+    PackedCounter _encodedLengths = PackedCounterLib.pack(_counters);
+
+    return
+      abi.encodePacked(
+        buffId,
+        buffEffectValue,
+        startTime,
+        duration,
+        times,
+        _encodedLengths.unwrap(),
+        EncodeArray.encode((extendedBuffEffectValues))
+      );
   }
 
   /** Encode keys as a bytes32 array using this table's schema */
-  function encodeKeyTuple(uint256 catId) internal pure returns (bytes32[] memory _keyTuple) {
+  function encodeKeyTuple(bytes32 catId) internal pure returns (bytes32[] memory _keyTuple) {
     _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
   }
 
   /* Delete all data for given keys */
-  function deleteRecord(uint256 catId) internal {
+  function deleteRecord(bytes32 catId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
     StoreSwitch.deleteRecord(_tableId, _keyTuple);
   }
 
   /* Delete all data for given keys (using the specified store) */
-  function deleteRecord(IStore _store, uint256 catId) internal {
+  function deleteRecord(IStore _store, bytes32 catId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catId));
+    _keyTuple[0] = catId;
 
     _store.deleteRecord(_tableId, _keyTuple);
   }

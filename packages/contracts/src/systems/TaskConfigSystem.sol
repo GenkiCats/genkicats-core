@@ -2,23 +2,24 @@
 pragma solidity >=0.8.0;
 
 import { System } from "@latticexyz/world/src/System.sol";
-import { TaskConfig } from "../codegen/Tables.sol";
+import { TaskConfig, MetaConfig } from "../codegen/Tables.sol";
 import { IWorld } from "../codegen/world/IWorld.sol";
 
 contract TaskConfigSystem is System {
   function setTask(
-    uint taskId,
+    bytes32 taskId,
     uint32 level,
     uint32 dupPeriod,
     uint32 rewardExp,
     uint256 rewardCoins,
     uint256 rewardDiamonds,
     bool itemConsumed,
-    uint256[] memory itemIds,
+    bytes32[] memory itemIds,
     uint32[] memory itemQuantities,
-    uint256[] memory rewardItemIds,
+    bytes32[] memory rewardItemIds,
     uint32[] memory rewardItemQuantities,
-    string memory uri
+    string memory uri,
+    string memory name
   ) public {
     if (level > 0) {
       TaskConfig.setLevel(taskId, level);
@@ -51,7 +52,10 @@ contract TaskConfigSystem is System {
       TaskConfig.setRewardItemQuantities(taskId, rewardItemQuantities);
     }
     if (bytes(uri).length > 0) {
-      TaskConfig.setUri(taskId, uri);
+      MetaConfig.setUri(taskId, uri);
+    }
+    if (bytes(name).length > 0) {
+      MetaConfig.setName(taskId, uri);
     }
   }
 }

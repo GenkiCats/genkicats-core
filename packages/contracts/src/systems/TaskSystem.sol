@@ -9,22 +9,23 @@ import { UserStatus, UserItems, TaskConfig } from "../codegen/Tables.sol";
 import { IWorld } from "../codegen/world/IWorld.sol";
 
 contract TaskSystem is System {
-  function finishTask(uint256 taskID) public {
+  function finishTask(bytes32 taskID) public {
     bytes32 userId = getUserId(_msgSender());
     IWorld world = getWorld();
 
     uint32 requiredLevel = TaskConfig.getLevel(taskID);
     uint32 exp = UserStatus.getExp(userId);
-    uint32 level = world.calculateUserLevel(exp);
+    uint32 level = UserStatus.getLevel(userId);
+    level = world.calculateLevel(level, exp, 0);
     require(level >= requiredLevel, "level is not enough");
 
     //TODO: dup detect
     // uint32 dupPeriod = TaskConfig.getDupPeriod(taskID);
 
-    uint256[] memory itemIds = TaskConfig.getItemIds(taskID);
+    bytes32[] memory itemIds = TaskConfig.getItemIds(taskID);
     uint32[] memory itemQuantities = TaskConfig.getItemQuantities(taskID);
     for (uint256 i = 0; i < itemIds.length; i++) {
-      uint256 itemId = itemIds[i];
+      bytes32 itemId = itemIds[i];
       // TODO: consider item status
       uint32 itemNum = UserItems.getItemNum(userId, itemId);
       require(itemNum >= itemQuantities[i], "Task required item is not enough");
@@ -32,10 +33,10 @@ contract TaskSystem is System {
 
     // pass the task requirements
     // claim reward items
-    uint256[] memory rewardItemIds = TaskConfig.getRewardItemIds(taskID);
+    bytes32[] memory rewardItemIds = TaskConfig.getRewardItemIds(taskID);
     uint32[] memory rewardItemQuantities = TaskConfig.getRewardItemQuantities(taskID);
     for (uint256 i = 0; i < rewardItemIds.length; i++) {
-      uint256 itemId = rewardItemIds[i];
+      bytes32 itemId = rewardItemIds[i];
       // @QuantityHelperSystem
       world.addItem(userId, itemId, rewardItemQuantities[i]);
     }

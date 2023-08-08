@@ -21,35 +21,37 @@ bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("CatCo
 bytes32 constant CatConfigTableId = _tableId;
 
 struct CatConfigData {
-  uint32 hungerLimit;
-  uint32 funLimit;
-  uint32 expLimit;
+  uint32 hungerConsumeRate;
+  uint32 funConsumeRate;
+  uint256 starvingStartTime;
+  uint32 foreverFriendshipLevel;
 }
 
 library CatConfig {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](3);
+    SchemaType[] memory _schema = new SchemaType[](4);
     _schema[0] = SchemaType.UINT32;
     _schema[1] = SchemaType.UINT32;
-    _schema[2] = SchemaType.UINT32;
+    _schema[2] = SchemaType.UINT256;
+    _schema[3] = SchemaType.UINT32;
 
     return SchemaLib.encode(_schema);
   }
 
   function getKeySchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](1);
-    _schema[0] = SchemaType.UINT32;
+    SchemaType[] memory _schema = new SchemaType[](0);
 
     return SchemaLib.encode(_schema);
   }
 
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
-    string[] memory _fieldNames = new string[](3);
-    _fieldNames[0] = "hungerLimit";
-    _fieldNames[1] = "funLimit";
-    _fieldNames[2] = "expLimit";
+    string[] memory _fieldNames = new string[](4);
+    _fieldNames[0] = "hungerConsumeRate";
+    _fieldNames[1] = "funConsumeRate";
+    _fieldNames[2] = "starvingStartTime";
+    _fieldNames[3] = "foreverFriendshipLevel";
     return ("CatConfig", _fieldNames);
   }
 
@@ -75,188 +77,223 @@ library CatConfig {
     _store.setMetadata(_tableId, _tableName, _fieldNames);
   }
 
-  /** Get hungerLimit */
-  function getHungerLimit(uint32 catLevel) internal view returns (uint32 hungerLimit) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+  /** Get hungerConsumeRate */
+  function getHungerConsumeRate() internal view returns (uint32 hungerConsumeRate) {
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 0);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Get hungerLimit (using the specified store) */
-  function getHungerLimit(IStore _store, uint32 catLevel) internal view returns (uint32 hungerLimit) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+  /** Get hungerConsumeRate (using the specified store) */
+  function getHungerConsumeRate(IStore _store) internal view returns (uint32 hungerConsumeRate) {
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 0);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Set hungerLimit */
-  function setHungerLimit(uint32 catLevel, uint32 hungerLimit) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+  /** Set hungerConsumeRate */
+  function setHungerConsumeRate(uint32 hungerConsumeRate) internal {
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
-    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((hungerLimit)));
+    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((hungerConsumeRate)));
   }
 
-  /** Set hungerLimit (using the specified store) */
-  function setHungerLimit(IStore _store, uint32 catLevel, uint32 hungerLimit) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+  /** Set hungerConsumeRate (using the specified store) */
+  function setHungerConsumeRate(IStore _store, uint32 hungerConsumeRate) internal {
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
-    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((hungerLimit)));
+    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((hungerConsumeRate)));
   }
 
-  /** Get funLimit */
-  function getFunLimit(uint32 catLevel) internal view returns (uint32 funLimit) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+  /** Get funConsumeRate */
+  function getFunConsumeRate() internal view returns (uint32 funConsumeRate) {
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Get funLimit (using the specified store) */
-  function getFunLimit(IStore _store, uint32 catLevel) internal view returns (uint32 funLimit) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+  /** Get funConsumeRate (using the specified store) */
+  function getFunConsumeRate(IStore _store) internal view returns (uint32 funConsumeRate) {
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Set funLimit */
-  function setFunLimit(uint32 catLevel, uint32 funLimit) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+  /** Set funConsumeRate */
+  function setFunConsumeRate(uint32 funConsumeRate) internal {
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
-    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((funLimit)));
+    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((funConsumeRate)));
   }
 
-  /** Set funLimit (using the specified store) */
-  function setFunLimit(IStore _store, uint32 catLevel, uint32 funLimit) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+  /** Set funConsumeRate (using the specified store) */
+  function setFunConsumeRate(IStore _store, uint32 funConsumeRate) internal {
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
-    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((funLimit)));
+    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((funConsumeRate)));
   }
 
-  /** Get expLimit */
-  function getExpLimit(uint32 catLevel) internal view returns (uint32 expLimit) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+  /** Get starvingStartTime */
+  function getStarvingStartTime() internal view returns (uint256 starvingStartTime) {
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (uint256(Bytes.slice32(_blob, 0)));
   }
 
-  /** Get expLimit (using the specified store) */
-  function getExpLimit(IStore _store, uint32 catLevel) internal view returns (uint32 expLimit) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+  /** Get starvingStartTime (using the specified store) */
+  function getStarvingStartTime(IStore _store) internal view returns (uint256 starvingStartTime) {
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
+    return (uint256(Bytes.slice32(_blob, 0)));
+  }
+
+  /** Set starvingStartTime */
+  function setStarvingStartTime(uint256 starvingStartTime) internal {
+    bytes32[] memory _keyTuple = new bytes32[](0);
+
+    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((starvingStartTime)));
+  }
+
+  /** Set starvingStartTime (using the specified store) */
+  function setStarvingStartTime(IStore _store, uint256 starvingStartTime) internal {
+    bytes32[] memory _keyTuple = new bytes32[](0);
+
+    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((starvingStartTime)));
+  }
+
+  /** Get foreverFriendshipLevel */
+  function getForeverFriendshipLevel() internal view returns (uint32 foreverFriendshipLevel) {
+    bytes32[] memory _keyTuple = new bytes32[](0);
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Set expLimit */
-  function setExpLimit(uint32 catLevel, uint32 expLimit) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+  /** Get foreverFriendshipLevel (using the specified store) */
+  function getForeverFriendshipLevel(IStore _store) internal view returns (uint32 foreverFriendshipLevel) {
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
-    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((expLimit)));
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
+    return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Set expLimit (using the specified store) */
-  function setExpLimit(IStore _store, uint32 catLevel, uint32 expLimit) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+  /** Set foreverFriendshipLevel */
+  function setForeverFriendshipLevel(uint32 foreverFriendshipLevel) internal {
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
-    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((expLimit)));
+    StoreSwitch.setField(_tableId, _keyTuple, 3, abi.encodePacked((foreverFriendshipLevel)));
+  }
+
+  /** Set foreverFriendshipLevel (using the specified store) */
+  function setForeverFriendshipLevel(IStore _store, uint32 foreverFriendshipLevel) internal {
+    bytes32[] memory _keyTuple = new bytes32[](0);
+
+    _store.setField(_tableId, _keyTuple, 3, abi.encodePacked((foreverFriendshipLevel)));
   }
 
   /** Get the full data */
-  function get(uint32 catLevel) internal view returns (CatConfigData memory _table) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+  function get() internal view returns (CatConfigData memory _table) {
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
     bytes memory _blob = StoreSwitch.getRecord(_tableId, _keyTuple, getSchema());
     return decode(_blob);
   }
 
   /** Get the full data (using the specified store) */
-  function get(IStore _store, uint32 catLevel) internal view returns (CatConfigData memory _table) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+  function get(IStore _store) internal view returns (CatConfigData memory _table) {
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
     bytes memory _blob = _store.getRecord(_tableId, _keyTuple, getSchema());
     return decode(_blob);
   }
 
   /** Set the full data using individual values */
-  function set(uint32 catLevel, uint32 hungerLimit, uint32 funLimit, uint32 expLimit) internal {
-    bytes memory _data = encode(hungerLimit, funLimit, expLimit);
+  function set(
+    uint32 hungerConsumeRate,
+    uint32 funConsumeRate,
+    uint256 starvingStartTime,
+    uint32 foreverFriendshipLevel
+  ) internal {
+    bytes memory _data = encode(hungerConsumeRate, funConsumeRate, starvingStartTime, foreverFriendshipLevel);
 
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
     StoreSwitch.setRecord(_tableId, _keyTuple, _data);
   }
 
   /** Set the full data using individual values (using the specified store) */
-  function set(IStore _store, uint32 catLevel, uint32 hungerLimit, uint32 funLimit, uint32 expLimit) internal {
-    bytes memory _data = encode(hungerLimit, funLimit, expLimit);
+  function set(
+    IStore _store,
+    uint32 hungerConsumeRate,
+    uint32 funConsumeRate,
+    uint256 starvingStartTime,
+    uint32 foreverFriendshipLevel
+  ) internal {
+    bytes memory _data = encode(hungerConsumeRate, funConsumeRate, starvingStartTime, foreverFriendshipLevel);
 
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
     _store.setRecord(_tableId, _keyTuple, _data);
   }
 
   /** Set the full data using the data struct */
-  function set(uint32 catLevel, CatConfigData memory _table) internal {
-    set(catLevel, _table.hungerLimit, _table.funLimit, _table.expLimit);
+  function set(CatConfigData memory _table) internal {
+    set(_table.hungerConsumeRate, _table.funConsumeRate, _table.starvingStartTime, _table.foreverFriendshipLevel);
   }
 
   /** Set the full data using the data struct (using the specified store) */
-  function set(IStore _store, uint32 catLevel, CatConfigData memory _table) internal {
-    set(_store, catLevel, _table.hungerLimit, _table.funLimit, _table.expLimit);
+  function set(IStore _store, CatConfigData memory _table) internal {
+    set(
+      _store,
+      _table.hungerConsumeRate,
+      _table.funConsumeRate,
+      _table.starvingStartTime,
+      _table.foreverFriendshipLevel
+    );
   }
 
   /** Decode the tightly packed blob using this table's schema */
   function decode(bytes memory _blob) internal pure returns (CatConfigData memory _table) {
-    _table.hungerLimit = (uint32(Bytes.slice4(_blob, 0)));
+    _table.hungerConsumeRate = (uint32(Bytes.slice4(_blob, 0)));
 
-    _table.funLimit = (uint32(Bytes.slice4(_blob, 4)));
+    _table.funConsumeRate = (uint32(Bytes.slice4(_blob, 4)));
 
-    _table.expLimit = (uint32(Bytes.slice4(_blob, 8)));
+    _table.starvingStartTime = (uint256(Bytes.slice32(_blob, 8)));
+
+    _table.foreverFriendshipLevel = (uint32(Bytes.slice4(_blob, 40)));
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint32 hungerLimit, uint32 funLimit, uint32 expLimit) internal view returns (bytes memory) {
-    return abi.encodePacked(hungerLimit, funLimit, expLimit);
+  function encode(
+    uint32 hungerConsumeRate,
+    uint32 funConsumeRate,
+    uint256 starvingStartTime,
+    uint32 foreverFriendshipLevel
+  ) internal view returns (bytes memory) {
+    return abi.encodePacked(hungerConsumeRate, funConsumeRate, starvingStartTime, foreverFriendshipLevel);
   }
 
   /** Encode keys as a bytes32 array using this table's schema */
-  function encodeKeyTuple(uint32 catLevel) internal pure returns (bytes32[] memory _keyTuple) {
-    _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+  function encodeKeyTuple() internal pure returns (bytes32[] memory _keyTuple) {
+    _keyTuple = new bytes32[](0);
   }
 
   /* Delete all data for given keys */
-  function deleteRecord(uint32 catLevel) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+  function deleteRecord() internal {
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
     StoreSwitch.deleteRecord(_tableId, _keyTuple);
   }
 
   /* Delete all data for given keys (using the specified store) */
-  function deleteRecord(IStore _store, uint32 catLevel) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(catLevel));
+  function deleteRecord(IStore _store) internal {
+    bytes32[] memory _keyTuple = new bytes32[](0);
 
     _store.deleteRecord(_tableId, _keyTuple);
   }

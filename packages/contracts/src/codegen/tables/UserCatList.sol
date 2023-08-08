@@ -20,11 +20,17 @@ import { PackedCounter, PackedCounterLib } from "@latticexyz/store/src/PackedCou
 bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("UserCatList")));
 bytes32 constant UserCatListTableId = _tableId;
 
+struct UserCatListData {
+  uint32 totalHungerLimit;
+  bytes32[] catIds;
+}
+
 library UserCatList {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](1);
-    _schema[0] = SchemaType.BYTES32_ARRAY;
+    SchemaType[] memory _schema = new SchemaType[](2);
+    _schema[0] = SchemaType.UINT32;
+    _schema[1] = SchemaType.BYTES32_ARRAY;
 
     return SchemaLib.encode(_schema);
   }
@@ -38,8 +44,9 @@ library UserCatList {
 
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
-    string[] memory _fieldNames = new string[](1);
-    _fieldNames[0] = "catIds";
+    string[] memory _fieldNames = new string[](2);
+    _fieldNames[0] = "totalHungerLimit";
+    _fieldNames[1] = "catIds";
     return ("UserCatList", _fieldNames);
   }
 
@@ -65,131 +72,232 @@ library UserCatList {
     _store.setMetadata(_tableId, _tableName, _fieldNames);
   }
 
-  /** Get catIds */
-  function get(bytes32 userId) internal view returns (bytes32[] memory catIds) {
+  /** Get totalHungerLimit */
+  function getTotalHungerLimit(bytes32 userId) internal view returns (uint32 totalHungerLimit) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 0);
-    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_bytes32());
+    return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Get catIds (using the specified store) */
-  function get(IStore _store, bytes32 userId) internal view returns (bytes32[] memory catIds) {
+  /** Get totalHungerLimit (using the specified store) */
+  function getTotalHungerLimit(IStore _store, bytes32 userId) internal view returns (uint32 totalHungerLimit) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 0);
+    return (uint32(Bytes.slice4(_blob, 0)));
+  }
+
+  /** Set totalHungerLimit */
+  function setTotalHungerLimit(bytes32 userId, uint32 totalHungerLimit) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((totalHungerLimit)));
+  }
+
+  /** Set totalHungerLimit (using the specified store) */
+  function setTotalHungerLimit(IStore _store, bytes32 userId, uint32 totalHungerLimit) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((totalHungerLimit)));
+  }
+
+  /** Get catIds */
+  function getCatIds(bytes32 userId) internal view returns (bytes32[] memory catIds) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
+    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_bytes32());
+  }
+
+  /** Get catIds (using the specified store) */
+  function getCatIds(IStore _store, bytes32 userId) internal view returns (bytes32[] memory catIds) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
     return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_bytes32());
   }
 
   /** Set catIds */
-  function set(bytes32 userId, bytes32[] memory catIds) internal {
+  function setCatIds(bytes32 userId, bytes32[] memory catIds) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 0, EncodeArray.encode((catIds)));
+    StoreSwitch.setField(_tableId, _keyTuple, 1, EncodeArray.encode((catIds)));
   }
 
   /** Set catIds (using the specified store) */
-  function set(IStore _store, bytes32 userId, bytes32[] memory catIds) internal {
+  function setCatIds(IStore _store, bytes32 userId, bytes32[] memory catIds) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    _store.setField(_tableId, _keyTuple, 0, EncodeArray.encode((catIds)));
+    _store.setField(_tableId, _keyTuple, 1, EncodeArray.encode((catIds)));
   }
 
   /** Get the length of catIds */
-  function length(bytes32 userId) internal view returns (uint256) {
+  function lengthCatIds(bytes32 userId) internal view returns (uint256) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 0, getSchema());
+    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 1, getSchema());
     return _byteLength / 32;
   }
 
   /** Get the length of catIds (using the specified store) */
-  function length(IStore _store, bytes32 userId) internal view returns (uint256) {
+  function lengthCatIds(IStore _store, bytes32 userId) internal view returns (uint256) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 0, getSchema());
+    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 1, getSchema());
     return _byteLength / 32;
   }
 
   /** Get an item of catIds (unchecked, returns invalid data if index overflows) */
-  function getItem(bytes32 userId, uint256 _index) internal view returns (bytes32) {
+  function getItemCatIds(bytes32 userId, uint256 _index) internal view returns (bytes32) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 0, getSchema(), _index * 32, (_index + 1) * 32);
+    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 1, getSchema(), _index * 32, (_index + 1) * 32);
     return (Bytes.slice32(_blob, 0));
   }
 
   /** Get an item of catIds (using the specified store) (unchecked, returns invalid data if index overflows) */
-  function getItem(IStore _store, bytes32 userId, uint256 _index) internal view returns (bytes32) {
+  function getItemCatIds(IStore _store, bytes32 userId, uint256 _index) internal view returns (bytes32) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 0, getSchema(), _index * 32, (_index + 1) * 32);
+    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 1, getSchema(), _index * 32, (_index + 1) * 32);
     return (Bytes.slice32(_blob, 0));
   }
 
   /** Push an element to catIds */
-  function push(bytes32 userId, bytes32 _element) internal {
+  function pushCatIds(bytes32 userId, bytes32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    StoreSwitch.pushToField(_tableId, _keyTuple, 0, abi.encodePacked((_element)));
+    StoreSwitch.pushToField(_tableId, _keyTuple, 1, abi.encodePacked((_element)));
   }
 
   /** Push an element to catIds (using the specified store) */
-  function push(IStore _store, bytes32 userId, bytes32 _element) internal {
+  function pushCatIds(IStore _store, bytes32 userId, bytes32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    _store.pushToField(_tableId, _keyTuple, 0, abi.encodePacked((_element)));
+    _store.pushToField(_tableId, _keyTuple, 1, abi.encodePacked((_element)));
   }
 
   /** Pop an element from catIds */
-  function pop(bytes32 userId) internal {
+  function popCatIds(bytes32 userId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    StoreSwitch.popFromField(_tableId, _keyTuple, 0, 32);
+    StoreSwitch.popFromField(_tableId, _keyTuple, 1, 32);
   }
 
   /** Pop an element from catIds (using the specified store) */
-  function pop(IStore _store, bytes32 userId) internal {
+  function popCatIds(IStore _store, bytes32 userId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    _store.popFromField(_tableId, _keyTuple, 0, 32);
+    _store.popFromField(_tableId, _keyTuple, 1, 32);
   }
 
   /** Update an element of catIds at `_index` */
-  function update(bytes32 userId, uint256 _index, bytes32 _element) internal {
+  function updateCatIds(bytes32 userId, uint256 _index, bytes32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    StoreSwitch.updateInField(_tableId, _keyTuple, 0, _index * 32, abi.encodePacked((_element)));
+    StoreSwitch.updateInField(_tableId, _keyTuple, 1, _index * 32, abi.encodePacked((_element)));
   }
 
   /** Update an element of catIds (using the specified store) at `_index` */
-  function update(IStore _store, bytes32 userId, uint256 _index, bytes32 _element) internal {
+  function updateCatIds(IStore _store, bytes32 userId, uint256 _index, bytes32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    _store.updateInField(_tableId, _keyTuple, 0, _index * 32, abi.encodePacked((_element)));
+    _store.updateInField(_tableId, _keyTuple, 1, _index * 32, abi.encodePacked((_element)));
+  }
+
+  /** Get the full data */
+  function get(bytes32 userId) internal view returns (UserCatListData memory _table) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    bytes memory _blob = StoreSwitch.getRecord(_tableId, _keyTuple, getSchema());
+    return decode(_blob);
+  }
+
+  /** Get the full data (using the specified store) */
+  function get(IStore _store, bytes32 userId) internal view returns (UserCatListData memory _table) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    bytes memory _blob = _store.getRecord(_tableId, _keyTuple, getSchema());
+    return decode(_blob);
+  }
+
+  /** Set the full data using individual values */
+  function set(bytes32 userId, uint32 totalHungerLimit, bytes32[] memory catIds) internal {
+    bytes memory _data = encode(totalHungerLimit, catIds);
+
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    StoreSwitch.setRecord(_tableId, _keyTuple, _data);
+  }
+
+  /** Set the full data using individual values (using the specified store) */
+  function set(IStore _store, bytes32 userId, uint32 totalHungerLimit, bytes32[] memory catIds) internal {
+    bytes memory _data = encode(totalHungerLimit, catIds);
+
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    _store.setRecord(_tableId, _keyTuple, _data);
+  }
+
+  /** Set the full data using the data struct */
+  function set(bytes32 userId, UserCatListData memory _table) internal {
+    set(userId, _table.totalHungerLimit, _table.catIds);
+  }
+
+  /** Set the full data using the data struct (using the specified store) */
+  function set(IStore _store, bytes32 userId, UserCatListData memory _table) internal {
+    set(_store, userId, _table.totalHungerLimit, _table.catIds);
+  }
+
+  /** Decode the tightly packed blob using this table's schema */
+  function decode(bytes memory _blob) internal view returns (UserCatListData memory _table) {
+    // 4 is the total byte length of static data
+    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 4));
+
+    _table.totalHungerLimit = (uint32(Bytes.slice4(_blob, 0)));
+
+    // Store trims the blob if dynamic fields are all empty
+    if (_blob.length > 4) {
+      uint256 _start;
+      // skip static data length + dynamic lengths word
+      uint256 _end = 36;
+
+      _start = _end;
+      _end += _encodedLengths.atIndex(0);
+      _table.catIds = (SliceLib.getSubslice(_blob, _start, _end).decodeArray_bytes32());
+    }
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(bytes32[] memory catIds) internal view returns (bytes memory) {
+  function encode(uint32 totalHungerLimit, bytes32[] memory catIds) internal view returns (bytes memory) {
     uint40[] memory _counters = new uint40[](1);
     _counters[0] = uint40(catIds.length * 32);
     PackedCounter _encodedLengths = PackedCounterLib.pack(_counters);
 
-    return abi.encodePacked(_encodedLengths.unwrap(), EncodeArray.encode((catIds)));
+    return abi.encodePacked(totalHungerLimit, _encodedLengths.unwrap(), EncodeArray.encode((catIds)));
   }
 
   /** Encode keys as a bytes32 array using this table's schema */

@@ -23,6 +23,7 @@ bytes32 constant UserStatusTableId = _tableId;
 struct UserStatusData {
   uint256 coinBalance;
   uint256 diamondBalance;
+  uint32 level;
   uint32 exp;
   bool timeZoneSign;
   uint32 timeZoneOffset;
@@ -32,13 +33,14 @@ struct UserStatusData {
 library UserStatus {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](6);
+    SchemaType[] memory _schema = new SchemaType[](7);
     _schema[0] = SchemaType.UINT256;
     _schema[1] = SchemaType.UINT256;
     _schema[2] = SchemaType.UINT32;
-    _schema[3] = SchemaType.BOOL;
-    _schema[4] = SchemaType.UINT32;
-    _schema[5] = SchemaType.STRING;
+    _schema[3] = SchemaType.UINT32;
+    _schema[4] = SchemaType.BOOL;
+    _schema[5] = SchemaType.UINT32;
+    _schema[6] = SchemaType.STRING;
 
     return SchemaLib.encode(_schema);
   }
@@ -52,13 +54,14 @@ library UserStatus {
 
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
-    string[] memory _fieldNames = new string[](6);
+    string[] memory _fieldNames = new string[](7);
     _fieldNames[0] = "coinBalance";
     _fieldNames[1] = "diamondBalance";
-    _fieldNames[2] = "exp";
-    _fieldNames[3] = "timeZoneSign";
-    _fieldNames[4] = "timeZoneOffset";
-    _fieldNames[5] = "nickName";
+    _fieldNames[2] = "level";
+    _fieldNames[3] = "exp";
+    _fieldNames[4] = "timeZoneSign";
+    _fieldNames[5] = "timeZoneOffset";
+    _fieldNames[6] = "nickName";
     return ("UserStatus", _fieldNames);
   }
 
@@ -152,12 +155,46 @@ library UserStatus {
     _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((diamondBalance)));
   }
 
+  /** Get level */
+  function getLevel(bytes32 userId) internal view returns (uint32 level) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
+    return (uint32(Bytes.slice4(_blob, 0)));
+  }
+
+  /** Get level (using the specified store) */
+  function getLevel(IStore _store, bytes32 userId) internal view returns (uint32 level) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
+    return (uint32(Bytes.slice4(_blob, 0)));
+  }
+
+  /** Set level */
+  function setLevel(bytes32 userId, uint32 level) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((level)));
+  }
+
+  /** Set level (using the specified store) */
+  function setLevel(IStore _store, bytes32 userId, uint32 level) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = userId;
+
+    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((level)));
+  }
+
   /** Get exp */
   function getExp(bytes32 userId) internal view returns (uint32 exp) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
@@ -166,7 +203,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
@@ -175,7 +212,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((exp)));
+    StoreSwitch.setField(_tableId, _keyTuple, 3, abi.encodePacked((exp)));
   }
 
   /** Set exp (using the specified store) */
@@ -183,7 +220,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((exp)));
+    _store.setField(_tableId, _keyTuple, 3, abi.encodePacked((exp)));
   }
 
   /** Get timeZoneSign */
@@ -191,7 +228,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 4);
     return (_toBool(uint8(Bytes.slice1(_blob, 0))));
   }
 
@@ -200,7 +237,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 4);
     return (_toBool(uint8(Bytes.slice1(_blob, 0))));
   }
 
@@ -209,7 +246,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 3, abi.encodePacked((timeZoneSign)));
+    StoreSwitch.setField(_tableId, _keyTuple, 4, abi.encodePacked((timeZoneSign)));
   }
 
   /** Set timeZoneSign (using the specified store) */
@@ -217,7 +254,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    _store.setField(_tableId, _keyTuple, 3, abi.encodePacked((timeZoneSign)));
+    _store.setField(_tableId, _keyTuple, 4, abi.encodePacked((timeZoneSign)));
   }
 
   /** Get timeZoneOffset */
@@ -225,7 +262,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 4);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 5);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
@@ -234,7 +271,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 4);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 5);
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
@@ -243,7 +280,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 4, abi.encodePacked((timeZoneOffset)));
+    StoreSwitch.setField(_tableId, _keyTuple, 5, abi.encodePacked((timeZoneOffset)));
   }
 
   /** Set timeZoneOffset (using the specified store) */
@@ -251,7 +288,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    _store.setField(_tableId, _keyTuple, 4, abi.encodePacked((timeZoneOffset)));
+    _store.setField(_tableId, _keyTuple, 5, abi.encodePacked((timeZoneOffset)));
   }
 
   /** Get nickName */
@@ -259,7 +296,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 5);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 6);
     return (string(_blob));
   }
 
@@ -268,7 +305,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 5);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 6);
     return (string(_blob));
   }
 
@@ -277,7 +314,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 5, bytes((nickName)));
+    StoreSwitch.setField(_tableId, _keyTuple, 6, bytes((nickName)));
   }
 
   /** Set nickName (using the specified store) */
@@ -285,7 +322,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    _store.setField(_tableId, _keyTuple, 5, bytes((nickName)));
+    _store.setField(_tableId, _keyTuple, 6, bytes((nickName)));
   }
 
   /** Get the length of nickName */
@@ -293,7 +330,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 5, getSchema());
+    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 6, getSchema());
     return _byteLength / 1;
   }
 
@@ -302,7 +339,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 5, getSchema());
+    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 6, getSchema());
     return _byteLength / 1;
   }
 
@@ -311,7 +348,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 5, getSchema(), _index * 1, (_index + 1) * 1);
+    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 6, getSchema(), _index * 1, (_index + 1) * 1);
     return (string(_blob));
   }
 
@@ -320,7 +357,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 5, getSchema(), _index * 1, (_index + 1) * 1);
+    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 6, getSchema(), _index * 1, (_index + 1) * 1);
     return (string(_blob));
   }
 
@@ -329,7 +366,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    StoreSwitch.pushToField(_tableId, _keyTuple, 5, bytes((_slice)));
+    StoreSwitch.pushToField(_tableId, _keyTuple, 6, bytes((_slice)));
   }
 
   /** Push a slice to nickName (using the specified store) */
@@ -337,7 +374,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    _store.pushToField(_tableId, _keyTuple, 5, bytes((_slice)));
+    _store.pushToField(_tableId, _keyTuple, 6, bytes((_slice)));
   }
 
   /** Pop a slice from nickName */
@@ -345,7 +382,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    StoreSwitch.popFromField(_tableId, _keyTuple, 5, 1);
+    StoreSwitch.popFromField(_tableId, _keyTuple, 6, 1);
   }
 
   /** Pop a slice from nickName (using the specified store) */
@@ -353,7 +390,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    _store.popFromField(_tableId, _keyTuple, 5, 1);
+    _store.popFromField(_tableId, _keyTuple, 6, 1);
   }
 
   /** Update a slice of nickName at `_index` */
@@ -361,7 +398,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    StoreSwitch.updateInField(_tableId, _keyTuple, 5, _index * 1, bytes((_slice)));
+    StoreSwitch.updateInField(_tableId, _keyTuple, 6, _index * 1, bytes((_slice)));
   }
 
   /** Update a slice of nickName (using the specified store) at `_index` */
@@ -369,7 +406,7 @@ library UserStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
 
-    _store.updateInField(_tableId, _keyTuple, 5, _index * 1, bytes((_slice)));
+    _store.updateInField(_tableId, _keyTuple, 6, _index * 1, bytes((_slice)));
   }
 
   /** Get the full data */
@@ -395,12 +432,13 @@ library UserStatus {
     bytes32 userId,
     uint256 coinBalance,
     uint256 diamondBalance,
+    uint32 level,
     uint32 exp,
     bool timeZoneSign,
     uint32 timeZoneOffset,
     string memory nickName
   ) internal {
-    bytes memory _data = encode(coinBalance, diamondBalance, exp, timeZoneSign, timeZoneOffset, nickName);
+    bytes memory _data = encode(coinBalance, diamondBalance, level, exp, timeZoneSign, timeZoneOffset, nickName);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
@@ -414,12 +452,13 @@ library UserStatus {
     bytes32 userId,
     uint256 coinBalance,
     uint256 diamondBalance,
+    uint32 level,
     uint32 exp,
     bool timeZoneSign,
     uint32 timeZoneOffset,
     string memory nickName
   ) internal {
-    bytes memory _data = encode(coinBalance, diamondBalance, exp, timeZoneSign, timeZoneOffset, nickName);
+    bytes memory _data = encode(coinBalance, diamondBalance, level, exp, timeZoneSign, timeZoneOffset, nickName);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = userId;
@@ -433,6 +472,7 @@ library UserStatus {
       userId,
       _table.coinBalance,
       _table.diamondBalance,
+      _table.level,
       _table.exp,
       _table.timeZoneSign,
       _table.timeZoneOffset,
@@ -447,6 +487,7 @@ library UserStatus {
       userId,
       _table.coinBalance,
       _table.diamondBalance,
+      _table.level,
       _table.exp,
       _table.timeZoneSign,
       _table.timeZoneOffset,
@@ -456,24 +497,26 @@ library UserStatus {
 
   /** Decode the tightly packed blob using this table's schema */
   function decode(bytes memory _blob) internal view returns (UserStatusData memory _table) {
-    // 73 is the total byte length of static data
-    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 73));
+    // 77 is the total byte length of static data
+    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 77));
 
     _table.coinBalance = (uint256(Bytes.slice32(_blob, 0)));
 
     _table.diamondBalance = (uint256(Bytes.slice32(_blob, 32)));
 
-    _table.exp = (uint32(Bytes.slice4(_blob, 64)));
+    _table.level = (uint32(Bytes.slice4(_blob, 64)));
 
-    _table.timeZoneSign = (_toBool(uint8(Bytes.slice1(_blob, 68))));
+    _table.exp = (uint32(Bytes.slice4(_blob, 68)));
 
-    _table.timeZoneOffset = (uint32(Bytes.slice4(_blob, 69)));
+    _table.timeZoneSign = (_toBool(uint8(Bytes.slice1(_blob, 72))));
+
+    _table.timeZoneOffset = (uint32(Bytes.slice4(_blob, 73)));
 
     // Store trims the blob if dynamic fields are all empty
-    if (_blob.length > 73) {
+    if (_blob.length > 77) {
       uint256 _start;
       // skip static data length + dynamic lengths word
-      uint256 _end = 105;
+      uint256 _end = 109;
 
       _start = _end;
       _end += _encodedLengths.atIndex(0);
@@ -485,6 +528,7 @@ library UserStatus {
   function encode(
     uint256 coinBalance,
     uint256 diamondBalance,
+    uint32 level,
     uint32 exp,
     bool timeZoneSign,
     uint32 timeZoneOffset,
@@ -498,6 +542,7 @@ library UserStatus {
       abi.encodePacked(
         coinBalance,
         diamondBalance,
+        level,
         exp,
         timeZoneSign,
         timeZoneOffset,
