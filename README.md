@@ -2,6 +2,8 @@
 
 ![Logo](assets/Genki_logo.png)
 
+![Testing](https://github.com/GenkiCats/genkicats-core/actions/workflows/main.yml/badge.svg)
+
 Genki Cats is a mobile, fully-onchain game based on the [MUD](https://github.com/latticexyz/mud) framework. Players can own their cats, cultivate their unique hobbies, and earn rich on-chain rewards. Through the customization of game engines, Genki Cats achieves a Web2 gaming experience while ensuring the game's permanency and openness.
 
 The game is still under rapid development. Please feel free to raise any issues here.
