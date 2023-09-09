@@ -1,5 +1,7 @@
 # Genki Cats Core Contracts
 
+![Logo](assets/Genki_logo.png)
+
 Genki Cats is a mobile fully-onchain game based on MUD. Players can own their cats, cultivate their unique hobbies, and earn rich on-chain rewards. Through the customization of game engines, Genki Cats achieves a Web2 gaming experience while ensuring the game's permanency and openness.
 
 The game is still under rapid development. Please feel free to raise any issues here.
@@ -58,4 +60,4 @@ Given that Genki Cats is constructed with over 20 system contracts and 50 table 
 - [x] Quantity helper system
 - [x] System for UID generation
 - [x] Offerings with time limits
-- [x] Timezone system
+- [x] Timezone systemz
