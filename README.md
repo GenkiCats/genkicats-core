@@ -1,8 +1,8 @@
-# Genki Cats Core Contracts
+# Genki Cats Core
 
 ![Logo](assets/Genki_logo.png)
 
-Genki Cats is a mobile fully-onchain game based on MUD. Players can own their cats, cultivate their unique hobbies, and earn rich on-chain rewards. Through the customization of game engines, Genki Cats achieves a Web2 gaming experience while ensuring the game's permanency and openness.
+Genki Cats is a mobile, fully-onchain game based on the [MUD](https://github.com/latticexyz/mud) framework. Players can own their cats, cultivate their unique hobbies, and earn rich on-chain rewards. Through the customization of game engines, Genki Cats achieves a Web2 gaming experience while ensuring the game's permanency and openness.
 
 The game is still under rapid development. Please feel free to raise any issues here.
 
@@ -10,12 +10,12 @@ The game is still under rapid development. Please feel free to raise any issues 
 
 Given that Genki Cats is constructed with over 20 system contracts and 50 table contracts, we're listing the primary gaming systems and functions below for clearer understanding.
 
-### User
+### Users
 
 - [x] User registration
 - [x] Bind multiple wallets for users
 
-### Pet
+### Pets
 
 - [x] Adopt a pet
 - [x] Off-chain estimation of pet status
@@ -25,7 +25,7 @@ Given that Genki Cats is constructed with over 20 system contracts and 50 table 
 - [ ] Pet marriage system
 - [ ] Pet birth system
 
-### Room
+### Home
 
 - [x] Automatic pet feeder system
 - [ ] Toy placement system
@@ -60,4 +60,4 @@ Given that Genki Cats is constructed with over 20 system contracts and 50 table 
 - [x] Quantity helper system
 - [x] System for UID generation
 - [x] Offerings with time limits
-- [x] Timezone systemz
+- [x] Timezone system
