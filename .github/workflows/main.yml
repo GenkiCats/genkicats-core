@@ -1,0 +1,47 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+  
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Setup foundry
+      uses: foundry-rs/foundry-toolchain@v1
+      with:
+        version: nightly
+
+    - name: Install pnpm
+      run: |
+        npm install -g pnpm
+
+    - name: Install dependencies
+      run: |
+        pnpm install
+
+    - name: Install dependencies in contracts
+      working-directory: packages/contracts
+      run: |
+        pnpm install
+
+    - name: Generate table and world
+      working-directory: packages/contracts
+      run: |
+        pnpm mud tablegen
+        pnpm mud worldgen
+
+    - name: create .env for test
+      working-directory: packages/contracts
+      run: |
+        echo "PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80" > .env
+
+    - name: Run tests
+      working-directory: packages/contracts
+      run: |
+        pnpm mud test
+        
+
