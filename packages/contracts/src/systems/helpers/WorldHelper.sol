@@ -4,6 +4,6 @@ import { IWorld } from "../../codegen/world/IWorld.sol";
 import { StoreSwitch } from "@latticexyz/store/src/StoreSwitch.sol";
 
 function getWorld() view returns (IWorld) {
-  address store = StoreSwitch.inferStoreAddress();
+  address store = StoreSwitch.getStoreAddress();
   return IWorld(store);
 }

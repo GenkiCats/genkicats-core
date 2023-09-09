@@ -12,17 +12,13 @@ export default mudConfig({
       accessList: [],
     },
     //TODO: cannot be open access in production
-    AdminSystem: {
+    AdminConfigSystem: {
       name: "admin_system",
       openAccess: true,
     },
     UserSystem: {
       name: "user_system",
       openAccess: true,
-    },
-    TimeZoneSystem: {
-      name: "time_zone_system",
-      openAccess: false,
     },
     PeriodEventsSystem: {
       name: "period_events",
@@ -57,22 +53,42 @@ export default mudConfig({
       },
     },
 
-    ItemList: {
+    /**
+     *  Buff
+     *
+     */
+
+    BuffTypeConfig: {
       keySchema: {
-        event_hash: "bytes32",
+        buffType: "uint32",
       },
       schema: {
-        itemId: "bytes32",
-        itemNum: "uint256",
+        attribute: "uint256", // the buff attributes, optional
+        extraAttributes: "uint256[]", // the extended buff values
       },
     },
 
-    Tradable: {
+    BuffConfig: {
       keySchema: {
-        itemId: "bytes32",
+        buffId: "bytes32",
       },
       schema: {
-        tradable: "bool",
+        buffType: "uint32", // the buff type
+        buffValue: "uint256", // the buff value, eg drop rate
+        duration: "uint256", // the duration of buff, in seconds
+        buffExtraValues: "uint256[]", // the extended buff value
+      },
+    },
+
+    BuffStatus: {
+      keySchema: {
+        targetType: "uint8", // 0 for pet, 1 for user, 2 for plants
+        targetId: "bytes32",
+        buffType: "uint32",
+      },
+      schema: {
+        buffId: "bytes32", // the buff id, notice here only keep the last buff of same type
+        startTime: "uint256", // the start time of this buff
       },
     },
 
@@ -87,22 +103,24 @@ export default mudConfig({
     CatConfig: {
       keySchema: {},
       schema: {
-        hungerConsumeRate: "uint32", // hunger consumption rate each seconds, in 10000 precision
-        funConsumeRate: "uint32", // fun consumption rate each seconds, in 10000 precision
+        hungerConsumeRate: "uint32", // hunger consumption rate each seconds, in 1e6 precision
+        funConsumeRate: "uint32", // fun consumption rate each seconds, in 1e6 precision
+        baseDropRate: "uint32", // the base reward drop rate of cat, in 1e4 precision
+        baseHungerCoinRate: "uint32", // the base hunger coin conversion rate of cat, in 1e4 precision
         starvingStartTime: "uint256", // the number of seconds cat can endure when hunger keep zero, after this the cat has chance to leave
         foreverFriendshipLevel: "uint32", // the friendship level of cat will never lost permanently
+        funLimit: "uint32", // the fun limit of cat, in 1e6 precision
+        cleanLimit: "uint32", // the clean limit of cat, in 1e6 precision
       },
     },
 
     CatLevelConfig: {
       keySchema: {
-        catLevel: "uint32",
+        level: "uint32",
       },
       schema: {
-        hungerLimit: "uint32",
-        funLimit: "uint32",
-        expLimit: "uint32",
-        coinBase: "uint32",
+        hungerLimit: "uint32", // in 1e4 precision
+        expLimit: "uint32", // in 1e4 precision
       },
     },
 
@@ -111,32 +129,17 @@ export default mudConfig({
         friendshipLevel: "uint32",
       },
       schema: {
-        expLimit: "uint32",
-        starvingTimeLimit: "uint256", // the number of seconds cat will leave when hunger keep zero, 0 means never leave
+        expLimit: "uint32", // in 1e4 precision
+        starvingTimeLimit: "uint32", // the number of seconds cat will leave when hunger keep zero, 0 means never leave
       },
     },
 
-    CatBuffConfig: {
-      keySchema: {
-        buffId: "bytes32",
-      },
+    CatBornStatusConfig: {
+      keySchema: {},
       schema: {
-        buffType: "uint32",
-        attribute: "uint256", // the buff attributes
-        extendedAttributes: "uint256[]", // the extended buff values
-      },
-    },
-    // pack the buff effect value and the buff attributes
-    CatBuffEffectConfig: {
-      keySchema: {
-        buffEffectId: "bytes32",
-      },
-      schema: {
-        buffId: "bytes32",
-        buffEffectValue: "uint256", // the buff effect value
-        duration: "uint256", // the duration of buff, in seconds
-        times: "uint32", // the times of buff, 0 means infinite
-        extendedBuffEffectValues: "uint256[]", // the extended buff effect values
+        hunger: "uint32",
+        fun: "uint32",
+        clean: "uint32",
       },
     },
 
@@ -154,8 +157,7 @@ export default mudConfig({
         level: "uint32",
         hunger: "uint32",
         fun: "uint32",
-        health: "uint32",
-        cleanLevel: "uint8",
+        clean: "uint32",
         starvingTime: "uint256", // the time when cat keep zero hunger, if cat is not starving now, this value is 0
         lastUpdateTime: "uint256", // the last time to update cat hunger and fun status
       },
@@ -174,26 +176,13 @@ export default mudConfig({
         birthTime: "uint256",
       },
     },
-    CatAutoFeederStatus: {
+    AutoFeederStatus: {
       keySchema: {
         catId: "bytes32",
       },
       schema: {
-        lastAutoFeedTime: "uint256", // the last time the cat is auto fed
-        autoFeedRatio: "uint32", // the ratio of auto feed, in 10000 precision, update when level up or change the number of cat
-      },
-    },
-    CatBuff: {
-      keySchema: {
-        catId: "bytes32",
-      },
-      schema: {
-        buffId: "bytes32",
-        buffEffectValue: "uint256", // the buff effect value
-        startTime: "uint256",
-        duration: "uint256", // the duration of buff, in seconds
-        times: "uint32", // the times of buff, 0 means infinite
-        extendedBuffEffectValues: "uint256[]", // the extended buff effect values
+        lastFeedTime: "uint256", // the last time the cat is auto fed
+        feedRatio: "uint32", // the ratio of auto feed, in 10000 precision, update when level up or change the number of cat
       },
     },
 
@@ -220,7 +209,7 @@ export default mudConfig({
         userId: "bytes32",
       },
       schema: {
-        totalHungerLimit: "uint32", // the total hunger limit of all cats
+        totalHungerLimit: "uint32", // the total hunger limit of all cats, in 1e4 precision
         catIds: "bytes32[]", // In game design, the max number of cats is 16 for each user
       },
     },
@@ -258,7 +247,7 @@ export default mudConfig({
     AutoFeederConfig: {
       keySchema: {},
       schema: {
-        feedRate: "uint32", // the hunger limit percent will be fed per cat per second in 10000 precision
+        feedRate: "uint32", // the hunger limit percent will be fed per cat per second in 1e6 precision
       },
     },
 
@@ -267,7 +256,7 @@ export default mudConfig({
         level: "uint32",
       },
       schema: {
-        foodLimit: "uint32",
+        foodLimit: "uint32", // the hunger in 1e4 precision
         foodPrice: "uint32",
       },
     },
@@ -316,7 +305,7 @@ export default mudConfig({
         level: "uint32",
       },
       schema: {
-        expLimit: "uint32",
+        expLimit: "uint32", // in 1e4 precision
       },
     },
 
@@ -350,9 +339,7 @@ export default mudConfig({
 
     /**
      *
-     * The item id below 1000000000 is reserved for initial game designer
-     *
-     * The item id above 1000000000 is reserved for players created
+     * Items
      *
      */
 
@@ -362,16 +349,25 @@ export default mudConfig({
       },
       schema: {
         maxItemQuantity: "uint32",
-        creator: "address", // the creator of this item, if creator is 0x0, then it is created by game designer
+        designer: "address", // the designer of this item
       },
     },
 
-    ItemBuffEffectConfig: {
+    ItemTradableConfig: {
       keySchema: {
         itemId: "bytes32",
       },
       schema: {
-        buffEffects: "bytes32[]", // the buff effect ids
+        tradable: "bool",
+      },
+    },
+
+    ItemBuffConfig: {
+      keySchema: {
+        itemId: "bytes32",
+      },
+      schema: {
+        buffIds: "bytes32[]", // the buff ids
       },
     },
 
@@ -386,8 +382,6 @@ export default mudConfig({
       },
       schema: {
         hunger: "uint32",
-        dropRate: "uint32",
-        hungerCoinRate: "uint32", // the coin rate for hunger in 10000 precision
       },
     },
 
@@ -401,32 +395,40 @@ export default mudConfig({
         taskId: "bytes32",
       },
       schema: {
-        level: "uint32",
-        dupPeriod: "uint32", // dup period = 0 mean no dup
-        rewardExp: "uint32",
+        level: "uint32", // level required for player to unlock this task
+        dupPeriod: "uint32", // dup period = 0 mean no dup, in seconds
+        rewardUserExp: "uint32",
         rewardCoins: "uint256",
         rewardDiamonds: "uint256",
-        itemConsumed: "bool", // if task need to consume the required items
-        itemIds: "bytes32[]",
-        itemQuantities: "uint32[]",
-        rewardItemIds: "bytes32[]",
-        rewardItemQuantities: "uint32[]",
+        status: "uint8", // 0: inactive, 1: active
       },
     },
-    // Chores are tasks has no requirement
-    //TODO: Need to enable
-    ChoresConfig: {
+    // need to finish all required tasks to unlock this task
+    TaskRequiredTasksConfig: {
       keySchema: {
-        choreId: "bytes32",
+        taskId: "bytes32",
       },
       schema: {
-        choreType: "uint8",
-        choreReward: "uint256",
-        choreRewardType: "uint8",
-        choreRewardItems: "bytes32[]",
-        choreRewardItemsNum: "uint256[]",
-        choreName: "string",
-        choreDescription: "string",
+        taskIds: "bytes32[]",
+      },
+    },
+    TaskRequiredItemsConfig: {
+      keySchema: {
+        taskId: "bytes32",
+      },
+      schema: {
+        itemIds: "bytes32[]",
+        itemQuantities: "uint32[]",
+        isConsumed: "bool[]", // if task need to consume the required items
+      },
+    },
+    TaskRewardItemsConfig: {
+      keySchema: {
+        taskId: "bytes32",
+      },
+      schema: {
+        itemIds: "bytes32[]",
+        itemQuantities: "uint32[]",
       },
     },
 
@@ -484,8 +486,8 @@ export default mudConfig({
     HobbyBasicConfig: {
       keySchema: {},
       schema: {
-        hungerCatExpRate: "uint32", // the cat exp rate for each hunger, in 10000 precision
-        hungerUserExpRate: "uint32", // the user exp rate for each hunger, in 10000 precision
+        hungerCatExpRate: "uint32", // the cat exp rate for each hunger, in 1e4 precision
+        hungerUserExpRate: "uint32", // the user exp rate for each hunger, in 1e4 precision
       },
     },
 
@@ -495,9 +497,9 @@ export default mudConfig({
         hobbyId: "bytes32",
       },
       schema: {
-        creator: "address",
-        tagChosenRange: "uint8", // the number of tag can be chosen in one tier by players before the activity start
-        tierNum: "uint8", // the number of tiers for this hobby, notice that tier starts from 1
+        designer: "address",
+        playerChosenTagNum: "uint8", // the number of tag can be chosen in one tier by players before the activity start
+        hungerConsumptionRate: "uint32", // the hunger consumption rate in seconds, in 1e6 precision
         extraRewardNum: "uint8", // the number of extra reward items in each activity for this hobby, 0 for only one reward item each time, related to the HobbyExtraRewardConfig
         hasExtraSteps: "bool", // if this hobby has extra steps, related to the HobbyExtraStepsConfig
         hobbyAttractiveItem: "bytes32", // item id, this item can be used to attract cats has this hobby, only the creator can create this item
@@ -515,35 +517,39 @@ export default mudConfig({
       },
     },
 
+    HobbyLevelTierConfig: {
+      keySchema: {
+        hobbyId: "bytes32",
+        level: "uint32",
+      },
+      schema: {
+        tier: "uint8",
+      },
+    },
+
     HobbyTierConfig: {
       keySchema: {
         hobbyId: "bytes32",
-        tier: "uint8", // each tier covers 5 levels, and tier starts from 1
+        tier: "uint8",
       },
       schema: {
         baseTime: "uint256", // the base activity time for this tier, the minimum time is 10 minutes, each 1 percent of hunger consumption rate requires at least 1 minute to consume
         baseRestTime: "uint256", // the base rest time for this tier, the minimum time is 10 minutes, each 1 percent of hunger consumption rate requires at least 1 minute to rest
-        hungerConsumptionRate: "uint32", // the hunger consumption base rate for this hobby in 10000 precision, the minimum rate is 0.1, which is 1000 here
-      },
-    },
-
-    HobbyRewardTagsConfig: {
-      keySchema: {
-        hobbyId: "bytes32",
-        tier: "uint8", // each tier covers 5 levels, and tier starts from 1
-      },
-      schema: {
-        tagIds: "bytes32[]",
+        tierChosenSampleId: "bytes32", // the sample id for chosen tier
+        tagChosenSampleId: "bytes32", // the sample id for chosen tag
+        tierChosenRange: "uint8[]", // the tiers can be chosen under this tier
+        tagChosenRange: "bytes32[]", // the tag ids for this tier
       },
     },
 
     HobbyRewardItemsConfig: {
       keySchema: {
         hobbyId: "bytes32",
-        tier: "uint8", // each tier covers 5 levels, and tier starts from 1
+        tier: "uint8",
         tagId: "bytes32",
       },
       schema: {
+        sampleId: "bytes32", // the sample id for reward items
         itemIds: "bytes32[]",
       },
     },
@@ -553,7 +559,7 @@ export default mudConfig({
     HobbyExtraRewardConfig: {
       keySchema: {
         hobbyId: "bytes32",
-        tier: "uint8", // each tier covers 5 levels, and tier starts from 1
+        tier: "uint8",
         tagId: "bytes32",
         extraIndex: "uint8", // the index of extra reward, 0 for the first extra reward, 1 for the second extra reward
       },
@@ -562,10 +568,10 @@ export default mudConfig({
       },
     },
 
-    HobbyRewardStepsConfig: {
+    HobbyExtraStepsConfig: {
       keySchema: {
         hobbyId: "bytes32",
-        tier: "uint8", // each tier covers 5 levels, and tier starts from 1
+        tier: "uint8",
         tagId: "bytes32",
       },
       schema: {
@@ -590,7 +596,7 @@ export default mudConfig({
         tierTagIndex: "uint32", // the item index in the tag config of a specific tier
         dropRate: "uint32", // the drop rate of this activity, 10000 for 100%
         specialEffect: "uint256", // the special effect of this activity, 0 for no special effect
-        stepNum: "uint32", // the number of finished steps of this activity
+        step: "uint32", // the number of finished steps of this activity
         startTime: "uint256", // the start time of this activity
         requestRandBlock: "uint256", // the block number of request random
         randomSeed: "uint256", // random seed
@@ -609,11 +615,9 @@ export default mudConfig({
         catId: "bytes32",
       },
       schema: {
-        dropRate: "uint32", // the general drop rate of this cat, 10000 for 100%
         currentLogId: "bytes32", // the current log id of this cat,
         latestLogId: "bytes32", // the latest log id of this cat,
-        lastEventFinishTime: "uint256", // the last event finish time of this cat,
-        lastFeedFoodId: "bytes32", // the last feed food item id of this cat,
+        lastEventFinishTime: "uint256", // the last event finish time of this cat
       },
     },
 
@@ -639,6 +643,7 @@ export default mudConfig({
         sampleId: "bytes32",
       },
       schema: {
+        designer: "address", // the designer of this sample config
         samplingMethod: "uint8", // 0 for no weight sampling, 1 for simple sampling, 2 for alias sampling, 3 for prefix sum sampling
       },
     },
@@ -704,6 +709,14 @@ export default mudConfig({
       },
     },
 
+    // using for create new id
+    GlobalIDCount: {
+      keySchema: {},
+      schema: {
+        count: "uint256",
+      },
+    },
+
     /**
      * Player Init Config
      */
@@ -712,21 +725,8 @@ export default mudConfig({
       schema: {
         initCoins: "uint256",
         initItems: "bytes32[]",
-        initHungerCoinRate: "uint32", // the hunger coin rate of cat before feed food, 10000 for 100%
-        initDropRate: "uint32", // the drop rate of cat, 10000 for 100%
       },
     },
   },
-  modules: [
-    {
-      name: "KeysInTableModule",
-      root: true,
-      args: [resolveTableId("Address2User")],
-    },
-    {
-      name: "UniqueEntityModule",
-      root: true,
-      args: [resolveTableId("Address2User")],
-    },
-  ],
+  modules: [],
 });

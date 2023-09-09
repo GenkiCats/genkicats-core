@@ -5,42 +5,23 @@ import { System } from "@latticexyz/world/src/System.sol";
 import { Shop } from "../codegen/Tables.sol";
 
 contract ShopConfigSystem is System {
-  function listBasicItem(bytes32 itemId, uint coinPrice, uint32 unlockLevel) public {
-    if (coinPrice != 0) {
-      Shop.setItemCoinPrice(itemId, coinPrice);
-    }
-    if (unlockLevel != 0) {
-      Shop.setItemUnlockLevel(itemId, unlockLevel);
-    }
-  }
-
-  function listBasicItems(
-    bytes32[] calldata itemIds,
-    uint[] calldata coinPrices,
-    uint32[] calldata unlockLevels
+  function setupShops(
+    bytes32[] memory itemIds,
+    uint[] memory coinPrices,
+    uint[] memory diamondPrices,
+    uint32[] memory unlockLevels,
+    uint32[] memory dailyLimits
   ) public {
     for (uint i = 0; i < itemIds.length; i++) {
-      listBasicItem(itemIds[i], coinPrices[i], unlockLevels[i]);
+      Shop.setItemCoinPrice(itemIds[i], coinPrices[i]);
+      Shop.setItemDiamondPrice(itemIds[i], diamondPrices[i]);
+      Shop.setItemUnlockLevel(itemIds[i], unlockLevels[i]);
+      Shop.setItemDailyLimit(itemIds[i], dailyLimits[i]);
     }
   }
 
-  function listAdvancedItem(bytes32 itemId, uint diamondPrice, uint32 unlockLevel) public {
-    if (diamondPrice != 0) {
-      Shop.setItemDiamondPrice(itemId, diamondPrice);
-    }
-    if (unlockLevel != 0) {
-      Shop.setItemUnlockLevel(itemId, unlockLevel);
-    }
-  }
-
-  function listAdvancedItems(
-    bytes32[] calldata itemIds,
-    uint[] calldata diamondPrices,
-    uint32[] calldata unlockLevels
-  ) public {
-    for (uint i = 0; i < itemIds.length; i++) {
-      listAdvancedItem(itemIds[i], diamondPrices[i], unlockLevels[i]);
-    }
+  function listItem(bytes32 itemId, uint coinPrice, uint diamondPrice, uint32 unlockLevel) public {
+    listItem(itemId, coinPrice, diamondPrice, 0, unlockLevel, 0, 0, 0, 0);
   }
 
   function listItem(

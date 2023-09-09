@@ -15,6 +15,9 @@ allow_paths = [
   "../../../../packages",
   # projects created from this template and using linked mud packages
   "../../../mud/packages",
+
+  #TODO: remove the line below in production, only for test mud local edition version
+  "/Users/fanyijie/Documents/mud/mud/packages"
 ]
 extra_output_files = [
   "abi",
@@ -24,3 +27,11 @@ fs_permissions = [{ access = "read", path = "./"}]
 
 [profile.lattice-testnet]
 eth_rpc_url = "https://follower.testnet-chain.linfra.xyz"
+
+[profile.local]
+eth_rpc_url = "http://127.0.0.1:8545"
+
+[profile.testnet]
+eth_rpc_url="https://arbitrum-goerli.publicnode.com"
+
+

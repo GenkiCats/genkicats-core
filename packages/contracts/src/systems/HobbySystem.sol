@@ -7,16 +7,23 @@ import { getWorld } from "./helpers/WorldHelper.sol";
 // User
 import { UserCats, UserStatus, UserLevelConfig } from "../codegen/Tables.sol";
 // Cats
-import { Cats, CatAttributes, CatLevelConfig, PlayerInitConfig } from "../codegen/Tables.sol";
+import { Cats, CatConfig, CatAttributes, CatLevelConfig, PlayerInitConfig } from "../codegen/Tables.sol";
 // Food
-import { FoodConfig } from "../codegen/Tables.sol";
+import { FoodConfig, BuffStatus, BuffConfig } from "../codegen/Tables.sol";
 // Hobby
-import { HobbyBasicConfig, HobbyRandomSourceConfig, HobbyConfig, HobbyTierConfig, HobbyLog, CatHobbyStatus, HobbyRewardStepsConfig } from "../codegen/Tables.sol";
+import { HobbyBasicConfig, HobbyRandomSourceConfig, HobbyConfig, HobbyTierConfig, HobbyLog, CatHobbyStatus, HobbyExtraStepsConfig } from "../codegen/Tables.sol";
 // Random
 import { GlobalRandomSourceConfig } from "../codegen/Tables.sol";
 
 import { IWorld } from "../codegen/world/IWorld.sol";
 import { IRandomGenerator } from "./helpers/IRandomGenerator.sol";
+
+import { LibRandom } from "./libs/LibRandom.sol";
+import { LibPrecision } from "./libs/LibPrecision.sol";
+import { LibBuff } from "./libs/LibBuff.sol";
+
+//TODO: remove in production
+import "forge-std/console.sol";
 
 contract HobbySystem is System {
   // this function should be called before the hobby tag chosen
@@ -27,6 +34,8 @@ contract HobbySystem is System {
   // or will use block.timestamp as the entropy source to generate random seed
   function requestRandomSeed(bytes32 catId, bytes32 hobbyId) public {
     bytes32 userId = Cats.getOwnerId(catId);
+    // check cat owner
+    require(userId == getUserId(_msgSender()), "only owner can request random seed");
     // can only generate new log after the last log is finished
     require(UserCats.getStatus(userId, catId) == 1, "The cat is not here");
 
@@ -75,38 +84,51 @@ contract HobbySystem is System {
   function getCatRandomSeed(bytes32 hobbyId, bytes32 userId, bytes32 catId) public view returns (uint256) {
     uint256 rawRandomSeed = getRawRandomSeed(hobbyId);
     bool strictRandom = HobbyRandomSourceConfig.getStrictRandom(hobbyId);
-    if (strictRandom == true) {
-      if (rawRandomSeed == 0) {
-        revert("The random seed has been outdated");
+    if (rawRandomSeed == 0) {
+      if (strictRandom == true) {
+        //TODO: if the random commit is not frequently, this can be exploited by players to wait for the outdated deliberately
+        revert("The random seed has been outdated, please request random seed again");
+      } else {
+        // use block.timestamp as the entropy source under non-strict random mode
+        rawRandomSeed = block.timestamp;
       }
     }
-    uint256 randomSeed = uint256(keccak256(abi.encode(rawRandomSeed, userId, catId, hobbyId, block.timestamp)));
+
+    uint256 randomSeed = uint256(keccak256(abi.encode(rawRandomSeed, userId, catId, hobbyId)));
     return randomSeed;
   }
 
-  function getTagRange(
-    bytes32 hobbyId,
-    bytes32 userId,
-    bytes32 catId,
-    uint256 randomSeed
-  ) public view returns (bytes32[] memory) {
-    uint8 tagChosenRange = HobbyConfig.getTagChosenRange(hobbyId);
+  function getHobbyTier(bytes32 hobbyId, bytes32 catId, uint256 randomSeed) public view returns (uint8) {
     IWorld world = getWorld();
-    // @HobbyConfigSystem
-    uint8 tier = world.getHobbyRewardTierBySeed(world, hobbyId, randomSeed);
-    // @HobbyConfigSystem
-    bytes32[] memory tags = world.getHobbyRewardTagsBySeed(world, hobbyId, tier, randomSeed, tagChosenRange);
-    return tags;
+    uint8 tier = world.getHobbyTierBySeed(hobbyId, catId, randomSeed);
+    return tier;
   }
 
-  function _checkTagValid(
+  function getPlayerChosenTags(
     bytes32 hobbyId,
-    bytes32 userId,
     bytes32 catId,
+    uint8 tier,
+    uint256 randomSeed
+  ) public view returns (bytes32[] memory) {
+    uint8 playerChosenTagNum = HobbyConfig.getPlayerChosenTagNum(hobbyId);
+    // if tagChosenRange is 0, then player cannot choose tag for this hobby
+    if (playerChosenTagNum == 0) {
+      return new bytes32[](0);
+    } else {
+      // @HobbyHelperSystem
+      bytes32[] memory tags = getWorld().getHobbyTagsBySeed(hobbyId, tier, randomSeed, playerChosenTagNum);
+      return tags;
+    }
+  }
+
+  function _isTagValid(
+    bytes32 hobbyId,
+    bytes32 catId,
+    uint8 tier,
     bytes32 tagId,
     uint256 randomSeed
   ) internal view returns (bool) {
-    bytes32[] memory tags = getTagRange(hobbyId, userId, catId, randomSeed);
+    bytes32[] memory tags = getPlayerChosenTags(hobbyId, catId, tier, randomSeed);
     bool validTag = false;
     for (uint8 i = 0; i < tags.length; i++) {
       if (tags[i] == tagId) {
@@ -117,32 +139,33 @@ contract HobbySystem is System {
     return validTag;
   }
 
-  function _checkMultipleStepsLog(
-    bytes32 lastHobbyLogId,
-    bytes32 newLogId,
+  function getLastHobbyStatus(
     bytes32 hobbyId,
-    bytes32 tagId
-  ) internal returns (uint8, bytes32, uint32) {
+    bytes32 lastHobbyLogId
+  ) internal view returns (uint32, uint8, bytes32, uint32) {
     uint8 tier;
+    bytes32 tagId;
     uint32 tierTagIndex;
     // check if need to copy the last hobby log when in multiple steps status
     if (lastHobbyLogId != bytes32(0)) {
-      // check if hobby log is in multiple steps status
-      // Remember that one cat can only do one hobby all the time, so we can directly use this hobbyId
-      bool hasExtraSteps = HobbyConfig.getHasExtraSteps(hobbyId);
-      if (hasExtraSteps) {
-        tier = HobbyLog.getTier(lastHobbyLogId);
-        tagId = HobbyLog.getTagId(lastHobbyLogId);
-        tierTagIndex = HobbyLog.getTierTagIndex(lastHobbyLogId);
-        uint32 maxStepNum = HobbyRewardStepsConfig.getItem(hobbyId, tier, tagId, tierTagIndex);
-        uint32 currentStepNum = HobbyLog.getStepNum(lastHobbyLogId);
-        if (currentStepNum < maxStepNum) {
-          // if the last hobby log is not finished, then continue on the new log
-          HobbyLog.setStepNum(newLogId, currentStepNum + 1);
-        }
+      tier = HobbyLog.getTier(lastHobbyLogId);
+      tagId = HobbyLog.getTagId(lastHobbyLogId);
+      tierTagIndex = HobbyLog.getTierTagIndex(lastHobbyLogId);
+      uint32 extraStepsRequired = HobbyExtraStepsConfig.getItem(hobbyId, tier, tagId, tierTagIndex);
+      uint32 lastStep = HobbyLog.getStep(lastHobbyLogId);
+      if (lastStep < extraStepsRequired) {
+        // if the last hobby log is not finished, then continue on the new log
+        return (lastStep + 1, tier, tagId, tierTagIndex);
+      } else {
+        // if the last hobby log is finished, then start a new log
+        // steps starts from 0
+        return (0, 0, bytes32(0), 0);
       }
+    } else {
+      // no last hobby log, then start a new log
+      // steps starts from 0
+      return (0, 0, bytes32(0), 0);
     }
-    return (tier, tagId, tierTagIndex);
   }
 
   function isCatResting(bytes32 catId, bytes32 hobbyId, uint8 tier) public view returns (bool) {
@@ -151,118 +174,100 @@ contract HobbySystem is System {
     return block.timestamp < lastEventFinishTime + baseRestTime;
   }
 
-  function getCatHungerConsumption(bytes32 hobbyId, bytes32 catId, uint8 tier) public view returns (uint32) {
-    // get hunger consumption rate
-    uint32 hungerConsumptionRate = HobbyTierConfig.getHungerConsumptionRate(hobbyId, tier);
-    // check if the cat can afford the hunger consumption
-    uint32 requiredHunger = (CatLevelConfig.getHungerLimit(Cats.getLevel(catId)) * hungerConsumptionRate) / 10000;
-    return requiredHunger;
+  function getCatHungerConsumption(bytes32 hobbyId, bytes32 catId, uint256 timeDiff) public view returns (uint32) {
+    uint32 hobbyConsumptionRate = HobbyConfig.getHungerConsumptionRate(hobbyId);
+    uint32 hungerLimit = CatLevelConfig.getHungerLimit(Cats.getLevel(catId));
+    uint32 hobbyConsumption = uint32(
+      (uint256(hobbyConsumptionRate) * timeDiff * uint256(hungerLimit)) / LibPrecision.CONSUMPTION_PRECISION
+    );
+    return hobbyConsumption;
   }
 
-  function getDropRate(bytes32 lastFeedFoodId) public view returns (uint32) {
-    uint32 dropRate;
-    // if the cat has never been fed, use init rate
-    if (lastFeedFoodId == 0) {
-      dropRate = PlayerInitConfig.getInitDropRate();
-    } else {
-      dropRate = FoodConfig.getDropRate(lastFeedFoodId);
+  function getDropRate(bytes32 catId) public view returns (uint32) {
+    uint32 dropRate = CatConfig.getBaseDropRate();
+    bytes32 buffId = BuffStatus.getBuffId(0, catId, LibBuff.DROP_RATE_MUL_BUFF_TYPE);
+    uint256 buffStartTime = BuffStatus.getStartTime(0, catId, LibBuff.DROP_RATE_MUL_BUFF_TYPE);
+    if (LibBuff.isBuffValid(buffId, buffStartTime)) {
+      uint256 dropRateFactor = BuffConfig.getBuffValue(buffId);
+      dropRate = uint32((uint256(dropRate) * dropRateFactor) / LibPrecision.PROB_PRECISION);
     }
+    console.log("dropRate: %s", uint256(dropRate));
     return dropRate;
   }
 
-  function getCoinReward(
-    bytes32 lastFeedFoodId,
-    uint32 requiredHunger,
-    uint256 randomSeed,
-    IWorld world
-  ) public view returns (uint256) {
-    uint32 hungerCoinRate;
-    // if the cat has never been fed, use init rate
-    if (lastFeedFoodId == 0) {
-      hungerCoinRate = PlayerInitConfig.getInitHungerCoinRate();
-    } else {
-      hungerCoinRate = FoodConfig.getHungerCoinRate(lastFeedFoodId);
+  function getCoinReward(bytes32 catId, uint32 requiredHunger, uint256 randomSeed) public view returns (uint256) {
+    uint32 hungerCoinRate = CatConfig.getBaseHungerCoinRate();
+    bytes32 buffId = BuffStatus.getBuffId(0, catId, LibBuff.COIN_RATE_MUL_BUFF_TYPE);
+    uint256 buffStartTime = BuffStatus.getStartTime(0, catId, LibBuff.COIN_RATE_MUL_BUFF_TYPE);
+    if (LibBuff.isBuffValid(buffId, buffStartTime)) {
+      uint256 hungerCoinRateFactor = BuffConfig.getBuffValue(buffId);
+      hungerCoinRate = uint32((uint256(hungerCoinRate) * hungerCoinRateFactor) / LibPrecision.PROB_PRECISION);
     }
-    uint256 coinRewardBase = (requiredHunger * hungerCoinRate) / 10000;
-    // @RandDisturbHelperSystem
-    // 80%~120% disturb
-    uint256 coinReward = world.getSimpleRandDisturbResult(coinRewardBase, coinRewardBase / 5, randomSeed);
+
+    uint256 coinReward = (requiredHunger * hungerCoinRate) / LibPrecision.CONVERSION_PRECISION;
+    console.log("coinReward: %s", coinReward);
     return coinReward;
   }
 
-  function getCatExpReward(
-    bytes32 catId,
-    uint32 requiredHunger,
-    uint256 randomSeed,
-    IWorld world
-  ) public view returns (uint32) {
+  function getCatExpReward(bytes32 catId, uint32 requiredHunger, uint256 randomSeed) public view returns (uint32) {
     uint32 hungerCatExpRate = HobbyBasicConfig.getHungerCatExpRate();
-    uint32 catExpLimit = CatLevelConfig.getExpLimit(Cats.getLevel(catId));
-    uint32 catExpRewardBase = (requiredHunger * hungerCatExpRate) / 10000;
-    // @RandDisturbHelperSystem
-    // 80%~120% disturb
-    uint32 catExpReward = uint32(world.getSimpleRandDisturbResult(catExpRewardBase, catExpRewardBase / 5, randomSeed));
+    console.log("hungerCatExpRate: %s", uint256(hungerCatExpRate));
+    uint32 catExpReward = (requiredHunger * hungerCatExpRate) / LibPrecision.CONVERSION_PRECISION;
+    console.log("catExpReward: %s", uint256(catExpReward));
     return catExpReward;
   }
 
-  function getUserExpReward(
-    bytes32 userId,
-    uint32 requiredHunger,
-    uint256 randomSeed,
-    IWorld world
-  ) public view returns (uint32) {
+  function getUserExpReward(bytes32 userId, uint32 requiredHunger, uint256 randomSeed) public view returns (uint32) {
     // get user exp
     uint32 hungerUserExpRate = HobbyBasicConfig.getHungerUserExpRate();
-    uint32 userExpLimit = UserLevelConfig.get(UserStatus.getLevel(userId));
-    uint32 userExpRewardBase = (requiredHunger * hungerUserExpRate) / 10000;
-    // @RandDisturbHelperSystem
-    // 80%~120% disturb
-    uint32 userExpReward = uint32(
-      world.getSimpleRandDisturbResult(userExpRewardBase, userExpRewardBase / 5, randomSeed)
-    );
+    console.log("hungerUserExpRate: %s", uint256(hungerUserExpRate));
+    uint32 userExpReward = (requiredHunger * hungerUserExpRate) / LibPrecision.CONVERSION_PRECISION;
+    console.log("userExpReward: %s", uint256(userExpReward));
     return userExpReward;
   }
 
-  function getDuration(bytes32 hobbyId, uint8 tier, uint256 randomSeed, IWorld world) public view returns (uint256) {
+  function getDuration(bytes32 hobbyId, uint8 tier, uint256 randomSeed) public view returns (uint256) {
     // get activity time
     uint256 baseTime = HobbyTierConfig.getBaseTime(hobbyId, tier);
 
     // @RandDisturbHelperSystem
     // 50%~150% disturb
-    uint256 activityTime = world.getSimpleRandDisturbResult(baseTime, baseTime / 2, randomSeed);
+    uint256 activityTime = LibRandom.getSimpleRandDisturbResult(
+      baseTime,
+      baseTime / 2,
+      randomSeed,
+      "hobbyEventDuration"
+    );
+    console.log("activityTime: %s", activityTime);
     return activityTime;
   }
 
-  function updateRewardItems(
-    bytes32 logId,
-    bytes32 hobbyId,
-    uint8 tier,
-    bytes32 tagId,
-    uint256 randomSeed,
-    IWorld world
-  ) internal {
+  function updateRewardItems(bytes32 logId, bytes32 hobbyId, uint8 tier, bytes32 tagId, uint256 randomSeed) internal {
     // decide if drop reward
-    if (randomSeed % 10000 < HobbyLog.getDropRate(logId)) {
+    if (randomSeed % LibPrecision.PROB_PRECISION < HobbyLog.getDropRate(logId)) {
       // get reward item
-      // @HobbyConfigSystem
-      bytes32[] memory rewardItems = world.getHobbyRewardItemsBySeed(world, hobbyId, tier, tagId, randomSeed);
+      // @HobbyHelperSystem
+      bytes32[] memory rewardItems = getWorld().getHobbyRewardItemsBySeed(hobbyId, tier, tagId, randomSeed);
+      for (uint256 i = 0; i < rewardItems.length; i++) {
+        console.log("rewardItems: %s", uint256(rewardItems[i]));
+      }
       HobbyLog.setRewardItems(logId, rewardItems);
     } else {
       HobbyLog.setRewardItems(logId, new bytes32[](0));
     }
+    console.log("reward items set");
   }
 
   // choose tag and start activity
   // the tagId should be in the tag range
   function startActivity(bytes32 catId, bytes32 hobbyId, bytes32 tagId) public {
     bytes32 userId = getUserId(_msgSender());
-    bytes32 catOwner = Cats.getOwnerId(catId);
-    require(userId == catOwner, "Only cat owner can start activity");
+    require(Cats.getOwnerId(catId) == userId, "Only cat owner can start activity");
 
     IWorld world = getWorld();
-
     // update cat status
     world.liveUpdate(catId);
+    require(Cats.getFun(catId) > 0, "The cat is not happy");
 
     require(UserCats.getStatus(userId, catId) == 1, "The cat is not here");
     // update cat status
@@ -287,63 +292,88 @@ contract HobbySystem is System {
       HobbyLog.setRandomSeed(logId, randomSeed);
     }
 
-    // check tagId is in the valid tag range
-    require(
-      _checkTagValid(hobbyId, userId, catId, tagId, randomSeed),
-      "The tag is not in the valid tag range, check if the random seed is outdated after tag chosen"
-    );
     uint8 tier;
     uint32 tierTagIndex;
-    (tier, tagId, tierTagIndex) = _checkMultipleStepsLog(lastHobbyLogId, logId, hobbyId, tagId);
-
-    // get tier
-    // @HobbyConfigSystem
-    // if tier not set, then get tier from random seed, notice that tier starts from 1 so 0 mean not set
-    if (tier == 0) {
-      tier = world.getHobbyRewardTierBySeed(world, hobbyId, randomSeed);
+    uint32 step;
+    // check if the hobby has extra steps
+    if (HobbyConfig.getHasExtraSteps(hobbyId) == true) {
+      // if true, check if the last step has been finished
+      // and get the config from the last log
+      (step, tier, tagId, tierTagIndex) = getLastHobbyStatus(hobbyId, lastHobbyLogId);
+      HobbyLog.setStep(logId, step);
     }
-    // record the tier
-    HobbyLog.setTier(logId, tier);
 
-    if (tagId == bytes32(0)) {
-      // if tagId not set, then get one tagId from random seed
-      tagId = world.getHobbyRewardTagBySeed(world, hobbyId, tier, randomSeed);
-    }
-    // record the tagId
-    HobbyLog.setTagId(logId, tagId);
+    // if need to start a new recor
+    if (step == 0) {
+      // Tier
+      tier = world.getHobbyTierBySeed(hobbyId, catId, randomSeed);
+      console.log("tier: %s", uint256(tier));
+      HobbyLog.setTier(logId, tier);
 
-    if (tierTagIndex == 0) {
-      // if tierTagIndex not set, then get tierTagIndex from random seed
-      tierTagIndex = uint32(world.getHobbyRewardItemIndexBySeed(world, hobbyId, tier, tagId, randomSeed));
+      // TagId
+      if (HobbyConfig.getPlayerChosenTagNum(hobbyId) == 0) {
+        // if the hobby has no tag players can chosen, then ignore the user input tag
+        // and get tagId from random seed
+        tagId = world.getHobbyTagBySeed(hobbyId, tier, randomSeed);
+      } else {
+        // check if the user input tag is valid in the predetermined tag range
+        require(
+          _isTagValid(hobbyId, catId, tier, tagId, randomSeed),
+          "The tag is not in the valid tag range, or check if the random seed is outdated after tag chosen"
+        );
+      }
+      console.log("tagId: %s", uint256(tagId));
+      HobbyLog.setTagId(logId, tagId);
+
+      // TierTagIndex
+      tierTagIndex = uint32(world.getHobbyRewardItemIndexBySeed(hobbyId, tier, tagId, randomSeed));
+      console.log("tierTagIndex: %s", uint256(tierTagIndex));
+      // record the tierTagIndex
+      HobbyLog.setTierTagIndex(logId, tierTagIndex);
     }
-    // record the tierTagIndex
-    HobbyLog.setTierTagIndex(logId, tierTagIndex);
 
     // check if the cat is resting
     require(!isCatResting(catId, hobbyId, tier), "The cat is resting");
 
-    uint32 requiredHunger = getCatHungerConsumption(hobbyId, catId, tier);
-    // we have invoke liveUpdate before, so the hunger should be up to date and we can directly read it
-    require(requiredHunger <= Cats.getHunger(catId), "The cat is too hungry");
-
-    // calcuate coin reward and drop rate
-    bytes32 lastFeedFoodId = CatHobbyStatus.getLastFeedFoodId(catId);
-    // record drop rate
-    HobbyLog.setDropRate(logId, getDropRate(lastFeedFoodId));
-    // record coin gains
-    HobbyLog.setRewardCoins(logId, getCoinReward(lastFeedFoodId, requiredHunger, randomSeed, world));
-
-    // record cat exp gains
-    HobbyLog.setRewardCatExp(logId, getCatExpReward(catId, requiredHunger, randomSeed, world));
-    // record user exp gains
-    HobbyLog.setRewardUserExp(logId, getUserExpReward(userId, requiredHunger, randomSeed, world));
+    //TODO: average drop rate in multiple steps activities
+    HobbyLog.setDropRate(logId, getDropRate(catId));
+    console.log("dropRate set");
 
     // set startTime to now to start consuming hunger
+    uint256 duration = getDuration(hobbyId, tier, randomSeed);
     HobbyLog.setStartTime(logId, block.timestamp);
-    HobbyLog.setEndTime(logId, block.timestamp + getDuration(hobbyId, tier, randomSeed, world));
+    // set the end time of this activity
+    HobbyLog.setEndTime(logId, block.timestamp + duration);
+    console.log("end time set");
 
+    // calculate the required hunger based on the duration
+    uint32 requiredHunger = getCatHungerConsumption(hobbyId, catId, duration);
+    console.log("requiredHunger: %s", uint256(requiredHunger));
+    // we have invoke liveUpdate before, so the hunger should be up to date and we can directly read it
+    // ignore the cat basic hunger consumption here
+    require(requiredHunger <= Cats.getHunger(catId), "The cat is too hungry");
+
+    // set coin and exp reward
+    setBaseRewards(catId, userId, logId, requiredHunger, randomSeed);
     // set reward items
-    updateRewardItems(logId, hobbyId, tier, tagId, randomSeed, world);
+    updateRewardItems(logId, hobbyId, tier, tagId, randomSeed);
+  }
+
+  function setBaseRewards(
+    bytes32 catId,
+    bytes32 userId,
+    bytes32 logId,
+    uint32 requiredHunger,
+    uint256 randomSeed
+  ) internal {
+    HobbyLog.setRewardCoins(logId, getCoinReward(catId, requiredHunger, randomSeed));
+    console.log("reward coin set");
+
+    HobbyLog.setRewardCatExp(logId, getCatExpReward(catId, requiredHunger, randomSeed));
+    console.log("reward cat exp set");
+
+    HobbyLog.setRewardUserExp(logId, getUserExpReward(userId, requiredHunger, randomSeed));
+    console.log("reward cat user set");
   }
 
   function claimReward(bytes32 catId, bytes32 hobbyId) public {
@@ -370,16 +400,20 @@ contract HobbySystem is System {
     // @QuantityHelperSystem
     // add reward coins
     world.addCoin(userId, rewardCoins);
-    // // add cat exp
-    // world.addCatExp(catId, rewardCatExp);
+    console.log("rewardCoins: %s", uint256(rewardCoins));
+    // add cat exp
+    world.addCatExp(catId, rewardCatExp);
+    console.log("rewardCatExp: %s", uint256(rewardCatExp));
 
-    // // add user exp
-    // world.addUserExp(userId, rewardUserExp);
+    // add user exp
+    world.addUserExp(userId, rewardUserExp);
+    console.log("rewardUserExp: %s", uint256(rewardUserExp));
 
-    // // transfer reward items
-    // for (uint256 i = 0; i < rewardItems.length; i++) {
-    //   uint256 rewardItemId = rewardItems[i];
-    //   world.addItems(userId, rewardItemId, 1);
-    // }
+    // transfer reward items
+    for (uint256 i = 0; i < rewardItems.length; i++) {
+      bytes32 rewardItemId = rewardItems[i];
+      world.addItem(userId, rewardItemId, 1);
+    }
+    console.log("Claim finish");
   }
 }

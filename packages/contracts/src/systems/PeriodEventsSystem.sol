@@ -2,25 +2,22 @@
 pragma solidity >=0.8.0;
 
 import { System } from "@latticexyz/world/src/System.sol";
-import { getUserId } from "./helpers/UserHelper.sol";
-import { getWorld } from "./helpers/WorldHelper.sol";
-import { IWorld } from "../codegen/world/IWorld.sol";
-
 import { EventTimes } from "../codegen/Tables.sol";
+
+import { LibTime } from "./libs/LibTime.sol";
 
 contract PeriodEventsSystem is System {
   function finishEvents(bytes32 userId, bytes32 eventId, uint32 timeUnit, uint32 times, uint32 maxTimes) public {
-    IWorld world = getWorld();
-    uint timeZoneTimestamp = world.getTimeZoneTimestamp(userId);
+    uint timeZoneTimestamp = LibTime.getTimeZoneTimestamp(userId);
     uint32 timeUnitNum;
     if (timeUnit == 0) {
-      timeUnitNum = world.getDayNum(timeZoneTimestamp);
+      timeUnitNum = LibTime.getDayNum(timeZoneTimestamp);
     } else if (timeUnit == 1) {
-      timeUnitNum = world.getWeekNum(timeZoneTimestamp);
+      timeUnitNum = LibTime.getWeekNum(timeZoneTimestamp);
     } else if (timeUnit == 2) {
-      timeUnitNum = world.getMonthNum(timeZoneTimestamp);
+      timeUnitNum = LibTime.getMonthNum(timeZoneTimestamp);
     } else if (timeUnit == 3) {
-      timeUnitNum = world.getYearNum(timeZoneTimestamp);
+      timeUnitNum = LibTime.getYearNum(timeZoneTimestamp);
     } else if (timeUnit == 4) {
       // forever event set timeUnitNum to 0 by design
       timeUnitNum = 0;

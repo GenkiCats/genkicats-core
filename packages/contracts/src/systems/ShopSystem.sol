@@ -27,14 +27,17 @@ contract ShopSystem is System {
     uint userBalance;
     if (currencyCode == 0) {
       price = Shop.getItemCoinPrice(itemId);
+      require(price != 0, "Can not buy with coins");
       userBalance = UserStatus.getCoinBalance(userId);
       world.decCoin(userId, itemNum * price);
     } else if (currencyCode == 1) {
       price = Shop.getItemDiamondPrice(itemId);
+      require(price != 0, "Can not buy with diamonds");
       userBalance = UserStatus.getDiamondBalance(userId);
       world.decDiamond(userId, itemNum * price);
     } else if (currencyCode == 2) {
       price = Shop.getItemTokenPrice(itemId);
+      require(price != 0, "Can not buy with tokens");
       // only when sender address has enough tokens can buy
       address tokenAddress = GlobalAddressConfig.get(keccak256("main_token"));
       // all coin consumed in shop will be locked in the world contract permanently
@@ -45,10 +48,10 @@ contract ShopSystem is System {
 
     // check if user has enought expereince
 
-    uint32 expRequired = Shop.getItemUnlockLevel(itemId);
-    if (expRequired > 0) {
-      uint32 userExp = UserStatus.getExp(userId);
-      require(userExp >= expRequired, "not enough experience");
+    uint32 levelRequired = Shop.getItemUnlockLevel(itemId);
+    if (levelRequired > 0) {
+      uint32 userLevel = UserStatus.getLevel(userId);
+      require(userLevel >= levelRequired, "user level not enough to buy this item");
     }
 
     // check if user reach purchase limit

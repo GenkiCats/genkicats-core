@@ -5,7 +5,8 @@ import { System } from "@latticexyz/world/src/System.sol";
 import { getUserId } from "./helpers/UserHelper.sol";
 import { getWorld } from "./helpers/WorldHelper.sol";
 import { getSimpleRandomInt } from "./helpers/RandomHelper.sol";
-import { UserStatus, UserItems, TaskConfig } from "../codegen/Tables.sol";
+import { UserStatus, UserItems } from "../codegen/Tables.sol";
+import { TaskConfig, TaskRequiredItemsConfig, TaskRequiredTasksConfig, TaskRewardItemsConfig } from "../codegen/Tables.sol";
 import { IWorld } from "../codegen/world/IWorld.sol";
 
 contract TaskSystem is System {
@@ -16,14 +17,14 @@ contract TaskSystem is System {
     uint32 requiredLevel = TaskConfig.getLevel(taskID);
     uint32 exp = UserStatus.getExp(userId);
     uint32 level = UserStatus.getLevel(userId);
-    level = world.calculateLevel(level, exp, 0);
+    level = UserStatus.getLevel(userId);
     require(level >= requiredLevel, "level is not enough");
 
     //TODO: dup detect
     // uint32 dupPeriod = TaskConfig.getDupPeriod(taskID);
 
-    bytes32[] memory itemIds = TaskConfig.getItemIds(taskID);
-    uint32[] memory itemQuantities = TaskConfig.getItemQuantities(taskID);
+    bytes32[] memory itemIds = TaskRequiredItemsConfig.getItemIds(taskID);
+    uint32[] memory itemQuantities = TaskRequiredItemsConfig.getItemQuantities(taskID);
     for (uint256 i = 0; i < itemIds.length; i++) {
       bytes32 itemId = itemIds[i];
       // TODO: consider item status
@@ -33,17 +34,17 @@ contract TaskSystem is System {
 
     // pass the task requirements
     // claim reward items
-    bytes32[] memory rewardItemIds = TaskConfig.getRewardItemIds(taskID);
-    uint32[] memory rewardItemQuantities = TaskConfig.getRewardItemQuantities(taskID);
+    bytes32[] memory rewardItemIds = TaskRewardItemsConfig.getItemIds(taskID);
+    uint32[] memory rewardItemQuantities = TaskRewardItemsConfig.getItemQuantities(taskID);
     for (uint256 i = 0; i < rewardItemIds.length; i++) {
       bytes32 itemId = rewardItemIds[i];
       // @QuantityHelperSystem
       world.addItem(userId, itemId, rewardItemQuantities[i]);
     }
 
-    uint32 rewardExp = TaskConfig.getRewardExp(taskID);
+    uint32 rewardExp = TaskConfig.getRewardUserExp(taskID);
     if (rewardExp > 0) {
-      world.addExp(userId, rewardExp);
+      world.addUserExp(userId, rewardExp);
     }
     uint256 rewardCoins = TaskConfig.getRewardCoins(taskID);
     if (rewardCoins > 0) {
