@@ -121,7 +121,7 @@ library EventTimes {
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint32 times) internal view returns (bytes memory) {
+  function encode(uint32 times) internal pure returns (bytes memory) {
     return abi.encodePacked(times);
   }
 

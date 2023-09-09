@@ -21,9 +21,9 @@ bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("Hobby
 bytes32 constant HobbyConfigTableId = _tableId;
 
 struct HobbyConfigData {
-  address creator;
-  uint8 tagChosenRange;
-  uint8 tierNum;
+  address designer;
+  uint8 playerChosenTagNum;
+  uint32 hungerConsumptionRate;
   uint8 extraRewardNum;
   bool hasExtraSteps;
   bytes32 hobbyAttractiveItem;
@@ -36,7 +36,7 @@ library HobbyConfig {
     SchemaType[] memory _schema = new SchemaType[](7);
     _schema[0] = SchemaType.ADDRESS;
     _schema[1] = SchemaType.UINT8;
-    _schema[2] = SchemaType.UINT8;
+    _schema[2] = SchemaType.UINT32;
     _schema[3] = SchemaType.UINT8;
     _schema[4] = SchemaType.BOOL;
     _schema[5] = SchemaType.BYTES32;
@@ -55,9 +55,9 @@ library HobbyConfig {
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
     string[] memory _fieldNames = new string[](7);
-    _fieldNames[0] = "creator";
-    _fieldNames[1] = "tagChosenRange";
-    _fieldNames[2] = "tierNum";
+    _fieldNames[0] = "designer";
+    _fieldNames[1] = "playerChosenTagNum";
+    _fieldNames[2] = "hungerConsumptionRate";
     _fieldNames[3] = "extraRewardNum";
     _fieldNames[4] = "hasExtraSteps";
     _fieldNames[5] = "hobbyAttractiveItem";
@@ -87,8 +87,8 @@ library HobbyConfig {
     _store.setMetadata(_tableId, _tableName, _fieldNames);
   }
 
-  /** Get creator */
-  function getCreator(bytes32 hobbyId) internal view returns (address creator) {
+  /** Get designer */
+  function getDesigner(bytes32 hobbyId) internal view returns (address designer) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = hobbyId;
 
@@ -96,8 +96,8 @@ library HobbyConfig {
     return (address(Bytes.slice20(_blob, 0)));
   }
 
-  /** Get creator (using the specified store) */
-  function getCreator(IStore _store, bytes32 hobbyId) internal view returns (address creator) {
+  /** Get designer (using the specified store) */
+  function getDesigner(IStore _store, bytes32 hobbyId) internal view returns (address designer) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = hobbyId;
 
@@ -105,24 +105,24 @@ library HobbyConfig {
     return (address(Bytes.slice20(_blob, 0)));
   }
 
-  /** Set creator */
-  function setCreator(bytes32 hobbyId, address creator) internal {
+  /** Set designer */
+  function setDesigner(bytes32 hobbyId, address designer) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = hobbyId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((creator)));
+    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((designer)));
   }
 
-  /** Set creator (using the specified store) */
-  function setCreator(IStore _store, bytes32 hobbyId, address creator) internal {
+  /** Set designer (using the specified store) */
+  function setDesigner(IStore _store, bytes32 hobbyId, address designer) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = hobbyId;
 
-    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((creator)));
+    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((designer)));
   }
 
-  /** Get tagChosenRange */
-  function getTagChosenRange(bytes32 hobbyId) internal view returns (uint8 tagChosenRange) {
+  /** Get playerChosenTagNum */
+  function getPlayerChosenTagNum(bytes32 hobbyId) internal view returns (uint8 playerChosenTagNum) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = hobbyId;
 
@@ -130,8 +130,8 @@ library HobbyConfig {
     return (uint8(Bytes.slice1(_blob, 0)));
   }
 
-  /** Get tagChosenRange (using the specified store) */
-  function getTagChosenRange(IStore _store, bytes32 hobbyId) internal view returns (uint8 tagChosenRange) {
+  /** Get playerChosenTagNum (using the specified store) */
+  function getPlayerChosenTagNum(IStore _store, bytes32 hobbyId) internal view returns (uint8 playerChosenTagNum) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = hobbyId;
 
@@ -139,54 +139,57 @@ library HobbyConfig {
     return (uint8(Bytes.slice1(_blob, 0)));
   }
 
-  /** Set tagChosenRange */
-  function setTagChosenRange(bytes32 hobbyId, uint8 tagChosenRange) internal {
+  /** Set playerChosenTagNum */
+  function setPlayerChosenTagNum(bytes32 hobbyId, uint8 playerChosenTagNum) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = hobbyId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((tagChosenRange)));
+    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((playerChosenTagNum)));
   }
 
-  /** Set tagChosenRange (using the specified store) */
-  function setTagChosenRange(IStore _store, bytes32 hobbyId, uint8 tagChosenRange) internal {
+  /** Set playerChosenTagNum (using the specified store) */
+  function setPlayerChosenTagNum(IStore _store, bytes32 hobbyId, uint8 playerChosenTagNum) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = hobbyId;
 
-    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((tagChosenRange)));
+    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((playerChosenTagNum)));
   }
 
-  /** Get tierNum */
-  function getTierNum(bytes32 hobbyId) internal view returns (uint8 tierNum) {
+  /** Get hungerConsumptionRate */
+  function getHungerConsumptionRate(bytes32 hobbyId) internal view returns (uint32 hungerConsumptionRate) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = hobbyId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
-    return (uint8(Bytes.slice1(_blob, 0)));
+    return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Get tierNum (using the specified store) */
-  function getTierNum(IStore _store, bytes32 hobbyId) internal view returns (uint8 tierNum) {
+  /** Get hungerConsumptionRate (using the specified store) */
+  function getHungerConsumptionRate(
+    IStore _store,
+    bytes32 hobbyId
+  ) internal view returns (uint32 hungerConsumptionRate) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = hobbyId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
-    return (uint8(Bytes.slice1(_blob, 0)));
+    return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Set tierNum */
-  function setTierNum(bytes32 hobbyId, uint8 tierNum) internal {
+  /** Set hungerConsumptionRate */
+  function setHungerConsumptionRate(bytes32 hobbyId, uint32 hungerConsumptionRate) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = hobbyId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((tierNum)));
+    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((hungerConsumptionRate)));
   }
 
-  /** Set tierNum (using the specified store) */
-  function setTierNum(IStore _store, bytes32 hobbyId, uint8 tierNum) internal {
+  /** Set hungerConsumptionRate (using the specified store) */
+  function setHungerConsumptionRate(IStore _store, bytes32 hobbyId, uint32 hungerConsumptionRate) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = hobbyId;
 
-    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((tierNum)));
+    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((hungerConsumptionRate)));
   }
 
   /** Get extraRewardNum */
@@ -430,18 +433,18 @@ library HobbyConfig {
   /** Set the full data using individual values */
   function set(
     bytes32 hobbyId,
-    address creator,
-    uint8 tagChosenRange,
-    uint8 tierNum,
+    address designer,
+    uint8 playerChosenTagNum,
+    uint32 hungerConsumptionRate,
     uint8 extraRewardNum,
     bool hasExtraSteps,
     bytes32 hobbyAttractiveItem,
     bytes32[] memory requiredItems
   ) internal {
     bytes memory _data = encode(
-      creator,
-      tagChosenRange,
-      tierNum,
+      designer,
+      playerChosenTagNum,
+      hungerConsumptionRate,
       extraRewardNum,
       hasExtraSteps,
       hobbyAttractiveItem,
@@ -458,18 +461,18 @@ library HobbyConfig {
   function set(
     IStore _store,
     bytes32 hobbyId,
-    address creator,
-    uint8 tagChosenRange,
-    uint8 tierNum,
+    address designer,
+    uint8 playerChosenTagNum,
+    uint32 hungerConsumptionRate,
     uint8 extraRewardNum,
     bool hasExtraSteps,
     bytes32 hobbyAttractiveItem,
     bytes32[] memory requiredItems
   ) internal {
     bytes memory _data = encode(
-      creator,
-      tagChosenRange,
-      tierNum,
+      designer,
+      playerChosenTagNum,
+      hungerConsumptionRate,
       extraRewardNum,
       hasExtraSteps,
       hobbyAttractiveItem,
@@ -486,9 +489,9 @@ library HobbyConfig {
   function set(bytes32 hobbyId, HobbyConfigData memory _table) internal {
     set(
       hobbyId,
-      _table.creator,
-      _table.tagChosenRange,
-      _table.tierNum,
+      _table.designer,
+      _table.playerChosenTagNum,
+      _table.hungerConsumptionRate,
       _table.extraRewardNum,
       _table.hasExtraSteps,
       _table.hobbyAttractiveItem,
@@ -501,9 +504,9 @@ library HobbyConfig {
     set(
       _store,
       hobbyId,
-      _table.creator,
-      _table.tagChosenRange,
-      _table.tierNum,
+      _table.designer,
+      _table.playerChosenTagNum,
+      _table.hungerConsumptionRate,
       _table.extraRewardNum,
       _table.hasExtraSteps,
       _table.hobbyAttractiveItem,
@@ -512,27 +515,27 @@ library HobbyConfig {
   }
 
   /** Decode the tightly packed blob using this table's schema */
-  function decode(bytes memory _blob) internal view returns (HobbyConfigData memory _table) {
-    // 56 is the total byte length of static data
-    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 56));
+  function decode(bytes memory _blob) internal pure returns (HobbyConfigData memory _table) {
+    // 59 is the total byte length of static data
+    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 59));
 
-    _table.creator = (address(Bytes.slice20(_blob, 0)));
+    _table.designer = (address(Bytes.slice20(_blob, 0)));
 
-    _table.tagChosenRange = (uint8(Bytes.slice1(_blob, 20)));
+    _table.playerChosenTagNum = (uint8(Bytes.slice1(_blob, 20)));
 
-    _table.tierNum = (uint8(Bytes.slice1(_blob, 21)));
+    _table.hungerConsumptionRate = (uint32(Bytes.slice4(_blob, 21)));
 
-    _table.extraRewardNum = (uint8(Bytes.slice1(_blob, 22)));
+    _table.extraRewardNum = (uint8(Bytes.slice1(_blob, 25)));
 
-    _table.hasExtraSteps = (_toBool(uint8(Bytes.slice1(_blob, 23))));
+    _table.hasExtraSteps = (_toBool(uint8(Bytes.slice1(_blob, 26))));
 
-    _table.hobbyAttractiveItem = (Bytes.slice32(_blob, 24));
+    _table.hobbyAttractiveItem = (Bytes.slice32(_blob, 27));
 
     // Store trims the blob if dynamic fields are all empty
-    if (_blob.length > 56) {
+    if (_blob.length > 59) {
       uint256 _start;
       // skip static data length + dynamic lengths word
-      uint256 _end = 88;
+      uint256 _end = 91;
 
       _start = _end;
       _end += _encodedLengths.atIndex(0);
@@ -542,23 +545,23 @@ library HobbyConfig {
 
   /** Tightly pack full data using this table's schema */
   function encode(
-    address creator,
-    uint8 tagChosenRange,
-    uint8 tierNum,
+    address designer,
+    uint8 playerChosenTagNum,
+    uint32 hungerConsumptionRate,
     uint8 extraRewardNum,
     bool hasExtraSteps,
     bytes32 hobbyAttractiveItem,
     bytes32[] memory requiredItems
-  ) internal view returns (bytes memory) {
+  ) internal pure returns (bytes memory) {
     uint40[] memory _counters = new uint40[](1);
     _counters[0] = uint40(requiredItems.length * 32);
     PackedCounter _encodedLengths = PackedCounterLib.pack(_counters);
 
     return
       abi.encodePacked(
-        creator,
-        tagChosenRange,
-        tierNum,
+        designer,
+        playerChosenTagNum,
+        hungerConsumptionRate,
         extraRewardNum,
         hasExtraSteps,
         hobbyAttractiveItem,

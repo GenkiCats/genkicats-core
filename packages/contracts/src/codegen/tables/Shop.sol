@@ -499,7 +499,7 @@ library Shop {
     uint32 itemWeeklyLimit,
     uint32 itemMonthlyLimit,
     uint32 itemForeverLimit
-  ) internal view returns (bytes memory) {
+  ) internal pure returns (bytes memory) {
     return
       abi.encodePacked(
         itemCoinPrice,

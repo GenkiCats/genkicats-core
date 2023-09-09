@@ -17,10 +17,10 @@ import { EncodeArray } from "@latticexyz/store/src/tightcoder/EncodeArray.sol";
 import { Schema, SchemaLib } from "@latticexyz/store/src/Schema.sol";
 import { PackedCounter, PackedCounterLib } from "@latticexyz/store/src/PackedCounter.sol";
 
-bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("HobbyRewardSteps")));
-bytes32 constant HobbyRewardStepsConfigTableId = _tableId;
+bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("HobbyExtraStepsC")));
+bytes32 constant HobbyExtraStepsConfigTableId = _tableId;
 
-library HobbyRewardStepsConfig {
+library HobbyExtraStepsConfig {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
     SchemaType[] memory _schema = new SchemaType[](1);
@@ -42,7 +42,7 @@ library HobbyRewardStepsConfig {
   function getMetadata() internal pure returns (string memory, string[] memory) {
     string[] memory _fieldNames = new string[](1);
     _fieldNames[0] = "extraSteps";
-    return ("HobbyRewardStepsConfig", _fieldNames);
+    return ("HobbyExtraStepsConfig", _fieldNames);
   }
 
   /** Register the table's schema */
@@ -225,7 +225,7 @@ library HobbyRewardStepsConfig {
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint32[] memory extraSteps) internal view returns (bytes memory) {
+  function encode(uint32[] memory extraSteps) internal pure returns (bytes memory) {
     uint40[] memory _counters = new uint40[](1);
     _counters[0] = uint40(extraSteps.length * 4);
     PackedCounter _encodedLengths = PackedCounterLib.pack(_counters);

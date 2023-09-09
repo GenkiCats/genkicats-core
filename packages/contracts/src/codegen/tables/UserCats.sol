@@ -430,7 +430,7 @@ library UserCats {
     uint256 lostTime,
     uint8 obtainMethod,
     uint8 status
-  ) internal view returns (bytes memory) {
+  ) internal pure returns (bytes memory) {
     return abi.encodePacked(friendshipExp, friendshipLevel, obtainTime, lostTime, obtainMethod, status);
   }
 

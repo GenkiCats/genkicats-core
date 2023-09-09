@@ -22,7 +22,7 @@ bytes32 constant CatFriendshipLevelConfigTableId = _tableId;
 
 struct CatFriendshipLevelConfigData {
   uint32 expLimit;
-  uint256 starvingTimeLimit;
+  uint32 starvingTimeLimit;
 }
 
 library CatFriendshipLevelConfig {
@@ -30,7 +30,7 @@ library CatFriendshipLevelConfig {
   function getSchema() internal pure returns (Schema) {
     SchemaType[] memory _schema = new SchemaType[](2);
     _schema[0] = SchemaType.UINT32;
-    _schema[1] = SchemaType.UINT256;
+    _schema[1] = SchemaType.UINT32;
 
     return SchemaLib.encode(_schema);
   }
@@ -107,28 +107,28 @@ library CatFriendshipLevelConfig {
   }
 
   /** Get starvingTimeLimit */
-  function getStarvingTimeLimit(uint32 friendshipLevel) internal view returns (uint256 starvingTimeLimit) {
+  function getStarvingTimeLimit(uint32 friendshipLevel) internal view returns (uint32 starvingTimeLimit) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(friendshipLevel));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
-    return (uint256(Bytes.slice32(_blob, 0)));
+    return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Get starvingTimeLimit (using the specified store) */
   function getStarvingTimeLimit(
     IStore _store,
     uint32 friendshipLevel
-  ) internal view returns (uint256 starvingTimeLimit) {
+  ) internal view returns (uint32 starvingTimeLimit) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(friendshipLevel));
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
-    return (uint256(Bytes.slice32(_blob, 0)));
+    return (uint32(Bytes.slice4(_blob, 0)));
   }
 
   /** Set starvingTimeLimit */
-  function setStarvingTimeLimit(uint32 friendshipLevel, uint256 starvingTimeLimit) internal {
+  function setStarvingTimeLimit(uint32 friendshipLevel, uint32 starvingTimeLimit) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(friendshipLevel));
 
@@ -136,7 +136,7 @@ library CatFriendshipLevelConfig {
   }
 
   /** Set starvingTimeLimit (using the specified store) */
-  function setStarvingTimeLimit(IStore _store, uint32 friendshipLevel, uint256 starvingTimeLimit) internal {
+  function setStarvingTimeLimit(IStore _store, uint32 friendshipLevel, uint32 starvingTimeLimit) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(friendshipLevel));
 
@@ -165,7 +165,7 @@ library CatFriendshipLevelConfig {
   }
 
   /** Set the full data using individual values */
-  function set(uint32 friendshipLevel, uint32 expLimit, uint256 starvingTimeLimit) internal {
+  function set(uint32 friendshipLevel, uint32 expLimit, uint32 starvingTimeLimit) internal {
     bytes memory _data = encode(expLimit, starvingTimeLimit);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
@@ -175,7 +175,7 @@ library CatFriendshipLevelConfig {
   }
 
   /** Set the full data using individual values (using the specified store) */
-  function set(IStore _store, uint32 friendshipLevel, uint32 expLimit, uint256 starvingTimeLimit) internal {
+  function set(IStore _store, uint32 friendshipLevel, uint32 expLimit, uint32 starvingTimeLimit) internal {
     bytes memory _data = encode(expLimit, starvingTimeLimit);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
@@ -198,11 +198,11 @@ library CatFriendshipLevelConfig {
   function decode(bytes memory _blob) internal pure returns (CatFriendshipLevelConfigData memory _table) {
     _table.expLimit = (uint32(Bytes.slice4(_blob, 0)));
 
-    _table.starvingTimeLimit = (uint256(Bytes.slice32(_blob, 4)));
+    _table.starvingTimeLimit = (uint32(Bytes.slice4(_blob, 4)));
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint32 expLimit, uint256 starvingTimeLimit) internal view returns (bytes memory) {
+  function encode(uint32 expLimit, uint32 starvingTimeLimit) internal pure returns (bytes memory) {
     return abi.encodePacked(expLimit, starvingTimeLimit);
   }
 

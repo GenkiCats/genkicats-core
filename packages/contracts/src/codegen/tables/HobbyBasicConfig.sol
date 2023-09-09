@@ -183,7 +183,7 @@ library HobbyBasicConfig {
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint32 hungerCatExpRate, uint32 hungerUserExpRate) internal view returns (bytes memory) {
+  function encode(uint32 hungerCatExpRate, uint32 hungerUserExpRate) internal pure returns (bytes memory) {
     return abi.encodePacked(hungerCatExpRate, hungerUserExpRate);
   }
 

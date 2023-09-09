@@ -437,7 +437,7 @@ library CatAttributes {
     uint256 personality,
     uint256 skin,
     uint256 birthTime
-  ) internal view returns (bytes memory) {
+  ) internal pure returns (bytes memory) {
     return abi.encodePacked(sex, fatherId, motherId, hobbyId, personality, skin, birthTime);
   }
 

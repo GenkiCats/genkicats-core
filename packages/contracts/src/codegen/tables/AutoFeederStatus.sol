@@ -17,15 +17,15 @@ import { EncodeArray } from "@latticexyz/store/src/tightcoder/EncodeArray.sol";
 import { Schema, SchemaLib } from "@latticexyz/store/src/Schema.sol";
 import { PackedCounter, PackedCounterLib } from "@latticexyz/store/src/PackedCounter.sol";
 
-bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("CatAutoFeederSta")));
-bytes32 constant CatAutoFeederStatusTableId = _tableId;
+bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("AutoFeederStatus")));
+bytes32 constant AutoFeederStatusTableId = _tableId;
 
-struct CatAutoFeederStatusData {
-  uint256 lastAutoFeedTime;
-  uint32 autoFeedRatio;
+struct AutoFeederStatusData {
+  uint256 lastFeedTime;
+  uint32 feedRatio;
 }
 
-library CatAutoFeederStatus {
+library AutoFeederStatus {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
     SchemaType[] memory _schema = new SchemaType[](2);
@@ -45,9 +45,9 @@ library CatAutoFeederStatus {
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
     string[] memory _fieldNames = new string[](2);
-    _fieldNames[0] = "lastAutoFeedTime";
-    _fieldNames[1] = "autoFeedRatio";
-    return ("CatAutoFeederStatus", _fieldNames);
+    _fieldNames[0] = "lastFeedTime";
+    _fieldNames[1] = "feedRatio";
+    return ("AutoFeederStatus", _fieldNames);
   }
 
   /** Register the table's schema */
@@ -72,8 +72,8 @@ library CatAutoFeederStatus {
     _store.setMetadata(_tableId, _tableName, _fieldNames);
   }
 
-  /** Get lastAutoFeedTime */
-  function getLastAutoFeedTime(bytes32 catId) internal view returns (uint256 lastAutoFeedTime) {
+  /** Get lastFeedTime */
+  function getLastFeedTime(bytes32 catId) internal view returns (uint256 lastFeedTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
@@ -81,8 +81,8 @@ library CatAutoFeederStatus {
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
-  /** Get lastAutoFeedTime (using the specified store) */
-  function getLastAutoFeedTime(IStore _store, bytes32 catId) internal view returns (uint256 lastAutoFeedTime) {
+  /** Get lastFeedTime (using the specified store) */
+  function getLastFeedTime(IStore _store, bytes32 catId) internal view returns (uint256 lastFeedTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
@@ -90,24 +90,24 @@ library CatAutoFeederStatus {
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
-  /** Set lastAutoFeedTime */
-  function setLastAutoFeedTime(bytes32 catId, uint256 lastAutoFeedTime) internal {
+  /** Set lastFeedTime */
+  function setLastFeedTime(bytes32 catId, uint256 lastFeedTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((lastAutoFeedTime)));
+    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((lastFeedTime)));
   }
 
-  /** Set lastAutoFeedTime (using the specified store) */
-  function setLastAutoFeedTime(IStore _store, bytes32 catId, uint256 lastAutoFeedTime) internal {
+  /** Set lastFeedTime (using the specified store) */
+  function setLastFeedTime(IStore _store, bytes32 catId, uint256 lastFeedTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
-    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((lastAutoFeedTime)));
+    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((lastFeedTime)));
   }
 
-  /** Get autoFeedRatio */
-  function getAutoFeedRatio(bytes32 catId) internal view returns (uint32 autoFeedRatio) {
+  /** Get feedRatio */
+  function getFeedRatio(bytes32 catId) internal view returns (uint32 feedRatio) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
@@ -115,8 +115,8 @@ library CatAutoFeederStatus {
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Get autoFeedRatio (using the specified store) */
-  function getAutoFeedRatio(IStore _store, bytes32 catId) internal view returns (uint32 autoFeedRatio) {
+  /** Get feedRatio (using the specified store) */
+  function getFeedRatio(IStore _store, bytes32 catId) internal view returns (uint32 feedRatio) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
@@ -124,24 +124,24 @@ library CatAutoFeederStatus {
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Set autoFeedRatio */
-  function setAutoFeedRatio(bytes32 catId, uint32 autoFeedRatio) internal {
+  /** Set feedRatio */
+  function setFeedRatio(bytes32 catId, uint32 feedRatio) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((autoFeedRatio)));
+    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((feedRatio)));
   }
 
-  /** Set autoFeedRatio (using the specified store) */
-  function setAutoFeedRatio(IStore _store, bytes32 catId, uint32 autoFeedRatio) internal {
+  /** Set feedRatio (using the specified store) */
+  function setFeedRatio(IStore _store, bytes32 catId, uint32 feedRatio) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
-    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((autoFeedRatio)));
+    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((feedRatio)));
   }
 
   /** Get the full data */
-  function get(bytes32 catId) internal view returns (CatAutoFeederStatusData memory _table) {
+  function get(bytes32 catId) internal view returns (AutoFeederStatusData memory _table) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
@@ -150,7 +150,7 @@ library CatAutoFeederStatus {
   }
 
   /** Get the full data (using the specified store) */
-  function get(IStore _store, bytes32 catId) internal view returns (CatAutoFeederStatusData memory _table) {
+  function get(IStore _store, bytes32 catId) internal view returns (AutoFeederStatusData memory _table) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
@@ -159,8 +159,8 @@ library CatAutoFeederStatus {
   }
 
   /** Set the full data using individual values */
-  function set(bytes32 catId, uint256 lastAutoFeedTime, uint32 autoFeedRatio) internal {
-    bytes memory _data = encode(lastAutoFeedTime, autoFeedRatio);
+  function set(bytes32 catId, uint256 lastFeedTime, uint32 feedRatio) internal {
+    bytes memory _data = encode(lastFeedTime, feedRatio);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
@@ -169,8 +169,8 @@ library CatAutoFeederStatus {
   }
 
   /** Set the full data using individual values (using the specified store) */
-  function set(IStore _store, bytes32 catId, uint256 lastAutoFeedTime, uint32 autoFeedRatio) internal {
-    bytes memory _data = encode(lastAutoFeedTime, autoFeedRatio);
+  function set(IStore _store, bytes32 catId, uint256 lastFeedTime, uint32 feedRatio) internal {
+    bytes memory _data = encode(lastFeedTime, feedRatio);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
@@ -179,25 +179,25 @@ library CatAutoFeederStatus {
   }
 
   /** Set the full data using the data struct */
-  function set(bytes32 catId, CatAutoFeederStatusData memory _table) internal {
-    set(catId, _table.lastAutoFeedTime, _table.autoFeedRatio);
+  function set(bytes32 catId, AutoFeederStatusData memory _table) internal {
+    set(catId, _table.lastFeedTime, _table.feedRatio);
   }
 
   /** Set the full data using the data struct (using the specified store) */
-  function set(IStore _store, bytes32 catId, CatAutoFeederStatusData memory _table) internal {
-    set(_store, catId, _table.lastAutoFeedTime, _table.autoFeedRatio);
+  function set(IStore _store, bytes32 catId, AutoFeederStatusData memory _table) internal {
+    set(_store, catId, _table.lastFeedTime, _table.feedRatio);
   }
 
   /** Decode the tightly packed blob using this table's schema */
-  function decode(bytes memory _blob) internal pure returns (CatAutoFeederStatusData memory _table) {
-    _table.lastAutoFeedTime = (uint256(Bytes.slice32(_blob, 0)));
+  function decode(bytes memory _blob) internal pure returns (AutoFeederStatusData memory _table) {
+    _table.lastFeedTime = (uint256(Bytes.slice32(_blob, 0)));
 
-    _table.autoFeedRatio = (uint32(Bytes.slice4(_blob, 32)));
+    _table.feedRatio = (uint32(Bytes.slice4(_blob, 32)));
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint256 lastAutoFeedTime, uint32 autoFeedRatio) internal view returns (bytes memory) {
-    return abi.encodePacked(lastAutoFeedTime, autoFeedRatio);
+  function encode(uint256 lastFeedTime, uint32 feedRatio) internal pure returns (bytes memory) {
+    return abi.encodePacked(lastFeedTime, feedRatio);
   }
 
   /** Encode keys as a bytes32 array using this table's schema */

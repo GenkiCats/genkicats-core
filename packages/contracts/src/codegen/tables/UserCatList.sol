@@ -273,7 +273,7 @@ library UserCatList {
   }
 
   /** Decode the tightly packed blob using this table's schema */
-  function decode(bytes memory _blob) internal view returns (UserCatListData memory _table) {
+  function decode(bytes memory _blob) internal pure returns (UserCatListData memory _table) {
     // 4 is the total byte length of static data
     PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 4));
 
@@ -292,7 +292,7 @@ library UserCatList {
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint32 totalHungerLimit, bytes32[] memory catIds) internal view returns (bytes memory) {
+  function encode(uint32 totalHungerLimit, bytes32[] memory catIds) internal pure returns (bytes memory) {
     uint40[] memory _counters = new uint40[](1);
     _counters[0] = uint40(catIds.length * 32);
     PackedCounter _encodedLengths = PackedCounterLib.pack(_counters);

@@ -100,7 +100,7 @@ library Address2User {
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(bytes32 userId) internal view returns (bytes memory) {
+  function encode(bytes32 userId) internal pure returns (bytes memory) {
     return abi.encodePacked(userId);
   }
 

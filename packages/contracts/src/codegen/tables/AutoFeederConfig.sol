@@ -95,7 +95,7 @@ library AutoFeederConfig {
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint32 feedRate) internal view returns (bytes memory) {
+  function encode(uint32 feedRate) internal pure returns (bytes memory) {
     return abi.encodePacked(feedRate);
   }
 

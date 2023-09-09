@@ -100,7 +100,7 @@ library UserLevelConfig {
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint32 expLimit) internal view returns (bytes memory) {
+  function encode(uint32 expLimit) internal pure returns (bytes memory) {
     return abi.encodePacked(expLimit);
   }
 

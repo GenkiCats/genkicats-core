@@ -496,7 +496,7 @@ library UserStatus {
   }
 
   /** Decode the tightly packed blob using this table's schema */
-  function decode(bytes memory _blob) internal view returns (UserStatusData memory _table) {
+  function decode(bytes memory _blob) internal pure returns (UserStatusData memory _table) {
     // 77 is the total byte length of static data
     PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 77));
 
@@ -533,7 +533,7 @@ library UserStatus {
     bool timeZoneSign,
     uint32 timeZoneOffset,
     string memory nickName
-  ) internal view returns (bytes memory) {
+  ) internal pure returns (bytes memory) {
     uint40[] memory _counters = new uint40[](1);
     _counters[0] = uint40(bytes(nickName).length);
     PackedCounter _encodedLengths = PackedCounterLib.pack(_counters);

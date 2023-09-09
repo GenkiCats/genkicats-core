@@ -22,7 +22,7 @@ bytes32 constant ItemConfigTableId = _tableId;
 
 struct ItemConfigData {
   uint32 maxItemQuantity;
-  address creator;
+  address designer;
 }
 
 library ItemConfig {
@@ -46,7 +46,7 @@ library ItemConfig {
   function getMetadata() internal pure returns (string memory, string[] memory) {
     string[] memory _fieldNames = new string[](2);
     _fieldNames[0] = "maxItemQuantity";
-    _fieldNames[1] = "creator";
+    _fieldNames[1] = "designer";
     return ("ItemConfig", _fieldNames);
   }
 
@@ -106,8 +106,8 @@ library ItemConfig {
     _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((maxItemQuantity)));
   }
 
-  /** Get creator */
-  function getCreator(bytes32 itemId) internal view returns (address creator) {
+  /** Get designer */
+  function getDesigner(bytes32 itemId) internal view returns (address designer) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = itemId;
 
@@ -115,8 +115,8 @@ library ItemConfig {
     return (address(Bytes.slice20(_blob, 0)));
   }
 
-  /** Get creator (using the specified store) */
-  function getCreator(IStore _store, bytes32 itemId) internal view returns (address creator) {
+  /** Get designer (using the specified store) */
+  function getDesigner(IStore _store, bytes32 itemId) internal view returns (address designer) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = itemId;
 
@@ -124,20 +124,20 @@ library ItemConfig {
     return (address(Bytes.slice20(_blob, 0)));
   }
 
-  /** Set creator */
-  function setCreator(bytes32 itemId, address creator) internal {
+  /** Set designer */
+  function setDesigner(bytes32 itemId, address designer) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = itemId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((creator)));
+    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((designer)));
   }
 
-  /** Set creator (using the specified store) */
-  function setCreator(IStore _store, bytes32 itemId, address creator) internal {
+  /** Set designer (using the specified store) */
+  function setDesigner(IStore _store, bytes32 itemId, address designer) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = itemId;
 
-    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((creator)));
+    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((designer)));
   }
 
   /** Get the full data */
@@ -159,8 +159,8 @@ library ItemConfig {
   }
 
   /** Set the full data using individual values */
-  function set(bytes32 itemId, uint32 maxItemQuantity, address creator) internal {
-    bytes memory _data = encode(maxItemQuantity, creator);
+  function set(bytes32 itemId, uint32 maxItemQuantity, address designer) internal {
+    bytes memory _data = encode(maxItemQuantity, designer);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = itemId;
@@ -169,8 +169,8 @@ library ItemConfig {
   }
 
   /** Set the full data using individual values (using the specified store) */
-  function set(IStore _store, bytes32 itemId, uint32 maxItemQuantity, address creator) internal {
-    bytes memory _data = encode(maxItemQuantity, creator);
+  function set(IStore _store, bytes32 itemId, uint32 maxItemQuantity, address designer) internal {
+    bytes memory _data = encode(maxItemQuantity, designer);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = itemId;
@@ -180,24 +180,24 @@ library ItemConfig {
 
   /** Set the full data using the data struct */
   function set(bytes32 itemId, ItemConfigData memory _table) internal {
-    set(itemId, _table.maxItemQuantity, _table.creator);
+    set(itemId, _table.maxItemQuantity, _table.designer);
   }
 
   /** Set the full data using the data struct (using the specified store) */
   function set(IStore _store, bytes32 itemId, ItemConfigData memory _table) internal {
-    set(_store, itemId, _table.maxItemQuantity, _table.creator);
+    set(_store, itemId, _table.maxItemQuantity, _table.designer);
   }
 
   /** Decode the tightly packed blob using this table's schema */
   function decode(bytes memory _blob) internal pure returns (ItemConfigData memory _table) {
     _table.maxItemQuantity = (uint32(Bytes.slice4(_blob, 0)));
 
-    _table.creator = (address(Bytes.slice20(_blob, 4)));
+    _table.designer = (address(Bytes.slice20(_blob, 4)));
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint32 maxItemQuantity, address creator) internal view returns (bytes memory) {
-    return abi.encodePacked(maxItemQuantity, creator);
+  function encode(uint32 maxItemQuantity, address designer) internal pure returns (bytes memory) {
+    return abi.encodePacked(maxItemQuantity, designer);
   }
 
   /** Encode keys as a bytes32 array using this table's schema */

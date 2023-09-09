@@ -23,16 +23,22 @@ bytes32 constant HobbyTierConfigTableId = _tableId;
 struct HobbyTierConfigData {
   uint256 baseTime;
   uint256 baseRestTime;
-  uint32 hungerConsumptionRate;
+  bytes32 tierChosenSampleId;
+  bytes32 tagChosenSampleId;
+  uint8[] tierChosenRange;
+  bytes32[] tagChosenRange;
 }
 
 library HobbyTierConfig {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](3);
+    SchemaType[] memory _schema = new SchemaType[](6);
     _schema[0] = SchemaType.UINT256;
     _schema[1] = SchemaType.UINT256;
-    _schema[2] = SchemaType.UINT32;
+    _schema[2] = SchemaType.BYTES32;
+    _schema[3] = SchemaType.BYTES32;
+    _schema[4] = SchemaType.UINT8_ARRAY;
+    _schema[5] = SchemaType.BYTES32_ARRAY;
 
     return SchemaLib.encode(_schema);
   }
@@ -47,10 +53,13 @@ library HobbyTierConfig {
 
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
-    string[] memory _fieldNames = new string[](3);
+    string[] memory _fieldNames = new string[](6);
     _fieldNames[0] = "baseTime";
     _fieldNames[1] = "baseRestTime";
-    _fieldNames[2] = "hungerConsumptionRate";
+    _fieldNames[2] = "tierChosenSampleId";
+    _fieldNames[3] = "tagChosenSampleId";
+    _fieldNames[4] = "tierChosenRange";
+    _fieldNames[5] = "tagChosenRange";
     return ("HobbyTierConfig", _fieldNames);
   }
 
@@ -152,46 +161,370 @@ library HobbyTierConfig {
     _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((baseRestTime)));
   }
 
-  /** Get hungerConsumptionRate */
-  function getHungerConsumptionRate(bytes32 hobbyId, uint8 tier) internal view returns (uint32 hungerConsumptionRate) {
+  /** Get tierChosenSampleId */
+  function getTierChosenSampleId(bytes32 hobbyId, uint8 tier) internal view returns (bytes32 tierChosenSampleId) {
     bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = hobbyId;
     _keyTuple[1] = bytes32(uint256(tier));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (Bytes.slice32(_blob, 0));
   }
 
-  /** Get hungerConsumptionRate (using the specified store) */
-  function getHungerConsumptionRate(
+  /** Get tierChosenSampleId (using the specified store) */
+  function getTierChosenSampleId(
     IStore _store,
     bytes32 hobbyId,
     uint8 tier
-  ) internal view returns (uint32 hungerConsumptionRate) {
+  ) internal view returns (bytes32 tierChosenSampleId) {
     bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = hobbyId;
     _keyTuple[1] = bytes32(uint256(tier));
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
-    return (uint32(Bytes.slice4(_blob, 0)));
+    return (Bytes.slice32(_blob, 0));
   }
 
-  /** Set hungerConsumptionRate */
-  function setHungerConsumptionRate(bytes32 hobbyId, uint8 tier, uint32 hungerConsumptionRate) internal {
+  /** Set tierChosenSampleId */
+  function setTierChosenSampleId(bytes32 hobbyId, uint8 tier, bytes32 tierChosenSampleId) internal {
     bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = hobbyId;
     _keyTuple[1] = bytes32(uint256(tier));
 
-    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((hungerConsumptionRate)));
+    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((tierChosenSampleId)));
   }
 
-  /** Set hungerConsumptionRate (using the specified store) */
-  function setHungerConsumptionRate(IStore _store, bytes32 hobbyId, uint8 tier, uint32 hungerConsumptionRate) internal {
+  /** Set tierChosenSampleId (using the specified store) */
+  function setTierChosenSampleId(IStore _store, bytes32 hobbyId, uint8 tier, bytes32 tierChosenSampleId) internal {
     bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = hobbyId;
     _keyTuple[1] = bytes32(uint256(tier));
 
-    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((hungerConsumptionRate)));
+    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((tierChosenSampleId)));
+  }
+
+  /** Get tagChosenSampleId */
+  function getTagChosenSampleId(bytes32 hobbyId, uint8 tier) internal view returns (bytes32 tagChosenSampleId) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
+    return (Bytes.slice32(_blob, 0));
+  }
+
+  /** Get tagChosenSampleId (using the specified store) */
+  function getTagChosenSampleId(
+    IStore _store,
+    bytes32 hobbyId,
+    uint8 tier
+  ) internal view returns (bytes32 tagChosenSampleId) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
+    return (Bytes.slice32(_blob, 0));
+  }
+
+  /** Set tagChosenSampleId */
+  function setTagChosenSampleId(bytes32 hobbyId, uint8 tier, bytes32 tagChosenSampleId) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    StoreSwitch.setField(_tableId, _keyTuple, 3, abi.encodePacked((tagChosenSampleId)));
+  }
+
+  /** Set tagChosenSampleId (using the specified store) */
+  function setTagChosenSampleId(IStore _store, bytes32 hobbyId, uint8 tier, bytes32 tagChosenSampleId) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    _store.setField(_tableId, _keyTuple, 3, abi.encodePacked((tagChosenSampleId)));
+  }
+
+  /** Get tierChosenRange */
+  function getTierChosenRange(bytes32 hobbyId, uint8 tier) internal view returns (uint8[] memory tierChosenRange) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 4);
+    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint8());
+  }
+
+  /** Get tierChosenRange (using the specified store) */
+  function getTierChosenRange(
+    IStore _store,
+    bytes32 hobbyId,
+    uint8 tier
+  ) internal view returns (uint8[] memory tierChosenRange) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 4);
+    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint8());
+  }
+
+  /** Set tierChosenRange */
+  function setTierChosenRange(bytes32 hobbyId, uint8 tier, uint8[] memory tierChosenRange) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    StoreSwitch.setField(_tableId, _keyTuple, 4, EncodeArray.encode((tierChosenRange)));
+  }
+
+  /** Set tierChosenRange (using the specified store) */
+  function setTierChosenRange(IStore _store, bytes32 hobbyId, uint8 tier, uint8[] memory tierChosenRange) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    _store.setField(_tableId, _keyTuple, 4, EncodeArray.encode((tierChosenRange)));
+  }
+
+  /** Get the length of tierChosenRange */
+  function lengthTierChosenRange(bytes32 hobbyId, uint8 tier) internal view returns (uint256) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 4, getSchema());
+    return _byteLength / 1;
+  }
+
+  /** Get the length of tierChosenRange (using the specified store) */
+  function lengthTierChosenRange(IStore _store, bytes32 hobbyId, uint8 tier) internal view returns (uint256) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 4, getSchema());
+    return _byteLength / 1;
+  }
+
+  /** Get an item of tierChosenRange (unchecked, returns invalid data if index overflows) */
+  function getItemTierChosenRange(bytes32 hobbyId, uint8 tier, uint256 _index) internal view returns (uint8) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 4, getSchema(), _index * 1, (_index + 1) * 1);
+    return (uint8(Bytes.slice1(_blob, 0)));
+  }
+
+  /** Get an item of tierChosenRange (using the specified store) (unchecked, returns invalid data if index overflows) */
+  function getItemTierChosenRange(
+    IStore _store,
+    bytes32 hobbyId,
+    uint8 tier,
+    uint256 _index
+  ) internal view returns (uint8) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 4, getSchema(), _index * 1, (_index + 1) * 1);
+    return (uint8(Bytes.slice1(_blob, 0)));
+  }
+
+  /** Push an element to tierChosenRange */
+  function pushTierChosenRange(bytes32 hobbyId, uint8 tier, uint8 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    StoreSwitch.pushToField(_tableId, _keyTuple, 4, abi.encodePacked((_element)));
+  }
+
+  /** Push an element to tierChosenRange (using the specified store) */
+  function pushTierChosenRange(IStore _store, bytes32 hobbyId, uint8 tier, uint8 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    _store.pushToField(_tableId, _keyTuple, 4, abi.encodePacked((_element)));
+  }
+
+  /** Pop an element from tierChosenRange */
+  function popTierChosenRange(bytes32 hobbyId, uint8 tier) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    StoreSwitch.popFromField(_tableId, _keyTuple, 4, 1);
+  }
+
+  /** Pop an element from tierChosenRange (using the specified store) */
+  function popTierChosenRange(IStore _store, bytes32 hobbyId, uint8 tier) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    _store.popFromField(_tableId, _keyTuple, 4, 1);
+  }
+
+  /** Update an element of tierChosenRange at `_index` */
+  function updateTierChosenRange(bytes32 hobbyId, uint8 tier, uint256 _index, uint8 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    StoreSwitch.updateInField(_tableId, _keyTuple, 4, _index * 1, abi.encodePacked((_element)));
+  }
+
+  /** Update an element of tierChosenRange (using the specified store) at `_index` */
+  function updateTierChosenRange(IStore _store, bytes32 hobbyId, uint8 tier, uint256 _index, uint8 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    _store.updateInField(_tableId, _keyTuple, 4, _index * 1, abi.encodePacked((_element)));
+  }
+
+  /** Get tagChosenRange */
+  function getTagChosenRange(bytes32 hobbyId, uint8 tier) internal view returns (bytes32[] memory tagChosenRange) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 5);
+    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_bytes32());
+  }
+
+  /** Get tagChosenRange (using the specified store) */
+  function getTagChosenRange(
+    IStore _store,
+    bytes32 hobbyId,
+    uint8 tier
+  ) internal view returns (bytes32[] memory tagChosenRange) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 5);
+    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_bytes32());
+  }
+
+  /** Set tagChosenRange */
+  function setTagChosenRange(bytes32 hobbyId, uint8 tier, bytes32[] memory tagChosenRange) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    StoreSwitch.setField(_tableId, _keyTuple, 5, EncodeArray.encode((tagChosenRange)));
+  }
+
+  /** Set tagChosenRange (using the specified store) */
+  function setTagChosenRange(IStore _store, bytes32 hobbyId, uint8 tier, bytes32[] memory tagChosenRange) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    _store.setField(_tableId, _keyTuple, 5, EncodeArray.encode((tagChosenRange)));
+  }
+
+  /** Get the length of tagChosenRange */
+  function lengthTagChosenRange(bytes32 hobbyId, uint8 tier) internal view returns (uint256) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 5, getSchema());
+    return _byteLength / 32;
+  }
+
+  /** Get the length of tagChosenRange (using the specified store) */
+  function lengthTagChosenRange(IStore _store, bytes32 hobbyId, uint8 tier) internal view returns (uint256) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 5, getSchema());
+    return _byteLength / 32;
+  }
+
+  /** Get an item of tagChosenRange (unchecked, returns invalid data if index overflows) */
+  function getItemTagChosenRange(bytes32 hobbyId, uint8 tier, uint256 _index) internal view returns (bytes32) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 5, getSchema(), _index * 32, (_index + 1) * 32);
+    return (Bytes.slice32(_blob, 0));
+  }
+
+  /** Get an item of tagChosenRange (using the specified store) (unchecked, returns invalid data if index overflows) */
+  function getItemTagChosenRange(
+    IStore _store,
+    bytes32 hobbyId,
+    uint8 tier,
+    uint256 _index
+  ) internal view returns (bytes32) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 5, getSchema(), _index * 32, (_index + 1) * 32);
+    return (Bytes.slice32(_blob, 0));
+  }
+
+  /** Push an element to tagChosenRange */
+  function pushTagChosenRange(bytes32 hobbyId, uint8 tier, bytes32 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    StoreSwitch.pushToField(_tableId, _keyTuple, 5, abi.encodePacked((_element)));
+  }
+
+  /** Push an element to tagChosenRange (using the specified store) */
+  function pushTagChosenRange(IStore _store, bytes32 hobbyId, uint8 tier, bytes32 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    _store.pushToField(_tableId, _keyTuple, 5, abi.encodePacked((_element)));
+  }
+
+  /** Pop an element from tagChosenRange */
+  function popTagChosenRange(bytes32 hobbyId, uint8 tier) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    StoreSwitch.popFromField(_tableId, _keyTuple, 5, 32);
+  }
+
+  /** Pop an element from tagChosenRange (using the specified store) */
+  function popTagChosenRange(IStore _store, bytes32 hobbyId, uint8 tier) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    _store.popFromField(_tableId, _keyTuple, 5, 32);
+  }
+
+  /** Update an element of tagChosenRange at `_index` */
+  function updateTagChosenRange(bytes32 hobbyId, uint8 tier, uint256 _index, bytes32 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    StoreSwitch.updateInField(_tableId, _keyTuple, 5, _index * 32, abi.encodePacked((_element)));
+  }
+
+  /** Update an element of tagChosenRange (using the specified store) at `_index` */
+  function updateTagChosenRange(IStore _store, bytes32 hobbyId, uint8 tier, uint256 _index, bytes32 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(tier));
+
+    _store.updateInField(_tableId, _keyTuple, 5, _index * 32, abi.encodePacked((_element)));
   }
 
   /** Get the full data */
@@ -220,9 +553,19 @@ library HobbyTierConfig {
     uint8 tier,
     uint256 baseTime,
     uint256 baseRestTime,
-    uint32 hungerConsumptionRate
+    bytes32 tierChosenSampleId,
+    bytes32 tagChosenSampleId,
+    uint8[] memory tierChosenRange,
+    bytes32[] memory tagChosenRange
   ) internal {
-    bytes memory _data = encode(baseTime, baseRestTime, hungerConsumptionRate);
+    bytes memory _data = encode(
+      baseTime,
+      baseRestTime,
+      tierChosenSampleId,
+      tagChosenSampleId,
+      tierChosenRange,
+      tagChosenRange
+    );
 
     bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = hobbyId;
@@ -238,9 +581,19 @@ library HobbyTierConfig {
     uint8 tier,
     uint256 baseTime,
     uint256 baseRestTime,
-    uint32 hungerConsumptionRate
+    bytes32 tierChosenSampleId,
+    bytes32 tagChosenSampleId,
+    uint8[] memory tierChosenRange,
+    bytes32[] memory tagChosenRange
   ) internal {
-    bytes memory _data = encode(baseTime, baseRestTime, hungerConsumptionRate);
+    bytes memory _data = encode(
+      baseTime,
+      baseRestTime,
+      tierChosenSampleId,
+      tagChosenSampleId,
+      tierChosenRange,
+      tagChosenRange
+    );
 
     bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = hobbyId;
@@ -251,30 +604,86 @@ library HobbyTierConfig {
 
   /** Set the full data using the data struct */
   function set(bytes32 hobbyId, uint8 tier, HobbyTierConfigData memory _table) internal {
-    set(hobbyId, tier, _table.baseTime, _table.baseRestTime, _table.hungerConsumptionRate);
+    set(
+      hobbyId,
+      tier,
+      _table.baseTime,
+      _table.baseRestTime,
+      _table.tierChosenSampleId,
+      _table.tagChosenSampleId,
+      _table.tierChosenRange,
+      _table.tagChosenRange
+    );
   }
 
   /** Set the full data using the data struct (using the specified store) */
   function set(IStore _store, bytes32 hobbyId, uint8 tier, HobbyTierConfigData memory _table) internal {
-    set(_store, hobbyId, tier, _table.baseTime, _table.baseRestTime, _table.hungerConsumptionRate);
+    set(
+      _store,
+      hobbyId,
+      tier,
+      _table.baseTime,
+      _table.baseRestTime,
+      _table.tierChosenSampleId,
+      _table.tagChosenSampleId,
+      _table.tierChosenRange,
+      _table.tagChosenRange
+    );
   }
 
   /** Decode the tightly packed blob using this table's schema */
   function decode(bytes memory _blob) internal pure returns (HobbyTierConfigData memory _table) {
+    // 128 is the total byte length of static data
+    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 128));
+
     _table.baseTime = (uint256(Bytes.slice32(_blob, 0)));
 
     _table.baseRestTime = (uint256(Bytes.slice32(_blob, 32)));
 
-    _table.hungerConsumptionRate = (uint32(Bytes.slice4(_blob, 64)));
+    _table.tierChosenSampleId = (Bytes.slice32(_blob, 64));
+
+    _table.tagChosenSampleId = (Bytes.slice32(_blob, 96));
+
+    // Store trims the blob if dynamic fields are all empty
+    if (_blob.length > 128) {
+      uint256 _start;
+      // skip static data length + dynamic lengths word
+      uint256 _end = 160;
+
+      _start = _end;
+      _end += _encodedLengths.atIndex(0);
+      _table.tierChosenRange = (SliceLib.getSubslice(_blob, _start, _end).decodeArray_uint8());
+
+      _start = _end;
+      _end += _encodedLengths.atIndex(1);
+      _table.tagChosenRange = (SliceLib.getSubslice(_blob, _start, _end).decodeArray_bytes32());
+    }
   }
 
   /** Tightly pack full data using this table's schema */
   function encode(
     uint256 baseTime,
     uint256 baseRestTime,
-    uint32 hungerConsumptionRate
-  ) internal view returns (bytes memory) {
-    return abi.encodePacked(baseTime, baseRestTime, hungerConsumptionRate);
+    bytes32 tierChosenSampleId,
+    bytes32 tagChosenSampleId,
+    uint8[] memory tierChosenRange,
+    bytes32[] memory tagChosenRange
+  ) internal pure returns (bytes memory) {
+    uint40[] memory _counters = new uint40[](2);
+    _counters[0] = uint40(tierChosenRange.length * 1);
+    _counters[1] = uint40(tagChosenRange.length * 32);
+    PackedCounter _encodedLengths = PackedCounterLib.pack(_counters);
+
+    return
+      abi.encodePacked(
+        baseTime,
+        baseRestTime,
+        tierChosenSampleId,
+        tagChosenSampleId,
+        _encodedLengths.unwrap(),
+        EncodeArray.encode((tierChosenRange)),
+        EncodeArray.encode((tagChosenRange))
+      );
   }
 
   /** Encode keys as a bytes32 array using this table's schema */

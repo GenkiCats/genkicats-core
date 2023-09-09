@@ -357,7 +357,7 @@ library MetaConfig {
   }
 
   /** Decode the tightly packed blob using this table's schema */
-  function decode(bytes memory _blob) internal view returns (MetaConfigData memory _table) {
+  function decode(bytes memory _blob) internal pure returns (MetaConfigData memory _table) {
     // 0 is the total byte length of static data
     PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 0));
 
@@ -378,7 +378,7 @@ library MetaConfig {
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(string memory name, string memory uri) internal view returns (bytes memory) {
+  function encode(string memory name, string memory uri) internal pure returns (bytes memory) {
     uint40[] memory _counters = new uint40[](2);
     _counters[0] = uint40(bytes(name).length);
     _counters[1] = uint40(bytes(uri).length);

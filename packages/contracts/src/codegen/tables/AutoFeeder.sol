@@ -196,7 +196,7 @@ library AutoFeeder {
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint32 hunger, uint32 level) internal view returns (bytes memory) {
+  function encode(uint32 hunger, uint32 level) internal pure returns (bytes memory) {
     return abi.encodePacked(hunger, level);
   }
 

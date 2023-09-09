@@ -28,7 +28,7 @@ struct HobbyLogData {
   uint32 tierTagIndex;
   uint32 dropRate;
   uint256 specialEffect;
-  uint32 stepNum;
+  uint32 step;
   uint256 startTime;
   uint256 requestRandBlock;
   uint256 randomSeed;
@@ -84,7 +84,7 @@ library HobbyLog {
     _fieldNames[4] = "tierTagIndex";
     _fieldNames[5] = "dropRate";
     _fieldNames[6] = "specialEffect";
-    _fieldNames[7] = "stepNum";
+    _fieldNames[7] = "step";
     _fieldNames[8] = "startTime";
     _fieldNames[9] = "requestRandBlock";
     _fieldNames[10] = "randomSeed";
@@ -358,8 +358,8 @@ library HobbyLog {
     _store.setField(_tableId, _keyTuple, 6, abi.encodePacked((specialEffect)));
   }
 
-  /** Get stepNum */
-  function getStepNum(bytes32 logId) internal view returns (uint32 stepNum) {
+  /** Get step */
+  function getStep(bytes32 logId) internal view returns (uint32 step) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = logId;
 
@@ -367,8 +367,8 @@ library HobbyLog {
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Get stepNum (using the specified store) */
-  function getStepNum(IStore _store, bytes32 logId) internal view returns (uint32 stepNum) {
+  /** Get step (using the specified store) */
+  function getStep(IStore _store, bytes32 logId) internal view returns (uint32 step) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = logId;
 
@@ -376,20 +376,20 @@ library HobbyLog {
     return (uint32(Bytes.slice4(_blob, 0)));
   }
 
-  /** Set stepNum */
-  function setStepNum(bytes32 logId, uint32 stepNum) internal {
+  /** Set step */
+  function setStep(bytes32 logId, uint32 step) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = logId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 7, abi.encodePacked((stepNum)));
+    StoreSwitch.setField(_tableId, _keyTuple, 7, abi.encodePacked((step)));
   }
 
-  /** Set stepNum (using the specified store) */
-  function setStepNum(IStore _store, bytes32 logId, uint32 stepNum) internal {
+  /** Set step (using the specified store) */
+  function setStep(IStore _store, bytes32 logId, uint32 step) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = logId;
 
-    _store.setField(_tableId, _keyTuple, 7, abi.encodePacked((stepNum)));
+    _store.setField(_tableId, _keyTuple, 7, abi.encodePacked((step)));
   }
 
   /** Get startTime */
@@ -851,7 +851,7 @@ library HobbyLog {
     uint32 tierTagIndex,
     uint32 dropRate,
     uint256 specialEffect,
-    uint32 stepNum,
+    uint32 step,
     uint256 startTime,
     uint256 requestRandBlock,
     uint256 randomSeed,
@@ -871,7 +871,7 @@ library HobbyLog {
       tierTagIndex,
       dropRate,
       specialEffect,
-      stepNum,
+      step,
       startTime,
       requestRandBlock,
       randomSeed,
@@ -901,7 +901,7 @@ library HobbyLog {
     uint32 tierTagIndex,
     uint32 dropRate,
     uint256 specialEffect,
-    uint32 stepNum,
+    uint32 step,
     uint256 startTime,
     uint256 requestRandBlock,
     uint256 randomSeed,
@@ -921,7 +921,7 @@ library HobbyLog {
       tierTagIndex,
       dropRate,
       specialEffect,
-      stepNum,
+      step,
       startTime,
       requestRandBlock,
       randomSeed,
@@ -951,7 +951,7 @@ library HobbyLog {
       _table.tierTagIndex,
       _table.dropRate,
       _table.specialEffect,
-      _table.stepNum,
+      _table.step,
       _table.startTime,
       _table.requestRandBlock,
       _table.randomSeed,
@@ -977,7 +977,7 @@ library HobbyLog {
       _table.tierTagIndex,
       _table.dropRate,
       _table.specialEffect,
-      _table.stepNum,
+      _table.step,
       _table.startTime,
       _table.requestRandBlock,
       _table.randomSeed,
@@ -992,7 +992,7 @@ library HobbyLog {
   }
 
   /** Decode the tightly packed blob using this table's schema */
-  function decode(bytes memory _blob) internal view returns (HobbyLogData memory _table) {
+  function decode(bytes memory _blob) internal pure returns (HobbyLogData memory _table) {
     // 342 is the total byte length of static data
     PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 342));
 
@@ -1010,7 +1010,7 @@ library HobbyLog {
 
     _table.specialEffect = (uint256(Bytes.slice32(_blob, 105)));
 
-    _table.stepNum = (uint32(Bytes.slice4(_blob, 137)));
+    _table.step = (uint32(Bytes.slice4(_blob, 137)));
 
     _table.startTime = (uint256(Bytes.slice32(_blob, 141)));
 
@@ -1051,7 +1051,7 @@ library HobbyLog {
     uint32 tierTagIndex,
     uint32 dropRate,
     uint256 specialEffect,
-    uint32 stepNum,
+    uint32 step,
     uint256 startTime,
     uint256 requestRandBlock,
     uint256 randomSeed,
@@ -1062,7 +1062,7 @@ library HobbyLog {
     uint32 rewardCatExp,
     uint32 rewardUserExp,
     bytes32[] memory rewardItems
-  ) internal view returns (bytes memory) {
+  ) internal pure returns (bytes memory) {
     uint40[] memory _counters = new uint40[](1);
     _counters[0] = uint40(rewardItems.length * 32);
     PackedCounter _encodedLengths = PackedCounterLib.pack(_counters);
@@ -1076,7 +1076,7 @@ library HobbyLog {
         tierTagIndex,
         dropRate,
         specialEffect,
-        stepNum,
+        step,
         startTime,
         requestRandBlock,
         randomSeed,

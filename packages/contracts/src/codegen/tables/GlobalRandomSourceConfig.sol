@@ -95,7 +95,7 @@ library GlobalRandomSourceConfig {
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(address randomSource) internal view returns (bytes memory) {
+  function encode(address randomSource) internal pure returns (bytes memory) {
     return abi.encodePacked(randomSource);
   }
 

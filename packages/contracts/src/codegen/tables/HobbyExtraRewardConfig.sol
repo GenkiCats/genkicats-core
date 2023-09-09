@@ -288,7 +288,7 @@ library HobbyExtraRewardConfig {
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(bytes32[] memory itemIds) internal view returns (bytes memory) {
+  function encode(bytes32[] memory itemIds) internal pure returns (bytes memory) {
     uint40[] memory _counters = new uint40[](1);
     _counters[0] = uint40(itemIds.length * 32);
     PackedCounter _encodedLengths = PackedCounterLib.pack(_counters);

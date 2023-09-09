@@ -196,7 +196,7 @@ library AutoFeederLevelConfig {
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint32 foodLimit, uint32 foodPrice) internal view returns (bytes memory) {
+  function encode(uint32 foodLimit, uint32 foodPrice) internal pure returns (bytes memory) {
     return abi.encodePacked(foodLimit, foodPrice);
   }
 

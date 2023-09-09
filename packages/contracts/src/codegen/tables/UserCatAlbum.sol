@@ -354,7 +354,7 @@ library UserCatAlbum {
   }
 
   /** Decode the tightly packed blob using this table's schema */
-  function decode(bytes memory _blob) internal view returns (UserCatAlbumData memory _table) {
+  function decode(bytes memory _blob) internal pure returns (UserCatAlbumData memory _table) {
     // 65 is the total byte length of static data
     PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 65));
 
@@ -382,7 +382,7 @@ library UserCatAlbum {
     uint256 obtainTime,
     uint8 status,
     uint256[] memory catIds
-  ) internal view returns (bytes memory) {
+  ) internal pure returns (bytes memory) {
     uint40[] memory _counters = new uint40[](1);
     _counters[0] = uint40(catIds.length * 32);
     PackedCounter _encodedLengths = PackedCounterLib.pack(_counters);

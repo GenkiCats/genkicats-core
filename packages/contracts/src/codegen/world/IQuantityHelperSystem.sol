@@ -16,5 +16,7 @@ interface IQuantityHelperSystem {
 
   function decDiamond(bytes32 userId, uint256 quantity) external;
 
-  function addExp(bytes32 userId, uint32 quantity) external;
+  function addUserExp(bytes32 userId, uint32 exp) external;
+
+  function addCatExp(bytes32 catId, uint32 exp) external;
 }

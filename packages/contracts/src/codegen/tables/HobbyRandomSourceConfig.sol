@@ -196,7 +196,7 @@ library HobbyRandomSourceConfig {
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(bool strictRandom, uint32 delayBlocks) internal view returns (bytes memory) {
+  function encode(bool strictRandom, uint32 delayBlocks) internal pure returns (bytes memory) {
     return abi.encodePacked(strictRandom, delayBlocks);
   }
 

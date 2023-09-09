@@ -20,11 +20,17 @@ import { PackedCounter, PackedCounterLib } from "@latticexyz/store/src/PackedCou
 bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("SampleMethodConf")));
 bytes32 constant SampleMethodConfigTableId = _tableId;
 
+struct SampleMethodConfigData {
+  address designer;
+  uint8 samplingMethod;
+}
+
 library SampleMethodConfig {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](1);
-    _schema[0] = SchemaType.UINT8;
+    SchemaType[] memory _schema = new SchemaType[](2);
+    _schema[0] = SchemaType.ADDRESS;
+    _schema[1] = SchemaType.UINT8;
 
     return SchemaLib.encode(_schema);
   }
@@ -38,8 +44,9 @@ library SampleMethodConfig {
 
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
-    string[] memory _fieldNames = new string[](1);
-    _fieldNames[0] = "samplingMethod";
+    string[] memory _fieldNames = new string[](2);
+    _fieldNames[0] = "designer";
+    _fieldNames[1] = "samplingMethod";
     return ("SampleMethodConfig", _fieldNames);
   }
 
@@ -65,43 +72,132 @@ library SampleMethodConfig {
     _store.setMetadata(_tableId, _tableName, _fieldNames);
   }
 
-  /** Get samplingMethod */
-  function get(bytes32 sampleId) internal view returns (uint8 samplingMethod) {
+  /** Get designer */
+  function getDesigner(bytes32 sampleId) internal view returns (address designer) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = sampleId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 0);
-    return (uint8(Bytes.slice1(_blob, 0)));
+    return (address(Bytes.slice20(_blob, 0)));
   }
 
-  /** Get samplingMethod (using the specified store) */
-  function get(IStore _store, bytes32 sampleId) internal view returns (uint8 samplingMethod) {
+  /** Get designer (using the specified store) */
+  function getDesigner(IStore _store, bytes32 sampleId) internal view returns (address designer) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = sampleId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 0);
+    return (address(Bytes.slice20(_blob, 0)));
+  }
+
+  /** Set designer */
+  function setDesigner(bytes32 sampleId, address designer) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = sampleId;
+
+    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((designer)));
+  }
+
+  /** Set designer (using the specified store) */
+  function setDesigner(IStore _store, bytes32 sampleId, address designer) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = sampleId;
+
+    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((designer)));
+  }
+
+  /** Get samplingMethod */
+  function getSamplingMethod(bytes32 sampleId) internal view returns (uint8 samplingMethod) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = sampleId;
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
+    return (uint8(Bytes.slice1(_blob, 0)));
+  }
+
+  /** Get samplingMethod (using the specified store) */
+  function getSamplingMethod(IStore _store, bytes32 sampleId) internal view returns (uint8 samplingMethod) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = sampleId;
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
     return (uint8(Bytes.slice1(_blob, 0)));
   }
 
   /** Set samplingMethod */
-  function set(bytes32 sampleId, uint8 samplingMethod) internal {
+  function setSamplingMethod(bytes32 sampleId, uint8 samplingMethod) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = sampleId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((samplingMethod)));
+    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((samplingMethod)));
   }
 
   /** Set samplingMethod (using the specified store) */
-  function set(IStore _store, bytes32 sampleId, uint8 samplingMethod) internal {
+  function setSamplingMethod(IStore _store, bytes32 sampleId, uint8 samplingMethod) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = sampleId;
 
-    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((samplingMethod)));
+    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((samplingMethod)));
+  }
+
+  /** Get the full data */
+  function get(bytes32 sampleId) internal view returns (SampleMethodConfigData memory _table) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = sampleId;
+
+    bytes memory _blob = StoreSwitch.getRecord(_tableId, _keyTuple, getSchema());
+    return decode(_blob);
+  }
+
+  /** Get the full data (using the specified store) */
+  function get(IStore _store, bytes32 sampleId) internal view returns (SampleMethodConfigData memory _table) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = sampleId;
+
+    bytes memory _blob = _store.getRecord(_tableId, _keyTuple, getSchema());
+    return decode(_blob);
+  }
+
+  /** Set the full data using individual values */
+  function set(bytes32 sampleId, address designer, uint8 samplingMethod) internal {
+    bytes memory _data = encode(designer, samplingMethod);
+
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = sampleId;
+
+    StoreSwitch.setRecord(_tableId, _keyTuple, _data);
+  }
+
+  /** Set the full data using individual values (using the specified store) */
+  function set(IStore _store, bytes32 sampleId, address designer, uint8 samplingMethod) internal {
+    bytes memory _data = encode(designer, samplingMethod);
+
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = sampleId;
+
+    _store.setRecord(_tableId, _keyTuple, _data);
+  }
+
+  /** Set the full data using the data struct */
+  function set(bytes32 sampleId, SampleMethodConfigData memory _table) internal {
+    set(sampleId, _table.designer, _table.samplingMethod);
+  }
+
+  /** Set the full data using the data struct (using the specified store) */
+  function set(IStore _store, bytes32 sampleId, SampleMethodConfigData memory _table) internal {
+    set(_store, sampleId, _table.designer, _table.samplingMethod);
+  }
+
+  /** Decode the tightly packed blob using this table's schema */
+  function decode(bytes memory _blob) internal pure returns (SampleMethodConfigData memory _table) {
+    _table.designer = (address(Bytes.slice20(_blob, 0)));
+
+    _table.samplingMethod = (uint8(Bytes.slice1(_blob, 20)));
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint8 samplingMethod) internal view returns (bytes memory) {
-    return abi.encodePacked(samplingMethod);
+  function encode(address designer, uint8 samplingMethod) internal pure returns (bytes memory) {
+    return abi.encodePacked(designer, samplingMethod);
   }
 
   /** Encode keys as a bytes32 array using this table's schema */

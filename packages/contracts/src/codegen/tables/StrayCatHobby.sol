@@ -100,7 +100,7 @@ library StrayCatHobby {
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(bytes32 hobbyId) internal view returns (bytes memory) {
+  function encode(bytes32 hobbyId) internal pure returns (bytes memory) {
     return abi.encodePacked(hobbyId);
   }
 

@@ -17,21 +17,22 @@ import { EncodeArray } from "@latticexyz/store/src/tightcoder/EncodeArray.sol";
 import { Schema, SchemaLib } from "@latticexyz/store/src/Schema.sol";
 import { PackedCounter, PackedCounterLib } from "@latticexyz/store/src/PackedCounter.sol";
 
-bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("Tradable")));
-bytes32 constant TradableTableId = _tableId;
+bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("HobbyLevelTierCo")));
+bytes32 constant HobbyLevelTierConfigTableId = _tableId;
 
-library Tradable {
+library HobbyLevelTierConfig {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
     SchemaType[] memory _schema = new SchemaType[](1);
-    _schema[0] = SchemaType.BOOL;
+    _schema[0] = SchemaType.UINT8;
 
     return SchemaLib.encode(_schema);
   }
 
   function getKeySchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](1);
+    SchemaType[] memory _schema = new SchemaType[](2);
     _schema[0] = SchemaType.BYTES32;
+    _schema[1] = SchemaType.UINT32;
 
     return SchemaLib.encode(_schema);
   }
@@ -39,8 +40,8 @@ library Tradable {
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
     string[] memory _fieldNames = new string[](1);
-    _fieldNames[0] = "tradable";
-    return ("Tradable", _fieldNames);
+    _fieldNames[0] = "tier";
+    return ("HobbyLevelTierConfig", _fieldNames);
   }
 
   /** Register the table's schema */
@@ -65,70 +66,71 @@ library Tradable {
     _store.setMetadata(_tableId, _tableName, _fieldNames);
   }
 
-  /** Get tradable */
-  function get(bytes32 itemId) internal view returns (bool tradable) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+  /** Get tier */
+  function get(bytes32 hobbyId, uint32 level) internal view returns (uint8 tier) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(level));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 0);
-    return (_toBool(uint8(Bytes.slice1(_blob, 0))));
+    return (uint8(Bytes.slice1(_blob, 0)));
   }
 
-  /** Get tradable (using the specified store) */
-  function get(IStore _store, bytes32 itemId) internal view returns (bool tradable) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+  /** Get tier (using the specified store) */
+  function get(IStore _store, bytes32 hobbyId, uint32 level) internal view returns (uint8 tier) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(level));
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 0);
-    return (_toBool(uint8(Bytes.slice1(_blob, 0))));
+    return (uint8(Bytes.slice1(_blob, 0)));
   }
 
-  /** Set tradable */
-  function set(bytes32 itemId, bool tradable) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+  /** Set tier */
+  function set(bytes32 hobbyId, uint32 level, uint8 tier) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(level));
 
-    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((tradable)));
+    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((tier)));
   }
 
-  /** Set tradable (using the specified store) */
-  function set(IStore _store, bytes32 itemId, bool tradable) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+  /** Set tier (using the specified store) */
+  function set(IStore _store, bytes32 hobbyId, uint32 level, uint8 tier) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(level));
 
-    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((tradable)));
+    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((tier)));
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(bool tradable) internal view returns (bytes memory) {
-    return abi.encodePacked(tradable);
+  function encode(uint8 tier) internal pure returns (bytes memory) {
+    return abi.encodePacked(tier);
   }
 
   /** Encode keys as a bytes32 array using this table's schema */
-  function encodeKeyTuple(bytes32 itemId) internal pure returns (bytes32[] memory _keyTuple) {
-    _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+  function encodeKeyTuple(bytes32 hobbyId, uint32 level) internal pure returns (bytes32[] memory _keyTuple) {
+    _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(level));
   }
 
   /* Delete all data for given keys */
-  function deleteRecord(bytes32 itemId) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+  function deleteRecord(bytes32 hobbyId, uint32 level) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(level));
 
     StoreSwitch.deleteRecord(_tableId, _keyTuple);
   }
 
   /* Delete all data for given keys (using the specified store) */
-  function deleteRecord(IStore _store, bytes32 itemId) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+  function deleteRecord(IStore _store, bytes32 hobbyId, uint32 level) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
+    _keyTuple[0] = hobbyId;
+    _keyTuple[1] = bytes32(uint256(level));
 
     _store.deleteRecord(_tableId, _keyTuple);
-  }
-}
-
-function _toBool(uint8 value) pure returns (bool result) {
-  assembly {
-    result := value
   }
 }

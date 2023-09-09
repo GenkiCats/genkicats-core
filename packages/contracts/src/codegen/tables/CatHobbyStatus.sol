@@ -21,22 +21,18 @@ bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("CatHo
 bytes32 constant CatHobbyStatusTableId = _tableId;
 
 struct CatHobbyStatusData {
-  uint32 dropRate;
   bytes32 currentLogId;
   bytes32 latestLogId;
   uint256 lastEventFinishTime;
-  bytes32 lastFeedFoodId;
 }
 
 library CatHobbyStatus {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](5);
-    _schema[0] = SchemaType.UINT32;
+    SchemaType[] memory _schema = new SchemaType[](3);
+    _schema[0] = SchemaType.BYTES32;
     _schema[1] = SchemaType.BYTES32;
-    _schema[2] = SchemaType.BYTES32;
-    _schema[3] = SchemaType.UINT256;
-    _schema[4] = SchemaType.BYTES32;
+    _schema[2] = SchemaType.UINT256;
 
     return SchemaLib.encode(_schema);
   }
@@ -50,12 +46,10 @@ library CatHobbyStatus {
 
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
-    string[] memory _fieldNames = new string[](5);
-    _fieldNames[0] = "dropRate";
-    _fieldNames[1] = "currentLogId";
-    _fieldNames[2] = "latestLogId";
-    _fieldNames[3] = "lastEventFinishTime";
-    _fieldNames[4] = "lastFeedFoodId";
+    string[] memory _fieldNames = new string[](3);
+    _fieldNames[0] = "currentLogId";
+    _fieldNames[1] = "latestLogId";
+    _fieldNames[2] = "lastEventFinishTime";
     return ("CatHobbyStatus", _fieldNames);
   }
 
@@ -81,46 +75,12 @@ library CatHobbyStatus {
     _store.setMetadata(_tableId, _tableName, _fieldNames);
   }
 
-  /** Get dropRate */
-  function getDropRate(bytes32 catId) internal view returns (uint32 dropRate) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = catId;
-
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 0);
-    return (uint32(Bytes.slice4(_blob, 0)));
-  }
-
-  /** Get dropRate (using the specified store) */
-  function getDropRate(IStore _store, bytes32 catId) internal view returns (uint32 dropRate) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = catId;
-
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 0);
-    return (uint32(Bytes.slice4(_blob, 0)));
-  }
-
-  /** Set dropRate */
-  function setDropRate(bytes32 catId, uint32 dropRate) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = catId;
-
-    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((dropRate)));
-  }
-
-  /** Set dropRate (using the specified store) */
-  function setDropRate(IStore _store, bytes32 catId, uint32 dropRate) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = catId;
-
-    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((dropRate)));
-  }
-
   /** Get currentLogId */
   function getCurrentLogId(bytes32 catId) internal view returns (bytes32 currentLogId) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 0);
     return (Bytes.slice32(_blob, 0));
   }
 
@@ -129,7 +89,7 @@ library CatHobbyStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 0);
     return (Bytes.slice32(_blob, 0));
   }
 
@@ -138,7 +98,7 @@ library CatHobbyStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((currentLogId)));
+    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((currentLogId)));
   }
 
   /** Set currentLogId (using the specified store) */
@@ -146,7 +106,7 @@ library CatHobbyStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
-    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((currentLogId)));
+    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((currentLogId)));
   }
 
   /** Get latestLogId */
@@ -154,7 +114,7 @@ library CatHobbyStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
     return (Bytes.slice32(_blob, 0));
   }
 
@@ -163,7 +123,7 @@ library CatHobbyStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
     return (Bytes.slice32(_blob, 0));
   }
 
@@ -172,7 +132,7 @@ library CatHobbyStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((latestLogId)));
+    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((latestLogId)));
   }
 
   /** Set latestLogId (using the specified store) */
@@ -180,7 +140,7 @@ library CatHobbyStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
-    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((latestLogId)));
+    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((latestLogId)));
   }
 
   /** Get lastEventFinishTime */
@@ -188,7 +148,7 @@ library CatHobbyStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
@@ -197,7 +157,7 @@ library CatHobbyStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
@@ -206,7 +166,7 @@ library CatHobbyStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 3, abi.encodePacked((lastEventFinishTime)));
+    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((lastEventFinishTime)));
   }
 
   /** Set lastEventFinishTime (using the specified store) */
@@ -214,41 +174,7 @@ library CatHobbyStatus {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
 
-    _store.setField(_tableId, _keyTuple, 3, abi.encodePacked((lastEventFinishTime)));
-  }
-
-  /** Get lastFeedFoodId */
-  function getLastFeedFoodId(bytes32 catId) internal view returns (bytes32 lastFeedFoodId) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = catId;
-
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 4);
-    return (Bytes.slice32(_blob, 0));
-  }
-
-  /** Get lastFeedFoodId (using the specified store) */
-  function getLastFeedFoodId(IStore _store, bytes32 catId) internal view returns (bytes32 lastFeedFoodId) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = catId;
-
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 4);
-    return (Bytes.slice32(_blob, 0));
-  }
-
-  /** Set lastFeedFoodId */
-  function setLastFeedFoodId(bytes32 catId, bytes32 lastFeedFoodId) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = catId;
-
-    StoreSwitch.setField(_tableId, _keyTuple, 4, abi.encodePacked((lastFeedFoodId)));
-  }
-
-  /** Set lastFeedFoodId (using the specified store) */
-  function setLastFeedFoodId(IStore _store, bytes32 catId, bytes32 lastFeedFoodId) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = catId;
-
-    _store.setField(_tableId, _keyTuple, 4, abi.encodePacked((lastFeedFoodId)));
+    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((lastEventFinishTime)));
   }
 
   /** Get the full data */
@@ -270,15 +196,8 @@ library CatHobbyStatus {
   }
 
   /** Set the full data using individual values */
-  function set(
-    bytes32 catId,
-    uint32 dropRate,
-    bytes32 currentLogId,
-    bytes32 latestLogId,
-    uint256 lastEventFinishTime,
-    bytes32 lastFeedFoodId
-  ) internal {
-    bytes memory _data = encode(dropRate, currentLogId, latestLogId, lastEventFinishTime, lastFeedFoodId);
+  function set(bytes32 catId, bytes32 currentLogId, bytes32 latestLogId, uint256 lastEventFinishTime) internal {
+    bytes memory _data = encode(currentLogId, latestLogId, lastEventFinishTime);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
@@ -290,13 +209,11 @@ library CatHobbyStatus {
   function set(
     IStore _store,
     bytes32 catId,
-    uint32 dropRate,
     bytes32 currentLogId,
     bytes32 latestLogId,
-    uint256 lastEventFinishTime,
-    bytes32 lastFeedFoodId
+    uint256 lastEventFinishTime
   ) internal {
-    bytes memory _data = encode(dropRate, currentLogId, latestLogId, lastEventFinishTime, lastFeedFoodId);
+    bytes memory _data = encode(currentLogId, latestLogId, lastEventFinishTime);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = catId;
@@ -306,51 +223,30 @@ library CatHobbyStatus {
 
   /** Set the full data using the data struct */
   function set(bytes32 catId, CatHobbyStatusData memory _table) internal {
-    set(
-      catId,
-      _table.dropRate,
-      _table.currentLogId,
-      _table.latestLogId,
-      _table.lastEventFinishTime,
-      _table.lastFeedFoodId
-    );
+    set(catId, _table.currentLogId, _table.latestLogId, _table.lastEventFinishTime);
   }
 
   /** Set the full data using the data struct (using the specified store) */
   function set(IStore _store, bytes32 catId, CatHobbyStatusData memory _table) internal {
-    set(
-      _store,
-      catId,
-      _table.dropRate,
-      _table.currentLogId,
-      _table.latestLogId,
-      _table.lastEventFinishTime,
-      _table.lastFeedFoodId
-    );
+    set(_store, catId, _table.currentLogId, _table.latestLogId, _table.lastEventFinishTime);
   }
 
   /** Decode the tightly packed blob using this table's schema */
   function decode(bytes memory _blob) internal pure returns (CatHobbyStatusData memory _table) {
-    _table.dropRate = (uint32(Bytes.slice4(_blob, 0)));
+    _table.currentLogId = (Bytes.slice32(_blob, 0));
 
-    _table.currentLogId = (Bytes.slice32(_blob, 4));
+    _table.latestLogId = (Bytes.slice32(_blob, 32));
 
-    _table.latestLogId = (Bytes.slice32(_blob, 36));
-
-    _table.lastEventFinishTime = (uint256(Bytes.slice32(_blob, 68)));
-
-    _table.lastFeedFoodId = (Bytes.slice32(_blob, 100));
+    _table.lastEventFinishTime = (uint256(Bytes.slice32(_blob, 64)));
   }
 
   /** Tightly pack full data using this table's schema */
   function encode(
-    uint32 dropRate,
     bytes32 currentLogId,
     bytes32 latestLogId,
-    uint256 lastEventFinishTime,
-    bytes32 lastFeedFoodId
-  ) internal view returns (bytes memory) {
-    return abi.encodePacked(dropRate, currentLogId, latestLogId, lastEventFinishTime, lastFeedFoodId);
+    uint256 lastEventFinishTime
+  ) internal pure returns (bytes memory) {
+    return abi.encodePacked(currentLogId, latestLogId, lastEventFinishTime);
   }
 
   /** Encode keys as a bytes32 array using this table's schema */

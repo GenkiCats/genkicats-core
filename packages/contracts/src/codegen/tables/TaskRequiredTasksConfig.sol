@@ -17,10 +17,10 @@ import { EncodeArray } from "@latticexyz/store/src/tightcoder/EncodeArray.sol";
 import { Schema, SchemaLib } from "@latticexyz/store/src/Schema.sol";
 import { PackedCounter, PackedCounterLib } from "@latticexyz/store/src/PackedCounter.sol";
 
-bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("ItemBuffEffectCo")));
-bytes32 constant ItemBuffEffectConfigTableId = _tableId;
+bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("TaskRequiredTask")));
+bytes32 constant TaskRequiredTasksConfigTableId = _tableId;
 
-library ItemBuffEffectConfig {
+library TaskRequiredTasksConfig {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
     SchemaType[] memory _schema = new SchemaType[](1);
@@ -39,8 +39,8 @@ library ItemBuffEffectConfig {
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
     string[] memory _fieldNames = new string[](1);
-    _fieldNames[0] = "buffEffects";
-    return ("ItemBuffEffectConfig", _fieldNames);
+    _fieldNames[0] = "taskIds";
+    return ("TaskRequiredTasksConfig", _fieldNames);
   }
 
   /** Register the table's schema */
@@ -65,151 +65,151 @@ library ItemBuffEffectConfig {
     _store.setMetadata(_tableId, _tableName, _fieldNames);
   }
 
-  /** Get buffEffects */
-  function get(bytes32 itemId) internal view returns (bytes32[] memory buffEffects) {
+  /** Get taskIds */
+  function get(bytes32 taskId) internal view returns (bytes32[] memory taskIds) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 0);
     return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_bytes32());
   }
 
-  /** Get buffEffects (using the specified store) */
-  function get(IStore _store, bytes32 itemId) internal view returns (bytes32[] memory buffEffects) {
+  /** Get taskIds (using the specified store) */
+  function get(IStore _store, bytes32 taskId) internal view returns (bytes32[] memory taskIds) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = _store.getField(_tableId, _keyTuple, 0);
     return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_bytes32());
   }
 
-  /** Set buffEffects */
-  function set(bytes32 itemId, bytes32[] memory buffEffects) internal {
+  /** Set taskIds */
+  function set(bytes32 taskId, bytes32[] memory taskIds) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+    _keyTuple[0] = taskId;
 
-    StoreSwitch.setField(_tableId, _keyTuple, 0, EncodeArray.encode((buffEffects)));
+    StoreSwitch.setField(_tableId, _keyTuple, 0, EncodeArray.encode((taskIds)));
   }
 
-  /** Set buffEffects (using the specified store) */
-  function set(IStore _store, bytes32 itemId, bytes32[] memory buffEffects) internal {
+  /** Set taskIds (using the specified store) */
+  function set(IStore _store, bytes32 taskId, bytes32[] memory taskIds) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+    _keyTuple[0] = taskId;
 
-    _store.setField(_tableId, _keyTuple, 0, EncodeArray.encode((buffEffects)));
+    _store.setField(_tableId, _keyTuple, 0, EncodeArray.encode((taskIds)));
   }
 
-  /** Get the length of buffEffects */
-  function length(bytes32 itemId) internal view returns (uint256) {
+  /** Get the length of taskIds */
+  function length(bytes32 taskId) internal view returns (uint256) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+    _keyTuple[0] = taskId;
 
     uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 0, getSchema());
     return _byteLength / 32;
   }
 
-  /** Get the length of buffEffects (using the specified store) */
-  function length(IStore _store, bytes32 itemId) internal view returns (uint256) {
+  /** Get the length of taskIds (using the specified store) */
+  function length(IStore _store, bytes32 taskId) internal view returns (uint256) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+    _keyTuple[0] = taskId;
 
     uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 0, getSchema());
     return _byteLength / 32;
   }
 
-  /** Get an item of buffEffects (unchecked, returns invalid data if index overflows) */
-  function getItem(bytes32 itemId, uint256 _index) internal view returns (bytes32) {
+  /** Get an item of taskIds (unchecked, returns invalid data if index overflows) */
+  function getItem(bytes32 taskId, uint256 _index) internal view returns (bytes32) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 0, getSchema(), _index * 32, (_index + 1) * 32);
     return (Bytes.slice32(_blob, 0));
   }
 
-  /** Get an item of buffEffects (using the specified store) (unchecked, returns invalid data if index overflows) */
-  function getItem(IStore _store, bytes32 itemId, uint256 _index) internal view returns (bytes32) {
+  /** Get an item of taskIds (using the specified store) (unchecked, returns invalid data if index overflows) */
+  function getItem(IStore _store, bytes32 taskId, uint256 _index) internal view returns (bytes32) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+    _keyTuple[0] = taskId;
 
     bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 0, getSchema(), _index * 32, (_index + 1) * 32);
     return (Bytes.slice32(_blob, 0));
   }
 
-  /** Push an element to buffEffects */
-  function push(bytes32 itemId, bytes32 _element) internal {
+  /** Push an element to taskIds */
+  function push(bytes32 taskId, bytes32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+    _keyTuple[0] = taskId;
 
     StoreSwitch.pushToField(_tableId, _keyTuple, 0, abi.encodePacked((_element)));
   }
 
-  /** Push an element to buffEffects (using the specified store) */
-  function push(IStore _store, bytes32 itemId, bytes32 _element) internal {
+  /** Push an element to taskIds (using the specified store) */
+  function push(IStore _store, bytes32 taskId, bytes32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+    _keyTuple[0] = taskId;
 
     _store.pushToField(_tableId, _keyTuple, 0, abi.encodePacked((_element)));
   }
 
-  /** Pop an element from buffEffects */
-  function pop(bytes32 itemId) internal {
+  /** Pop an element from taskIds */
+  function pop(bytes32 taskId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+    _keyTuple[0] = taskId;
 
     StoreSwitch.popFromField(_tableId, _keyTuple, 0, 32);
   }
 
-  /** Pop an element from buffEffects (using the specified store) */
-  function pop(IStore _store, bytes32 itemId) internal {
+  /** Pop an element from taskIds (using the specified store) */
+  function pop(IStore _store, bytes32 taskId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+    _keyTuple[0] = taskId;
 
     _store.popFromField(_tableId, _keyTuple, 0, 32);
   }
 
-  /** Update an element of buffEffects at `_index` */
-  function update(bytes32 itemId, uint256 _index, bytes32 _element) internal {
+  /** Update an element of taskIds at `_index` */
+  function update(bytes32 taskId, uint256 _index, bytes32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+    _keyTuple[0] = taskId;
 
     StoreSwitch.updateInField(_tableId, _keyTuple, 0, _index * 32, abi.encodePacked((_element)));
   }
 
-  /** Update an element of buffEffects (using the specified store) at `_index` */
-  function update(IStore _store, bytes32 itemId, uint256 _index, bytes32 _element) internal {
+  /** Update an element of taskIds (using the specified store) at `_index` */
+  function update(IStore _store, bytes32 taskId, uint256 _index, bytes32 _element) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+    _keyTuple[0] = taskId;
 
     _store.updateInField(_tableId, _keyTuple, 0, _index * 32, abi.encodePacked((_element)));
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(bytes32[] memory buffEffects) internal view returns (bytes memory) {
+  function encode(bytes32[] memory taskIds) internal pure returns (bytes memory) {
     uint40[] memory _counters = new uint40[](1);
-    _counters[0] = uint40(buffEffects.length * 32);
+    _counters[0] = uint40(taskIds.length * 32);
     PackedCounter _encodedLengths = PackedCounterLib.pack(_counters);
 
-    return abi.encodePacked(_encodedLengths.unwrap(), EncodeArray.encode((buffEffects)));
+    return abi.encodePacked(_encodedLengths.unwrap(), EncodeArray.encode((taskIds)));
   }
 
   /** Encode keys as a bytes32 array using this table's schema */
-  function encodeKeyTuple(bytes32 itemId) internal pure returns (bytes32[] memory _keyTuple) {
+  function encodeKeyTuple(bytes32 taskId) internal pure returns (bytes32[] memory _keyTuple) {
     _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+    _keyTuple[0] = taskId;
   }
 
   /* Delete all data for given keys */
-  function deleteRecord(bytes32 itemId) internal {
+  function deleteRecord(bytes32 taskId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+    _keyTuple[0] = taskId;
 
     StoreSwitch.deleteRecord(_tableId, _keyTuple);
   }
 
   /* Delete all data for given keys (using the specified store) */
-  function deleteRecord(IStore _store, bytes32 itemId) internal {
+  function deleteRecord(IStore _store, bytes32 taskId) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = itemId;
+    _keyTuple[0] = taskId;
 
     _store.deleteRecord(_tableId, _keyTuple);
   }
